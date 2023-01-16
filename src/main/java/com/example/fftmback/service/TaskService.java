@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskService {
 
-    private final TaskRepository taskRepository;
+//    private final TaskRepository taskRepository;
 
     public List<BoardDto> getBoards(BoardFilter filter) {
         return Collections.EMPTY_LIST;
