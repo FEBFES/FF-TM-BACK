@@ -2,7 +2,7 @@ package com.example.fftmback.controller;
 
 import com.example.fftmback.dto.BoardDto;
 import com.example.fftmback.filter.BoardFilter;
-import com.example.fftmback.service.BoardService;
+import com.example.fftmback.service.TaskService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,10 +16,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardController {
 
-    private final @NonNull BoardService boardService;
+    private final @NonNull TaskService taskService;
 
     @GetMapping
     public List<BoardDto> getBoards(BoardFilter filter) {
-        return boardService.getBoards(filter);
+        return taskService.getBoards(filter);
     }
 }
