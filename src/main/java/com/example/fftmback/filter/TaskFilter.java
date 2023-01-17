@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.Instant;
 
 @Data
-public class BoardFilter {
+public class TaskFilter {
 
     private String name;
     private Instant dateInFrom;

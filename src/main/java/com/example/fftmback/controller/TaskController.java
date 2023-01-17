@@ -1,7 +1,7 @@
 package com.example.fftmback.controller;
 
-import com.example.fftmback.dto.BoardDto;
-import com.example.fftmback.filter.BoardFilter;
+import com.example.fftmback.dto.TaskDto;
+import com.example.fftmback.filter.TaskFilter;
 import com.example.fftmback.service.TaskService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/boards")
+@RequestMapping("/tasks")
 @RequiredArgsConstructor
-public class BoardController {
+public class TaskController {
 
     private final @NonNull TaskService taskService;
 
     @GetMapping
-    public List<BoardDto> getBoards(BoardFilter filter) {
-        return taskService.getBoards(filter);
+    public List<TaskDto> getTasks(TaskFilter filter) {
+        return taskService.getTasks(filter);
     }
 }

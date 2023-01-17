@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
+
 
 @Entity
 @Table(name = "tasks")
@@ -20,4 +22,7 @@ public class TaskEntity {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "dateIn", nullable = false)
+    private Instant dateIn;
 }

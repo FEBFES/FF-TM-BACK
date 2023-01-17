@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
-@EntityScan("com.example.fftmback.domain")
 public class FfTmBackApplication {
 
     public static void main(String[] args) {

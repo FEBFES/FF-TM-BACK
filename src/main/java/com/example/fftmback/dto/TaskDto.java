@@ -5,9 +5,10 @@ import lombok.Value;
 import java.time.Instant;
 
 @Value
-public class BoardDto {
+public class TaskDto {
 
     Long id;
     String name;
+    String description;
     Instant dateIn;
 }
