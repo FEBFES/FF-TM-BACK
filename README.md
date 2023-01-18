@@ -11,7 +11,9 @@ Spring Boot 3 + Java 17
 ### Required VM options
 
 db.url = your created postgres db url
+
 db.username = your postgres username
+
 db.password = your postgres password
 
 ```
@@ -19,3 +21,13 @@ db.password = your postgres password
 -Dspring.datasource.username=db.username
 -Dspring.datasource.password=db.password
 ```
+
+### Style
+
+New branch: {type of task}/{task number}/{short description}
+
+For example: feature/12/added-new-entity
+
+New commit: {task number} - {short description}
+
+For example: 12 - added new entity
