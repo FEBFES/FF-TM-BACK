@@ -1,19 +1,15 @@
 package com.example.fftmback.controller;
 
 import com.example.fftmback.domain.ProjectEntity;
-
+import com.example.fftmback.dto.ProjectDto;
 import com.example.fftmback.service.ProjectService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-
-import static ch.qos.logback.core.util.AggregationType.NOT_FOUND;
 
 @RestController
 @RequestMapping("/projects")
@@ -23,33 +19,30 @@ public class ProjectController {
     private final @NonNull ProjectService projectService;
 
     @GetMapping
-    public List<ProjectEntity> getProjects() {
-        return projectService.getProjects();
+    public List<ProjectDto> getProjects() {
+        return projectService.getProjects().stream().map(ProjectService::mapToProjectDto).toList();
     }
 
     @PostMapping
-    public @ResponseBody ProjectEntity createNewProject(@RequestParam String name,
-                                                        @RequestParam String description
+    public @ResponseBody ProjectDto createNewProject(@RequestBody ProjectDto projectDto
     ) {
-        return projectService.createProject(name, description);
+        return ProjectService.mapToProjectDto(projectService.createProject(projectDto));
     }
 
     @GetMapping(path = "{id}")
-    public @ResponseBody ProjectEntity getProject(@PathVariable Long id) {
+    public @ResponseBody ProjectDto getProject(@PathVariable Long id) {
         ProjectEntity projectEntity = projectService.getProject(id);
-
-        if (projectService.isEmptyProject(projectEntity)) {
+        if (ProjectService.isEmptyProject(projectEntity)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found");
         }
-
-        return projectEntity;
+        return ProjectService.mapToProjectDto(projectEntity);
     }
-    @PutMapping(path = "{id}/editProject")
+
+    @PutMapping(path = "{id}")
     public boolean editProject(@PathVariable Long id,
-                               @RequestParam String name,
-                               @RequestParam String description
+                               @RequestBody ProjectDto projectDto
     ) {
-        return projectService.editProject(id, name, description);
+        return projectService.editProject(id, projectDto);
     }
 
     @DeleteMapping(path = "{id}")

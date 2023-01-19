@@ -1,12 +1,12 @@
 package com.example.fftmback.service;
 
 import com.example.fftmback.domain.ProjectEntity;
+import com.example.fftmback.dto.ProjectDto;
 import com.example.fftmback.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +20,8 @@ public class ProjectService {
     protected ProjectRepository projectRepository;
 
 
-    public ProjectEntity createProject(String name, String description) {
-        return projectRepository.save(createProjectEntity(name, description));
+    public ProjectEntity createProject(ProjectDto projectDto) {
+        return projectRepository.save(createProjectEntity(projectDto.getName(), projectDto.getDescription()));
     }
 
     public List<ProjectEntity> getProjects() {
@@ -33,11 +33,11 @@ public class ProjectService {
         return projectRepository.findById(id).orElse(EMPTY_PROJECT_ENTITY);
     }
 
-    public boolean editProject(Long id, String name, String description) {
+    public boolean editProject(Long id, ProjectDto projectDto) {
         Optional<ProjectEntity> projectEntity = projectRepository.findById(id);
         projectEntity.ifPresent(project -> {
-            project.setName(name);
-            project.setDescription(description);
+            project.setName(projectDto.getName());
+            project.setDescription(projectDto.getDescription());
             projectRepository.save(project);
         });
         return projectEntity.isPresent();
@@ -60,6 +60,15 @@ public class ProjectService {
 
     public static boolean isEmptyProject(ProjectEntity projectEntity) {
         return projectEntity.getId() == null;
+    }
+
+    public static ProjectDto mapToProjectDto(ProjectEntity projectEntity) {
+        return new ProjectDto(
+                projectEntity.getId(),
+                projectEntity.getName(),
+                projectEntity.getDescription(),
+                projectEntity.getCreateDate()
+        );
     }
 
 
