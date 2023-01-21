@@ -23,6 +23,20 @@ db.password = your postgres password
 -Dspring.datasource.password=db.password
 ```
 
+## Style
+
+### Branch naming
+
+New branch: {type of task}/{task number}/{short description}
+
+For example: feature/12/added-new-entity
+
+### Commit naming
+
+New commit: {task number} - {short description}
+
+For example: 12 - added new entity
+
 ## Deploy
 
 1. run `.\mvnw clean package`
