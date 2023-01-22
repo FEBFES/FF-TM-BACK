@@ -2,7 +2,7 @@ package com.example.fftmback.dto;
 
 import lombok.Value;
 
-import java.time.Instant;
+import java.util.Date;
 
 @Value
 public class TaskDto {
@@ -10,5 +10,5 @@ public class TaskDto {
     Long id;
     String name;
     String description;
-    Instant dateIn;
+    Date createDate;
 }

@@ -1,28 +1,21 @@
 package com.example.fftmback.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Date;
 
 @Entity
 @Table(name = "projects")
 @Getter
 @Setter
-public class ProjectEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column(name = "create_date")
-    private Date createDate;
+public class ProjectEntity extends AppEntity {
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "description")
     private String description;
-
 
 }
