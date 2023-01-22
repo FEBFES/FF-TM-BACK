@@ -1,6 +1,6 @@
-package com.example.fftmback.repository;
+package com.febfes.fftmback.repository;
 
-import com.example.fftmback.domain.TaskEntity;
+import com.febfes.fftmback.domain.TaskEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

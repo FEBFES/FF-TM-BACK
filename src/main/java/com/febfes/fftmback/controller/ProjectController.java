@@ -1,8 +1,8 @@
-package com.example.fftmback.controller;
+package com.febfes.fftmback.controller;
 
-import com.example.fftmback.domain.ProjectEntity;
-import com.example.fftmback.dto.ProjectDto;
-import com.example.fftmback.service.ProjectService;
+import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.service.ProjectService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

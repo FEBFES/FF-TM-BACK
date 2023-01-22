@@ -1,4 +1,4 @@
-package com.example.fftmback.dto;
+package com.febfes.fftmback.dto;
 
 import lombok.Value;
 

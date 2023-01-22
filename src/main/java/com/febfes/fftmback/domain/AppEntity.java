@@ -1,4 +1,4 @@
-package com.example.fftmback.domain;
+package com.febfes.fftmback.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,6 +15,6 @@ public abstract class AppEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "\"createDate\"")
+    @Column(name = "create_date", nullable = false)
     private Date createDate;
 }

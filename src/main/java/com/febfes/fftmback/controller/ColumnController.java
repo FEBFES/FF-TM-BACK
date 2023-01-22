@@ -1,7 +1,7 @@
-package com.example.fftmback.controller;
+package com.febfes.fftmback.controller;
 
-import com.example.fftmback.dto.ColumnDto;
-import com.example.fftmback.service.ColumnService;
+import com.febfes.fftmback.dto.ColumnDto;
+import com.febfes.fftmback.service.ColumnService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ public class ColumnController {
         return ColumnService.mapToColumnDto(columnService.createColumn(projectId, columnDto));
     }
 
-    @PutMapping(path = "*/editColumn/{columnId}")
+    @PutMapping(path = "editColumn/{columnId}")
     public boolean editColumn(@PathVariable Long columnId,
                               @RequestBody ColumnDto columnDto
     ) {
@@ -34,7 +34,7 @@ public class ColumnController {
         return columnService.editColumn(columnId, columnDto);
     }
 
-    @DeleteMapping(path = "*/deleteColumn/{columnId}")
+    @DeleteMapping(path = "deleteColumn/{columnId}")
     public boolean deleteColumn(@PathVariable Long columnId
     ) {
         return columnService.deleteColumn(columnId);

@@ -43,4 +43,4 @@ For example: 12 - added new entity
 
 ## Swagger
 
-Swagger is available at: http://localhost:8080/swagger-ui/index.html#/
+Swagger is available at: http://localhost:8080/api/swagger-ui/index.html#/

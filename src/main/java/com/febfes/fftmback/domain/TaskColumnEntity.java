@@ -1,4 +1,4 @@
-package com.example.fftmback.domain;
+package com.febfes.fftmback.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,21 +7,21 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "columns")
+@Table(name = "task_column")
 @Getter
 @Setter
-public class ColumnEntity extends AppEntity {
+public class TaskColumnEntity extends AppEntity {
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "\"projectId\"")
+    @Column(name = "project_id", nullable = false)
     private Long projectId;
 
     @Column(name = "description")
     private String description;
 
-    @Column(name = "\"columnOrder\"")
+    @Column(name = "column_order", nullable = false)
     private Integer columnOrder;
 
 }

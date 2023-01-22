@@ -1,13 +1,12 @@
-package com.example.fftmback.service;
+package com.febfes.fftmback.service;
 
-import com.example.fftmback.domain.ProjectEntity;
-import com.example.fftmback.dto.ProjectDto;
-import com.example.fftmback.repository.ProjectRepository;
+import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.repository.ProjectRepository;
+import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,9 +15,9 @@ import java.util.Optional;
 public class ProjectService {
 
     public static final ProjectEntity EMPTY_PROJECT_ENTITY = new ProjectEntity();
-    @Autowired
-    protected ProjectRepository projectRepository;
 
+    private final ProjectRepository projectRepository;
+    private final DateProvider dateProvider;
 
     public ProjectEntity createProject(ProjectDto projectDto) {
         return projectRepository.save(createProjectEntity(projectDto.getName(), projectDto.getDescription()));
@@ -54,7 +53,7 @@ public class ProjectService {
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setName(name);
         projectEntity.setDescription(description);
-        projectEntity.setCreateDate(new Date());
+        projectEntity.setCreateDate(dateProvider.getCurrentDate());
         return projectEntity;
     }
 
