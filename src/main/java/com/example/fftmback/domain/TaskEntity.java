@@ -1,28 +1,22 @@
 package com.example.fftmback.domain;
 
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
 
 
 @Entity
 @Table(name = "tasks")
 @Getter
 @Setter
-public class TaskEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class TaskEntity extends AppEntity {
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "description")
     private String description;
-
-    @Column(name = "\"dateIn\"", nullable = false)
-    private Instant dateIn;
 }
