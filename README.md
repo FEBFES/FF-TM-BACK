@@ -37,10 +37,6 @@ New commit: {task number} - {short description}
 
 For example: 12 - added new entity
 
-## Deploy
-
-1. run `.\mvnw clean package`
-
 ## Swagger
 
 Swagger is available at: http://localhost:8090/api/swagger-ui/index.html#/
