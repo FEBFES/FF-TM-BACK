@@ -1,17 +1,19 @@
-package com.example.fftmback.domain;
+package com.febfes.fftmback.domain;
 
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 
 @Entity
-@Table(name = "tasks")
-@Getter
-@Setter
+@Table(name = "task")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TaskEntity extends AppEntity {
 
     @Column(name = "name", nullable = false)
