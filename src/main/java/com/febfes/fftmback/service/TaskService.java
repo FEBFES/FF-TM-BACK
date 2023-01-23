@@ -2,15 +2,14 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class TaskService {
 
     public TaskEntity getTaskById(Long id) {
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task #" + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Task", id));
         log.info("Received task: {}", task);
         return task;
     }
@@ -50,7 +49,7 @@ public class TaskService {
 
     public TaskEntity updateTask(Long id, TaskDto taskDto) {
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task #" + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Task", id));
 
         task.setName(taskDto.getName());
         task.setDescription(taskDto.getDescription());
@@ -61,7 +60,7 @@ public class TaskService {
 
     public void deleteTask(Long id) {
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task #" + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Task", id));
         taskRepository.delete(task);
     }
 
