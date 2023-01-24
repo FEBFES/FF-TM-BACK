@@ -40,3 +40,25 @@ For example: 12 - added new entity
 ## Swagger
 
 Swagger is available at: http://localhost:8090/api/swagger-ui/index.html#/
+
+## Liquibase
+
+Adding new migrations
+
+1. Create new .yaml file in [changelog](src%2Fmain%2Fresources%2Fdb%2Fchangelog).
+   File name {version of migration} - {short description}
+
+For example: last migration has num 0.1.2 and our migrations add new table Person
+-> 0.1.3-addPersonTable.yaml
+
+2. Add created file in the end
+   of [db.changelog-master.yaml](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fdb.changelog-master.yaml)
+
+```
+databaseChangeLog:
+    ...
+    - include:
+        file: /db/changelog/0.1.2-someAction.yaml
+    - include:
+        file: /db/changelog/0.1.3-addPersonTable.yaml
+```

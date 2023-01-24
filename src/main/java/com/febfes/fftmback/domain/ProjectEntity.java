@@ -21,4 +21,5 @@ public class ProjectEntity extends AppEntity {
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "project_id")
     private List<TaskColumnEntity> taskColumnEntityList;
+    //TODO problem n+1 when project was deleted
 }

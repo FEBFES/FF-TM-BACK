@@ -1,10 +1,14 @@
 package com.febfes.fftmback.dto;
 
-import lombok.Value;
+import lombok.*;
 
 import java.util.Date;
 
-@Value
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProjectDto {
 
     Long id;
