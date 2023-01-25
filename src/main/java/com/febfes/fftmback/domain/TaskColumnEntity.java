@@ -1,10 +1,10 @@
 package com.febfes.fftmback.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "task_column")
@@ -23,5 +23,10 @@ public class TaskColumnEntity extends AppEntity {
 
     @Column(name = "column_order", nullable = false)
     private Integer columnOrder;
+
+    @OneToMany(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "column_id")
+    private List<TaskEntity> taskEntityList;
+    //TODO problem when project was deleted
 
 }
