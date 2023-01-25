@@ -64,7 +64,9 @@ public class ColumnService {
                 taskColumnEntity.getId(),
                 taskColumnEntity.getName(),
                 taskColumnEntity.getDescription(),
-                taskColumnEntity.getColumnOrder()
+                taskColumnEntity.getCreateDate(),
+                taskColumnEntity.getColumnOrder(),
+                taskColumnEntity.getProjectId()
         );
     }
 }
