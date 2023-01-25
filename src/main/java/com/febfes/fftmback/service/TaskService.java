@@ -39,9 +39,10 @@ public class TaskService {
         TaskEntity task = TaskEntity.builder()
                 .name(taskDto.getName())
                 .description(taskDto.getDescription())
+                .columnId(taskDto.getColumnId())
+                .projectId(taskDto.getProjectId())
                 .build();
         task.setCreateDate(dateProvider.getCurrentDate());
-
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
         return savedTask;
@@ -50,9 +51,10 @@ public class TaskService {
     public TaskEntity updateTask(Long id, TaskDto taskDto) {
         TaskEntity task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Task", id));
-
         task.setName(taskDto.getName());
         task.setDescription(taskDto.getDescription());
+        task.setColumnId(taskDto.getColumnId());
+        task.setProjectId(taskDto.getProjectId());
         taskRepository.save(task);
         log.info("Updated task: {}", task);
         return task;
@@ -69,7 +71,9 @@ public class TaskService {
                 task.getId(),
                 task.getName(),
                 task.getDescription(),
-                task.getCreateDate()
+                task.getCreateDate(),
+                task.getProjectId(),
+                task.getColumnId()
         );
     }
 }

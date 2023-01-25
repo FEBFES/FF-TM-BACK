@@ -11,4 +11,6 @@ public class TaskDto {
     String name;
     String description;
     Date createDate;
+    Long projectId;
+    Long columnId;
 }

@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: VladisStep
+      comment: "Add project_id and column_id in task table"
+      changes:
+        - addColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: project_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_task_project
+                    references: project(id)
+              - column:
+                  name: column_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_task_column
+                    references: task_column(id)

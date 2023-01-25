@@ -21,4 +21,10 @@ public class TaskEntity extends AppEntity {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "project_id")
+    private Long projectId;
+
+    @Column(name = "column_id")
+    private Long columnId;
 }
