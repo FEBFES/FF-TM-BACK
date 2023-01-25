@@ -12,7 +12,7 @@ import java.util.Date;
 public abstract class AppEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "create_date", nullable = false)
