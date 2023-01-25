@@ -1,12 +1,8 @@
 package com.febfes.fftmback.dto;
 
-import lombok.*;
+import lombok.Value;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Value
 public class ColumnDto {
     Long id;
     String name;
