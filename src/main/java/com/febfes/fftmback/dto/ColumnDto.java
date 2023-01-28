@@ -8,14 +8,14 @@ import java.util.Date;
 @Value
 public class ColumnDto {
 
-    @Schema(description = "No need to set id in the request body")
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     Long id;
 
     String name;
 
     String description;
 
-    @Schema(description = "No need to set create date in the request body")
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     Date createDate;
 
     Integer columnOrder;

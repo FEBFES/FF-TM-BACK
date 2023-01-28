@@ -1,34 +1,34 @@
 package com.febfes.fftmback.exception;
 
 import com.febfes.fftmback.util.DateProvider;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
 
-@ControllerAdvice
+@RestControllerAdvice
 @RequiredArgsConstructor
 public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 
     private final DateProvider dateProvider;
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Object> handleEntityNotFoundException(
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @Hidden
+    public ApiError handleEntityNotFoundException(
             EntityNotFoundException ex,
             WebRequest request,
             HttpServletRequest httpRequest
     ) {
-        ApiError error = createResponseBodyForExceptions(HttpStatus.NOT_FOUND, EntityNotFoundException.class.getSimpleName(),
+        return createResponseBodyForExceptions(HttpStatus.NOT_FOUND, EntityNotFoundException.class.getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
-
-        return new ResponseEntity<>(error, HttpStatusCode.valueOf(error.getStatus()));
     }
 
     private ApiError createResponseBodyForExceptions(HttpStatus status, List<String> errors, String message, String path) {
