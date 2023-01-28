@@ -2,15 +2,15 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/projects")
@@ -35,11 +35,11 @@ public class ProjectController {
     @Operation(summary = "Get project by its id")
     @GetMapping(path = "{id}")
     public @ResponseBody ProjectDto getProject(@PathVariable Long id) {
-        ProjectEntity projectEntity = projectService.getProject(id);
-        if (ProjectService.isEmptyProject(projectEntity)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found");
+        Optional<ProjectEntity> project = projectService.getProject(id);
+        if (project.isEmpty()) {
+            throw new EntityNotFoundException(ProjectEntity.class.toString(), id);
         }
-        return ProjectService.mapToProjectDto(projectEntity);
+        return ProjectService.mapToProjectDto(project.get());
     }
 
     @Operation(summary = "Edit project by its id")
