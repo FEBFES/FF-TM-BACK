@@ -2,6 +2,7 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
+import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
@@ -69,4 +70,16 @@ public class ColumnService {
                 taskColumnEntity.getProjectId()
         );
     }
+
+    public static ColumnWithTasksDto mapToColumnWithTaskResponse(TaskColumnEntity column) {
+        return new ColumnWithTasksDto(
+                column.getId(),
+                column.getName(),
+                column.getColumnOrder(),
+                column.getTaskEntityList().stream().map(TaskService::mapToShortTaskResponse).toList()
+
+        );
+    }
+
+
 }
