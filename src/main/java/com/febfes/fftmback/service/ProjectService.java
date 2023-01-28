@@ -2,6 +2,7 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.dto.response.DashboardResponse;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +14,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
-
-    public static final ProjectEntity EMPTY_PROJECT_ENTITY = new ProjectEntity();
 
     private final ProjectRepository projectRepository;
     private final DateProvider dateProvider;
@@ -28,8 +27,8 @@ public class ProjectService {
         return projectRepository.findAll();
     }
 
-    public ProjectEntity getProject(Long id) {
-        return projectRepository.findById(id).orElse(EMPTY_PROJECT_ENTITY);
+    public Optional<ProjectEntity> getProject(Long id) {
+        return projectRepository.findById(id);
     }
 
     public boolean editProject(Long id, ProjectDto projectDto) {
@@ -57,10 +56,6 @@ public class ProjectService {
         return projectEntity;
     }
 
-    public static boolean isEmptyProject(ProjectEntity projectEntity) {
-        return projectEntity.getId() == null;
-    }
-
     public static ProjectDto mapToProjectDto(ProjectEntity projectEntity) {
         return new ProjectDto(
                 projectEntity.getId(),
@@ -70,5 +65,16 @@ public class ProjectService {
         );
     }
 
+    public static DashboardResponse mapToDashboard(ProjectEntity project) {
+        return new DashboardResponse(
+                project.getId(),
+                project.getName(),
+                project.getDescription(),
+                project.getTaskColumnEntityList()
+                        .stream()
+                        .map(ColumnService::mapToColumnWithTaskResponse)
+                        .toList()
+        );
+    }
 
 }
