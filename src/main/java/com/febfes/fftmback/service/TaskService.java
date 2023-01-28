@@ -2,7 +2,7 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.dto.response.ShortTaskResponse;
+import com.febfes.fftmback.dto.TaskShortDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.util.DateProvider;
@@ -78,8 +78,8 @@ public class TaskService {
         );
     }
 
-    public static ShortTaskResponse mapToShortTaskResponse(TaskEntity task) {
-        return new ShortTaskResponse(
+    public static TaskShortDto mapToShortTaskResponse(TaskEntity task) {
+        return new TaskShortDto(
                 task.getId(),
                 task.getName(),
                 task.getDescription()

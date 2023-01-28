@@ -1,8 +1,8 @@
 package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.dto.response.DashboardResponse;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
@@ -65,8 +65,8 @@ public class ProjectService {
         );
     }
 
-    public static DashboardResponse mapToDashboard(ProjectEntity project) {
-        return new DashboardResponse(
+    public static DashboardDto mapToDashboard(ProjectEntity project) {
+        return new DashboardDto(
                 project.getId(),
                 project.getName(),
                 project.getDescription(),
