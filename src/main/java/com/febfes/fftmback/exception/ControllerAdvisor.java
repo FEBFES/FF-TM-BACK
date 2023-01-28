@@ -1,5 +1,6 @@
 package com.febfes.fftmback.exception;
 
+import com.febfes.fftmback.dto.ApiErrorDto;
 import com.febfes.fftmback.util.DateProvider;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @Hidden
-    public ApiError handleEntityNotFoundException(
+    public ApiErrorDto handleEntityNotFoundException(
             EntityNotFoundException ex,
             WebRequest request,
             HttpServletRequest httpRequest
@@ -31,8 +32,8 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
-    private ApiError createResponseBodyForExceptions(HttpStatus status, List<String> errors, String message, String path) {
-        return ApiError.builder()
+    private ApiErrorDto createResponseBodyForExceptions(HttpStatus status, List<String> errors, String message, String path) {
+        return ApiErrorDto.builder()
                 .timestamp(dateProvider.getCurrentDate())
                 .status(status.value())
                 .errors(errors)
@@ -41,7 +42,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
                 .build();
     }
 
-    private ApiError createResponseBodyForExceptions(HttpStatus status, String error, String message, String path) {
+    private ApiErrorDto createResponseBodyForExceptions(HttpStatus status, String error, String message, String path) {
         return createResponseBodyForExceptions(status, List.of(error), message, path);
     }
 }

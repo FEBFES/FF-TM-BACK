@@ -1,4 +1,4 @@
-package com.febfes.fftmback.exception;
+package com.febfes.fftmback.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class ApiError {
+public class ApiErrorDto {
     private Date timestamp;
     private Integer status;
     private List<String> errors;
