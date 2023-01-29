@@ -6,6 +6,7 @@ import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +18,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/projects")
+@RequestMapping("v1/projects")
 @RequiredArgsConstructor
+@Tag(name = "Project")
 public class ProjectController {
 
     private final @NonNull ProjectService projectService;
@@ -26,7 +28,9 @@ public class ProjectController {
     @Operation(summary = "Get all projects")
     @ApiGet
     public List<ProjectDto> getProjects() {
-        return projectService.getProjects().stream().map(ProjectService::mapToProjectDto).toList();
+        return projectService.getProjects().stream()
+                .map(ProjectService::mapToProjectDto)
+                .toList();
     }
 
     @Operation(summary = "Create new project")
@@ -41,24 +45,23 @@ public class ProjectController {
     public ProjectDto getProject(@PathVariable Long id) {
         Optional<ProjectEntity> project = projectService.getProject(id);
         if (project.isEmpty()) {
-            throw new EntityNotFoundException(ProjectEntity.class.toString(), id);
+            // TODO: может перенести этот exception также в сервис?
+            throw new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id);
         }
         return ProjectService.mapToProjectDto(project.get());
     }
 
     @Operation(summary = "Edit project by its id")
     @ApiEdit(path = "/{id}")
-    public boolean editProject(@PathVariable Long id,
-                               @RequestBody ProjectDto projectDto
+    public void editProject(@PathVariable Long id,
+                            @RequestBody ProjectDto projectDto
     ) {
-        // TODO: сделать этот метод также, как и в TaskController
-        return projectService.editProject(id, projectDto);
+        projectService.editProject(id, projectDto);
     }
 
     @Operation(summary = "Delete project by its id")
     @ApiDelete(path = "/{id}")
-    public boolean deleteProject(@PathVariable Long id) {
-        // TODO: сделать этот метод также, как и в TaskController (можно оставить возврат boolean, но по идее статуса ошибки будет достаточно)
-        return projectService.deleteProject(id);
+    public void deleteProject(@PathVariable Long id) {
+        projectService.deleteProject(id);
     }
 }

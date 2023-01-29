@@ -20,5 +20,6 @@ public class ColumnDto {
 
     Integer columnOrder;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     Long projectId;
 }

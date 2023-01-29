@@ -3,6 +3,7 @@ package com.febfes.fftmback.service;
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,6 @@ public class ProjectService {
     }
 
     public List<ProjectEntity> getProjects() {
-        // TODO add pagination
         return projectRepository.findAll();
     }
 
@@ -31,21 +31,26 @@ public class ProjectService {
         return projectRepository.findById(id);
     }
 
-    public boolean editProject(Long id, ProjectDto projectDto) {
-        Optional<ProjectEntity> projectEntity = projectRepository.findById(id);
-        projectEntity.ifPresent(project -> {
-            project.setName(projectDto.getName());
-            project.setDescription(projectDto.getDescription());
-            projectRepository.save(project);
-        });
-        return projectEntity.isPresent();
+    public void editProject(Long id, ProjectDto projectDto) {
+        ProjectEntity projectEntity = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
+        projectEntity.setName(projectDto.getName());
+        projectEntity.setDescription(projectDto.getDescription());
+        projectRepository.save(projectEntity);
     }
 
-    public boolean deleteProject(Long id) {
+    public void deleteProject(Long id) {
         if (projectRepository.existsById(id)) {
             projectRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id);
         }
-        return true;
+    }
+
+    public DashboardDto getDashboard(Long id) {
+        ProjectEntity projectEntity = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
+        return mapToDashboard(projectEntity);
     }
 
     private ProjectEntity createProjectEntity(String name, String description) {
@@ -67,12 +72,11 @@ public class ProjectService {
 
     public static DashboardDto mapToDashboard(ProjectEntity project) {
         return new DashboardDto(
-                project.getId(),
                 project.getName(),
                 project.getDescription(),
                 project.getTaskColumnEntityList()
                         .stream()
-                        .map(ColumnService::mapToColumnWithTaskResponse)
+                        .map(ColumnService::mapToColumnWithTasksDto)
                         .toList()
         );
     }
