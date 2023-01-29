@@ -3,13 +3,11 @@ package com.febfes.fftmback.service;
 import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,27 +25,22 @@ public class ColumnService {
         ));
     }
 
-    public List<TaskColumnEntity> getColumns(Long projectId) {
-        // TODO add pagination
-        return columnRepository.findColumnEntitiesByProjectId(projectId);
+    public void editColumn(Long projectId, Long id, ColumnDto columnDto) {
+        TaskColumnEntity columnEntity = columnRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id));
+        columnEntity.setName(columnDto.getName());
+        columnEntity.setDescription(columnDto.getDescription());
+        columnEntity.setColumnOrder(columnDto.getColumnOrder());
+        columnEntity.setProjectId(projectId);
+        columnRepository.save(columnEntity);
     }
 
-    public boolean editColumn(Long id, ColumnDto columnDto) {
-        Optional<TaskColumnEntity> columnEntity = columnRepository.findById(id);
-        columnEntity.ifPresent(column -> {
-            column.setName(columnDto.getName());
-            column.setDescription(columnDto.getDescription());
-            column.setColumnOrder(columnDto.getColumnOrder());
-            columnRepository.save(column);
-        });
-        return columnEntity.isPresent();
-    }
-
-    public boolean deleteColumn(Long id) {
+    public void deleteColumn(Long id) {
         if (columnRepository.existsById(id)) {
             columnRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id);
         }
-        return true;
     }
 
     private TaskColumnEntity createColumnEntity(String name, String description, Integer columnOrder, Long projectId) {
@@ -71,15 +64,16 @@ public class ColumnService {
         );
     }
 
-    public static ColumnWithTasksDto mapToColumnWithTaskResponse(TaskColumnEntity column) {
+    public static ColumnWithTasksDto mapToColumnWithTasksDto(TaskColumnEntity column) {
         return new ColumnWithTasksDto(
                 column.getId(),
                 column.getName(),
                 column.getColumnOrder(),
-                column.getTaskEntityList().stream().map(TaskService::mapToShortTaskResponse).toList()
-
+                column.getTaskEntityList()
+                        .stream()
+                        .map(TaskService::mapToTaskShortDto)
+                        .toList()
         );
     }
-
 
 }

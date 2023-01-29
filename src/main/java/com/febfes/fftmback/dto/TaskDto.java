@@ -18,7 +18,9 @@ public class TaskDto {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     Date createDate;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     Long projectId;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     Long columnId;
 }

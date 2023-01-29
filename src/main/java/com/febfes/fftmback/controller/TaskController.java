@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,50 +14,58 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("v1/projects")
 @RequiredArgsConstructor
+@Tag(name = "Task")
 public class TaskController {
 
     private final @NonNull TaskService taskService;
 
-    @Operation(summary = "Get all tasks with pagination")
-    @ApiGet
+    @Operation(summary = "Get tasks with pagination")
+    @ApiGet(path = "{projectId}/columns/{columnId}/tasks")
     public List<TaskDto> getTasks(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "limit", defaultValue = "20") int limit
+            @RequestParam(value = "limit", defaultValue = "20") int limit,
+            @PathVariable Long projectId,
+            @PathVariable Long columnId
     ) {
 
-        List<TaskEntity> tasks = taskService.getTasks(page, limit);
+        List<TaskEntity> tasks = taskService.getTasks(page, limit, columnId);
         return tasks.stream()
                 .map(taskService::mapTask)
                 .collect(Collectors.toList());
     }
 
     @Operation(summary = "Get task by its id")
-    @ApiGetOne(path = "/{id}")
+    @ApiGetOne(path = "{projectId}/columns/{columnId}/tasks/{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
-    public TaskDto getTaskById(@PathVariable Long id) {
+    public TaskDto getTaskById(@PathVariable Long projectId, @PathVariable Long columnId, @PathVariable Long id) {
         TaskEntity task = taskService.getTaskById(id);
         return taskService.mapTask(task);
     }
 
     @Operation(summary = "Create new task")
-    @ApiCreate
-    public TaskDto createTask(@RequestBody TaskDto taskDto) {
-        TaskEntity task = taskService.createTask(taskDto);
+    @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
+    public TaskDto createTask(@PathVariable Long projectId, @PathVariable Long columnId, @RequestBody TaskDto taskDto) {
+        TaskEntity task = taskService.createTask(projectId, columnId, taskDto);
         return taskService.mapTask(task);
     }
 
     @Operation(summary = "Edit task by its id")
-    @ApiEdit(path = "/{id}")
-    public TaskDto updateTask(@PathVariable Long id, @RequestBody TaskDto taskDto) {
-        TaskEntity task = taskService.updateTask(id, taskDto);
+    @ApiEdit(path = "{projectId}/columns/{columnId}/tasks/{id}")
+    public TaskDto updateTask(
+            @PathVariable Long projectId,
+            @PathVariable Long columnId,
+            @PathVariable Long id,
+            @RequestBody TaskDto taskDto
+    ) {
+        TaskEntity task = taskService.updateTask(id, projectId, columnId, taskDto);
         return taskService.mapTask(task);
     }
 
     @Operation(summary = "Delete task by its id")
-    @ApiDelete(path = "/{id}")
-    public void deleteTask(@PathVariable Long id) {
+    @ApiDelete(path = "{projectId}/columns/{columnId}/tasks/{id}")
+    public void deleteTask(@PathVariable Long projectId, @PathVariable Long columnId, @PathVariable Long id) {
         taskService.deleteTask(id);
     }
 }

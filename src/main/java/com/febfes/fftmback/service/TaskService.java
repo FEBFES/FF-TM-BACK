@@ -22,26 +22,28 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final DateProvider dateProvider;
 
-    public List<TaskEntity> getTasks(int page, int limit) {
+    public List<TaskEntity> getTasks(int page, int limit, Long columnId) {
         Pageable pageableRequest = PageRequest.of(page, limit);
-        List<TaskEntity> tasks = taskRepository.findAll(pageableRequest).stream().toList();
+        List<TaskEntity> tasks = taskRepository.findAllByColumnId(pageableRequest, columnId)
+                .stream()
+                .toList();
         log.info("Received tasks size: {}", tasks.size());
         return tasks;
     }
 
     public TaskEntity getTaskById(Long id) {
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task", id));
+                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
         log.info("Received task: {}", task);
         return task;
     }
 
-    public TaskEntity createTask(TaskDto taskDto) {
+    public TaskEntity createTask(Long projectId, Long columnId, TaskDto taskDto) {
         TaskEntity task = TaskEntity.builder()
                 .name(taskDto.getName())
                 .description(taskDto.getDescription())
-                .columnId(taskDto.getColumnId())
-                .projectId(taskDto.getProjectId())
+                .columnId(columnId)
+                .projectId(projectId)
                 .build();
         task.setCreateDate(dateProvider.getCurrentDate());
         TaskEntity savedTask = taskRepository.save(task);
@@ -49,13 +51,13 @@ public class TaskService {
         return savedTask;
     }
 
-    public TaskEntity updateTask(Long id, TaskDto taskDto) {
+    public TaskEntity updateTask(Long id, Long projectId, Long columnId, TaskDto taskDto) {
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task", id));
+                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
         task.setName(taskDto.getName());
         task.setDescription(taskDto.getDescription());
-        task.setColumnId(taskDto.getColumnId());
-        task.setProjectId(taskDto.getProjectId());
+        task.setColumnId(columnId);
+        task.setProjectId(projectId);
         taskRepository.save(task);
         log.info("Updated task: {}", task);
         return task;
@@ -63,7 +65,7 @@ public class TaskService {
 
     public void deleteTask(Long id) {
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task", id));
+                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
         taskRepository.delete(task);
     }
 
@@ -78,11 +80,12 @@ public class TaskService {
         );
     }
 
-    public static TaskShortDto mapToShortTaskResponse(TaskEntity task) {
+    public static TaskShortDto mapToTaskShortDto(TaskEntity task) {
         return new TaskShortDto(
                 task.getId(),
                 task.getName(),
-                task.getDescription()
+                task.getDescription(),
+                task.getColumnId()
         );
     }
 }
