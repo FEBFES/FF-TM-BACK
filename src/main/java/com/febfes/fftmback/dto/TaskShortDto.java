@@ -4,6 +4,7 @@ public record TaskShortDto(
         Long id,
         String name,
         String description,
-        Long columnId
+        Long columnId,
+        Long projectId
 ) {
 }

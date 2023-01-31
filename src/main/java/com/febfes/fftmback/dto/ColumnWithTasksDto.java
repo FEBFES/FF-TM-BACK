@@ -6,6 +6,7 @@ public record ColumnWithTasksDto(
         Long id,
         String name,
         Integer columnOrder,
+        Long projectId,
         List<TaskShortDto> tasks
 ) {
 
