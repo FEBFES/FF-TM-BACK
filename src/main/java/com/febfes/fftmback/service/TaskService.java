@@ -2,7 +2,6 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.dto.TaskShortDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.util.DateProvider;
@@ -40,8 +39,8 @@ public class TaskService {
 
     public TaskEntity createTask(Long projectId, Long columnId, TaskDto taskDto) {
         TaskEntity task = TaskEntity.builder()
-                .name(taskDto.getName())
-                .description(taskDto.getDescription())
+                .name(taskDto.name())
+                .description(taskDto.description())
                 .columnId(columnId)
                 .projectId(projectId)
                 .build();
@@ -54,8 +53,8 @@ public class TaskService {
     public TaskEntity updateTask(Long id, Long projectId, Long columnId, TaskDto taskDto) {
         TaskEntity task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
-        task.setName(taskDto.getName());
-        task.setDescription(taskDto.getDescription());
+        task.setName(taskDto.name());
+        task.setDescription(taskDto.description());
         task.setColumnId(columnId);
         task.setProjectId(projectId);
         taskRepository.save(task);
@@ -67,25 +66,5 @@ public class TaskService {
         TaskEntity task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
         taskRepository.delete(task);
-    }
-
-    public TaskDto mapTask(TaskEntity task) {
-        return new TaskDto(
-                task.getId(),
-                task.getName(),
-                task.getDescription(),
-                task.getCreateDate(),
-                task.getProjectId(),
-                task.getColumnId()
-        );
-    }
-
-    public static TaskShortDto mapToTaskShortDto(TaskEntity task) {
-        return new TaskShortDto(
-                task.getId(),
-                task.getName(),
-                task.getDescription(),
-                task.getColumnId()
-        );
     }
 }

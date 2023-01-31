@@ -2,7 +2,6 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
-import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.util.DateProvider;
@@ -18,9 +17,9 @@ public class ColumnService {
 
     public TaskColumnEntity createColumn(Long projectId, ColumnDto columnDto) {
         return columnRepository.save(createColumnEntity(
-                columnDto.getName(),
-                columnDto.getDescription(),
-                columnDto.getColumnOrder(),
+                columnDto.name(),
+                columnDto.description(),
+                columnDto.columnOrder(),
                 projectId
         ));
     }
@@ -28,9 +27,9 @@ public class ColumnService {
     public void editColumn(Long projectId, Long id, ColumnDto columnDto) {
         TaskColumnEntity columnEntity = columnRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id));
-        columnEntity.setName(columnDto.getName());
-        columnEntity.setDescription(columnDto.getDescription());
-        columnEntity.setColumnOrder(columnDto.getColumnOrder());
+        columnEntity.setName(columnDto.name());
+        columnEntity.setDescription(columnDto.description());
+        columnEntity.setColumnOrder(columnDto.columnOrder());
         columnEntity.setProjectId(projectId);
         columnRepository.save(columnEntity);
     }
@@ -51,29 +50,6 @@ public class ColumnService {
         taskColumnEntity.setCreateDate(dateProvider.getCurrentDate());
         taskColumnEntity.setProjectId(projectId);
         return taskColumnEntity;
-    }
-
-    public static ColumnDto mapToColumnDto(TaskColumnEntity taskColumnEntity) {
-        return new ColumnDto(
-                taskColumnEntity.getId(),
-                taskColumnEntity.getName(),
-                taskColumnEntity.getDescription(),
-                taskColumnEntity.getCreateDate(),
-                taskColumnEntity.getColumnOrder(),
-                taskColumnEntity.getProjectId()
-        );
-    }
-
-    public static ColumnWithTasksDto mapToColumnWithTasksDto(TaskColumnEntity column) {
-        return new ColumnWithTasksDto(
-                column.getId(),
-                column.getName(),
-                column.getColumnOrder(),
-                column.getTaskEntityList()
-                        .stream()
-                        .map(TaskService::mapToTaskShortDto)
-                        .toList()
-        );
     }
 
 }

@@ -4,6 +4,7 @@ import com.febfes.fftmback.annotation.ApiCreate;
 import com.febfes.fftmback.annotation.ApiDelete;
 import com.febfes.fftmback.annotation.ApiEdit;
 import com.febfes.fftmback.dto.ColumnDto;
+import com.febfes.fftmback.mapper.ColumnMapper;
 import com.febfes.fftmback.service.ColumnService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +26,7 @@ public class ColumnController {
     @Operation(summary = "Create new column in a project with given id")
     @ApiCreate(path = "{projectId}/columns")
     public ColumnDto crateNewColumn(@PathVariable Long projectId, @RequestBody ColumnDto columnDto) {
-        return ColumnService.mapToColumnDto(columnService.createColumn(projectId, columnDto));
+        return ColumnMapper.INSTANCE.columnToColumnDto(columnService.createColumn(projectId, columnDto));
     }
 
     @Operation(summary = "Edit column by its columnId")
@@ -38,8 +39,8 @@ public class ColumnController {
     }
 
     @Operation(summary = "Delete column by its columnId")
-    @ApiDelete(path = "{projectId}/columns/{columnId}")
-    public void deleteColumn(@PathVariable Long projectId, @PathVariable Long columnId) {
+    @ApiDelete(path = "{ignoredProjectId}/columns/{columnId}")
+    public void deleteColumn(@PathVariable Long ignoredProjectId, @PathVariable Long columnId) {
         columnService.deleteColumn(columnId);
     }
 }

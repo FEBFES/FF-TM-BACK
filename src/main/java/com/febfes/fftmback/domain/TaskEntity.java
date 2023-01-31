@@ -14,6 +14,8 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class TaskEntity extends AppEntity {
 
     @Column(name = "name", nullable = false)
