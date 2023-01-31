@@ -3,6 +3,7 @@ package com.febfes.fftmback.controller;
 import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.domain.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.mapper.TaskMapper;
 import com.febfes.fftmback.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +33,7 @@ public class TaskController {
 
         List<TaskEntity> tasks = taskService.getTasks(page, limit, columnId);
         return tasks.stream()
-                .map(taskService::mapTask)
+                .map(t -> TaskMapper.INSTANCE.taskToTaskDto(t))
                 .collect(Collectors.toList());
     }
 
@@ -41,14 +42,14 @@ public class TaskController {
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public TaskDto getTaskById(@PathVariable Long projectId, @PathVariable Long columnId, @PathVariable Long id) {
         TaskEntity task = taskService.getTaskById(id);
-        return taskService.mapTask(task);
+        return TaskMapper.INSTANCE.taskToTaskDto(task);
     }
 
     @Operation(summary = "Create new task")
     @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
     public TaskDto createTask(@PathVariable Long projectId, @PathVariable Long columnId, @RequestBody TaskDto taskDto) {
         TaskEntity task = taskService.createTask(projectId, columnId, taskDto);
-        return taskService.mapTask(task);
+        return TaskMapper.INSTANCE.taskToTaskDto(task);
     }
 
     @Operation(summary = "Edit task by its id")
@@ -60,7 +61,7 @@ public class TaskController {
             @RequestBody TaskDto taskDto
     ) {
         TaskEntity task = taskService.updateTask(id, projectId, columnId, taskDto);
-        return taskService.mapTask(task);
+        return TaskMapper.INSTANCE.taskToTaskDto(task);
     }
 
     @Operation(summary = "Delete task by its id")

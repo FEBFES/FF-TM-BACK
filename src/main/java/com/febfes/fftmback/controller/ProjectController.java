@@ -4,6 +4,7 @@ import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,14 +30,14 @@ public class ProjectController {
     @ApiGet
     public List<ProjectDto> getProjects() {
         return projectService.getProjects().stream()
-                .map(ProjectService::mapToProjectDto)
+                .map(ProjectMapper.INSTANCE::projectToProjectDto)
                 .toList();
     }
 
     @Operation(summary = "Create new project")
     @ApiCreate
     public ProjectDto createNewProject(@RequestBody ProjectDto projectDto) {
-        return ProjectService.mapToProjectDto(projectService.createProject(projectDto));
+        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.createProject(projectDto));
     }
 
     @Operation(summary = "Get project by its id")
@@ -48,7 +49,7 @@ public class ProjectController {
             // TODO: может перенести этот exception также в сервис?
             throw new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id);
         }
-        return ProjectService.mapToProjectDto(project.get());
+        return ProjectMapper.INSTANCE.projectToProjectDto(project.get());
     }
 
     @Operation(summary = "Edit project by its id")

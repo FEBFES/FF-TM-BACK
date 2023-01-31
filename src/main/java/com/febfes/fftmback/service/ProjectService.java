@@ -4,6 +4,7 @@ import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.mapper.DashboardMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class ProjectService {
     private final DateProvider dateProvider;
 
     public ProjectEntity createProject(ProjectDto projectDto) {
-        return projectRepository.save(createProjectEntity(projectDto.getName(), projectDto.getDescription()));
+        return projectRepository.save(createProjectEntity(projectDto.name(), projectDto.description()));
     }
 
     public List<ProjectEntity> getProjects() {
@@ -34,8 +35,8 @@ public class ProjectService {
     public void editProject(Long id, ProjectDto projectDto) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
-        projectEntity.setName(projectDto.getName());
-        projectEntity.setDescription(projectDto.getDescription());
+        projectEntity.setName(projectDto.name());
+        projectEntity.setDescription(projectDto.description());
         projectRepository.save(projectEntity);
     }
 
@@ -50,7 +51,7 @@ public class ProjectService {
     public DashboardDto getDashboard(Long id) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
-        return mapToDashboard(projectEntity);
+        return DashboardMapper.INSTANCE.projectToDashboardDto(projectEntity);
     }
 
     private ProjectEntity createProjectEntity(String name, String description) {
@@ -59,26 +60,6 @@ public class ProjectService {
         projectEntity.setDescription(description);
         projectEntity.setCreateDate(dateProvider.getCurrentDate());
         return projectEntity;
-    }
-
-    public static ProjectDto mapToProjectDto(ProjectEntity projectEntity) {
-        return new ProjectDto(
-                projectEntity.getId(),
-                projectEntity.getName(),
-                projectEntity.getDescription(),
-                projectEntity.getCreateDate()
-        );
-    }
-
-    public static DashboardDto mapToDashboard(ProjectEntity project) {
-        return new DashboardDto(
-                project.getName(),
-                project.getDescription(),
-                project.getTaskColumnEntityList()
-                        .stream()
-                        .map(ColumnService::mapToColumnWithTasksDto)
-                        .toList()
-        );
     }
 
 }
