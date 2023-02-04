@@ -1,4 +1,4 @@
-package com.febfes.fftmback.service.Implementation;
+package com.febfes.fftmback.service.Impl;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ProjectServiceImp implements ProjectService {
+public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final DateProvider dateProvider;
@@ -32,14 +32,14 @@ public class ProjectServiceImp implements ProjectService {
 
     public List<ProjectEntity> getProjects() {
         List<ProjectEntity> projectEntityList = projectRepository.findAll();
-        log.info("Founded {} projects", projectEntityList.size());
+        log.info("Received {} projects", projectEntityList.size());
         return projectEntityList;
     }
 
     public ProjectEntity getProject(Long id) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
-        log.info("Founded project {} by id {}", projectEntity, id);
+        log.info("Received project {} by id= {}", projectEntity, id);
         return projectEntity;
     }
 
@@ -48,14 +48,14 @@ public class ProjectServiceImp implements ProjectService {
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
         projectEntity.setName(projectDto.name());
         projectEntity.setDescription(projectDto.description());
-        log.info("Update project size: {}", projectEntity);
         projectRepository.save(projectEntity);
+        log.info("Updated project: {}", projectEntity);
     }
 
     public void deleteProject(Long id) {
         if (projectRepository.existsById(id)) {
             projectRepository.deleteById(id);
-            log.info("Project with id {} was deleted", id);
+            log.info("Project with id= {} was deleted", id);
         } else {
             throw new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id);
         }
@@ -65,7 +65,7 @@ public class ProjectServiceImp implements ProjectService {
     public DashboardDto getDashboard(Long id) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
-        log.info("Dashboard by project id {} was founded", id);
+        log.info("Received dashboard for project with id=", id);
         return DashboardMapper.INSTANCE.projectToDashboardDto(projectEntity);
     }
 

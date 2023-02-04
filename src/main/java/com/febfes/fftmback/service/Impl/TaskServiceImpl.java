@@ -1,4 +1,4 @@
-package com.febfes.fftmback.service.Implementation;
+package com.febfes.fftmback.service.Impl;
 
 import com.febfes.fftmback.domain.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TaskServiceImp implements TaskService {
+public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final DateProvider dateProvider;

@@ -1,4 +1,4 @@
-package com.febfes.fftmback.service.Implementation;
+package com.febfes.fftmback.service.Impl;
 
 import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ColumnServiceImp implements ColumnService {
+public class ColumnServiceImpl implements ColumnService {
 
     private final ColumnRepository columnRepository;
     private final DateProvider dateProvider;
@@ -25,7 +25,7 @@ public class ColumnServiceImp implements ColumnService {
                 columnDto.columnOrder(),
                 projectId
         ));
-        log.info("Save column: {}", columnEntity);
+        log.info("Saved column: {}", columnEntity);
         return columnEntity;
     }
 
@@ -36,14 +36,15 @@ public class ColumnServiceImp implements ColumnService {
         columnEntity.setDescription(columnDto.description());
         columnEntity.setColumnOrder(columnDto.columnOrder());
         columnEntity.setProjectId(projectId);
-        log.info("Update column: {}", columnEntity);
         columnRepository.save(columnEntity);
+        log.info("Updated column: {}", columnEntity);
+
     }
 
     public void deleteColumn(Long id) {
         if (columnRepository.existsById(id)) {
             columnRepository.deleteById(id);
-            log.info("Column with id {} was delted", id);
+            log.info("Column with id= {} was delted", id);
         } else {
             throw new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id);
         }

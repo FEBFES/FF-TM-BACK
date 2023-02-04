@@ -5,9 +5,9 @@ import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.service.Implementation.ColumnServiceImp;
-import com.febfes.fftmback.service.Implementation.ProjectServiceImp;
-import com.febfes.fftmback.service.Implementation.TaskServiceImp;
+import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.Impl.TaskServiceImpl;
+import com.febfes.fftmback.service.ProjectService;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,25 +24,25 @@ public class DashboardControllerTests extends BasicTestClass {
     private static final String TASK_NAME = "Task name";
 
     @Autowired
-    private ProjectServiceImp projectServiceImp;
+    private ProjectService projectService;
 
     @Autowired
-    private ColumnServiceImp columnServiceImp;
+    private ColumnService columnService;
 
     @Autowired
-    private TaskServiceImp taskServiceImp;
+    private TaskServiceImpl taskService;
 
     @Test
     void testSingleSuccessTest1() {
 
-        ProjectEntity projectEntity = projectServiceImp.createProject(
+        ProjectEntity projectEntity = projectService.createProject(
                 new ProjectDto(null, PROJECT_NAME, null, null)
         );
-        TaskColumnEntity columnEntity = columnServiceImp.createColumn(
+        TaskColumnEntity columnEntity = columnService.createColumn(
                 projectEntity.getId(),
                 new ColumnDto(null, COLUMN_NAME, null, null, COLUMN_ORDER, null)
         );
-        taskServiceImp.createTask(
+        taskService.createTask(
                 projectEntity.getId(),
                 columnEntity.getId(),
                 new TaskDto(null, TASK_NAME, null, null, null, null)
