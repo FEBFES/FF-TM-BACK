@@ -1,9 +1,7 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
-import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("v1/projects")
@@ -44,12 +41,7 @@ public class ProjectController {
     @ApiGetOne(path = "/{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public ProjectDto getProject(@PathVariable Long id) {
-        Optional<ProjectEntity> project = projectService.getProject(id);
-        if (project.isEmpty()) {
-            // TODO: может перенести этот exception также в сервис?
-            throw new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id);
-        }
-        return ProjectMapper.INSTANCE.projectToProjectDto(project.get());
+        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProject(id));
     }
 
     @Operation(summary = "Edit project by its id")

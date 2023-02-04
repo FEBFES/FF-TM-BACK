@@ -6,8 +6,8 @@ import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.Impl.TaskServiceImpl;
 import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.TaskService;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class DashboardControllerTests extends BasicTestClass {
     private ColumnService columnService;
 
     @Autowired
-    private TaskService taskService;
+    private TaskServiceImpl taskService;
 
     @Test
     void testSingleSuccessTest1() {
