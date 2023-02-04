@@ -33,7 +33,7 @@ public class TaskController {
 
         List<TaskEntity> tasks = taskService.getTasks(page, limit, columnId);
         return tasks.stream()
-                .map(t -> TaskMapper.INSTANCE.taskToTaskDto(t))
+                .map(TaskMapper.INSTANCE::taskToTaskDto)
                 .collect(Collectors.toList());
     }
 

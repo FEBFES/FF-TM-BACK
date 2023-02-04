@@ -18,9 +18,6 @@ public class TaskColumnEntity extends AppEntity {
     @Column(name = "project_id", nullable = false)
     private Long projectId;
 
-    @Column(name = "description")
-    private String description;
-
     @Column(name = "column_order", nullable = false)
     private Integer columnOrder;
 

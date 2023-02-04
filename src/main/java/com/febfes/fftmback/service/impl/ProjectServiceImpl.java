@@ -1,4 +1,4 @@
-package com.febfes.fftmback.service.Impl;
+package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
@@ -65,7 +65,7 @@ public class ProjectServiceImpl implements ProjectService {
     public DashboardDto getDashboard(Long id) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
-        log.info("Received dashboard for project with id=", id);
+        log.info("Received dashboard for project with id={}", id);
         return DashboardMapper.INSTANCE.projectToDashboardDto(projectEntity);
     }
 

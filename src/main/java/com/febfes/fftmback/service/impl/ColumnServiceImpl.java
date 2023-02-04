@@ -1,4 +1,4 @@
-package com.febfes.fftmback.service.Impl;
+package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
@@ -21,7 +21,6 @@ public class ColumnServiceImpl implements ColumnService {
     public TaskColumnEntity createColumn(Long projectId, ColumnDto columnDto) {
         TaskColumnEntity columnEntity = columnRepository.save(createColumnEntity(
                 columnDto.name(),
-                columnDto.description(),
                 columnDto.columnOrder(),
                 projectId
         ));
@@ -29,13 +28,11 @@ public class ColumnServiceImpl implements ColumnService {
         return columnEntity;
     }
 
-    public void editColumn(Long projectId, Long id, ColumnDto columnDto) {
+    public void editColumn(Long id, ColumnDto columnDto) {
         TaskColumnEntity columnEntity = columnRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id));
         columnEntity.setName(columnDto.name());
-        columnEntity.setDescription(columnDto.description());
         columnEntity.setColumnOrder(columnDto.columnOrder());
-        columnEntity.setProjectId(projectId);
         columnRepository.save(columnEntity);
         log.info("Updated column: {}", columnEntity);
 
@@ -44,16 +41,15 @@ public class ColumnServiceImpl implements ColumnService {
     public void deleteColumn(Long id) {
         if (columnRepository.existsById(id)) {
             columnRepository.deleteById(id);
-            log.info("Column with id= {} was delted", id);
+            log.info("Column with id={} deleted", id);
         } else {
             throw new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id);
         }
     }
 
-    private TaskColumnEntity createColumnEntity(String name, String description, Integer columnOrder, Long projectId) {
+    private TaskColumnEntity createColumnEntity(String name, Integer columnOrder, Long projectId) {
         TaskColumnEntity taskColumnEntity = new TaskColumnEntity();
         taskColumnEntity.setName(name);
-        taskColumnEntity.setDescription(description);
         taskColumnEntity.setColumnOrder(columnOrder);
         taskColumnEntity.setCreateDate(dateProvider.getCurrentDate());
         taskColumnEntity.setProjectId(projectId);

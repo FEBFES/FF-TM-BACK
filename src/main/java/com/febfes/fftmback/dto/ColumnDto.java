@@ -10,8 +10,6 @@ public record ColumnDto(
 
         String name,
 
-        String description,
-
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Date createDate,
 
