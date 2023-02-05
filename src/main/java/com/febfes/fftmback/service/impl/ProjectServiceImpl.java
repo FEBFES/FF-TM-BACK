@@ -26,7 +26,7 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectEntity projectEntity = projectRepository.save(
                 createProjectEntity(projectDto.name(), projectDto.description())
         );
-        log.info("Save project: {}", projectEntity);
+        log.info("Saved project: {}", projectEntity);
         return projectEntity;
     }
 
@@ -39,7 +39,7 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectEntity getProject(Long id) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
-        log.info("Received project {} by id= {}", projectEntity, id);
+        log.info("Received project {} by id={}", projectEntity, id);
         return projectEntity;
     }
 
@@ -55,7 +55,7 @@ public class ProjectServiceImpl implements ProjectService {
     public void deleteProject(Long id) {
         if (projectRepository.existsById(id)) {
             projectRepository.deleteById(id);
-            log.info("Project with id= {} was deleted", id);
+            log.info("Project with id={} was deleted", id);
         } else {
             throw new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id);
         }

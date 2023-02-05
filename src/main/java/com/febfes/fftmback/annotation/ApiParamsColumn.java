@@ -13,5 +13,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
 @Parameter(in = ParameterIn.PATH, name ="projectId" ,schema = @Schema(type = "number", description = "Project id"))
 @Parameter(in = ParameterIn.PATH, name ="columnId" ,schema = @Schema(type = "number", description = "Column id"))
-public @interface ApiParams {
+public @interface ApiParamsColumn {
 }

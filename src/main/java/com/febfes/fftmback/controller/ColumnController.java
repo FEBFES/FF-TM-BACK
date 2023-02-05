@@ -3,8 +3,9 @@ package com.febfes.fftmback.controller;
 import com.febfes.fftmback.annotation.ApiCreate;
 import com.febfes.fftmback.annotation.ApiDelete;
 import com.febfes.fftmback.annotation.ApiEdit;
-import com.febfes.fftmback.annotation.ApiParams;
+import com.febfes.fftmback.annotation.ApiParamsColumn;
 import com.febfes.fftmback.dto.ColumnDto;
+import com.febfes.fftmback.dto.parameter.ColumnParameters;
 import com.febfes.fftmback.mapper.ColumnMapper;
 import com.febfes.fftmback.service.ColumnService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("v1/projects")
@@ -39,22 +38,22 @@ public class ColumnController {
 
     @Operation(summary = "Edit column by its columnId")
     @ApiEdit(path = "{projectId}/columns/{columnId}")
-    @ApiParams
-    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use map
+    @ApiParamsColumn
+    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use ColumnParameters
     public void editColumn(
-            @PathVariable @Parameter(hidden = true) Map<String, String> pathVarsMap,
+            @Parameter(hidden = true) ColumnParameters pathVars,
             @RequestBody ColumnDto columnDto
     ) {
 
-        columnService.editColumn(Long.parseLong(pathVarsMap.get("columnId")), columnDto);
+        columnService.editColumn(pathVars.columnId(), columnDto);
     }
 
     @Operation(summary = "Delete column by its columnId")
     @ApiDelete(path = "{projectId}/columns/{columnId}")
-    @ApiParams
-    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use map
-    public void deleteColumn(@PathVariable @Parameter(hidden = true) Map<String, String> pathVarsMap) {
+    @ApiParamsColumn
+    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use ColumnParameters
+    public void deleteColumn(@Parameter(hidden = true) ColumnParameters pathVars) {
 
-        columnService.deleteColumn(Long.parseLong(pathVarsMap.get("columnId")));
+        columnService.deleteColumn(pathVars.columnId());
     }
 }

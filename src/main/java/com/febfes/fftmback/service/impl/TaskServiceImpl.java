@@ -22,7 +22,11 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final DateProvider dateProvider;
 
-    public List<TaskEntity> getTasks(int page, int limit, Long columnId) {
+    public List<TaskEntity> getTasks(
+            int page,
+            int limit,
+            Long columnId
+    ) {
         Pageable pageableRequest = PageRequest.of(page, limit);
         List<TaskEntity> tasks = taskRepository.findAllByColumnId(pageableRequest, columnId)
                 .stream()
@@ -38,7 +42,11 @@ public class TaskServiceImpl implements TaskService {
         return task;
     }
 
-    public TaskEntity createTask(Long projectId, Long columnId, TaskDto taskDto) {
+    public TaskEntity createTask(
+            Long projectId,
+            Long columnId,
+            TaskDto taskDto
+    ) {
         TaskEntity task = TaskEntity.builder()
                 .name(taskDto.name())
                 .description(taskDto.description())
@@ -51,7 +59,12 @@ public class TaskServiceImpl implements TaskService {
         return savedTask;
     }
 
-    public TaskEntity updateTask(Long id, Long projectId, Long columnId, TaskDto taskDto) {
+    public TaskEntity updateTask(
+            Long id,
+            Long projectId,
+            Long columnId,
+            TaskDto taskDto
+    ) {
         TaskEntity task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
         task.setName(taskDto.name());
