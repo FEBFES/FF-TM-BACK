@@ -9,8 +9,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "task")
-@Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

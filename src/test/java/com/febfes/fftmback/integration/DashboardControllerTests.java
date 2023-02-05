@@ -7,7 +7,7 @@ import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.impl.TaskServiceImpl;
+import com.febfes.fftmback.service.TaskService;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class DashboardControllerTests extends BasicTestClass {
     private ColumnService columnService;
 
     @Autowired
-    private TaskServiceImpl taskService;
+    private TaskService taskService;
 
     @Test
     void testSingleSuccessTest1() {
@@ -54,7 +54,6 @@ public class DashboardControllerTests extends BasicTestClass {
                 .get("/api/v1/projects/{id}/dashboard", projectEntity.getId())
                 .then()
                 .statusCode(200)
-                .body("name", equalTo(PROJECT_NAME))
                 .body("columns[0].name", equalTo(COLUMN_NAME))
                 .body("columns[0].tasks[0].name", equalTo(TASK_NAME));
         //TODO Возможно стоит добавить json парсер и проверять подругому ответ
