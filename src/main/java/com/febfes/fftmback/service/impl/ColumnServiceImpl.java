@@ -3,6 +3,7 @@ package com.febfes.fftmback.service.impl;
 import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.mapper.ColumnMapper;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.util.DateProvider;
@@ -19,11 +20,9 @@ public class ColumnServiceImpl implements ColumnService {
     private final DateProvider dateProvider;
 
     public TaskColumnEntity createColumn(Long projectId, ColumnDto columnDto) {
-        TaskColumnEntity columnEntity = columnRepository.save(createColumnEntity(
-                columnDto.name(),
-                columnDto.columnOrder(),
-                projectId
-        ));
+        TaskColumnEntity columnEntity = columnRepository.save(
+                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId, dateProvider.getCurrentDate())
+        );
         log.info("Saved column: {}", columnEntity);
         return columnEntity;
     }

@@ -21,3 +21,11 @@ databaseChangeLog:
             columnName: name
             newDataType: varchar(30)
             tableName: task_column
+  - changeSet:
+      id: 2
+      author: VladisStep
+      comment: "Add unique projectId + columnOrder"
+      changes:
+        - addUniqueConstraint:
+            tableName: task_column
+            columnNames: project_id, column_order

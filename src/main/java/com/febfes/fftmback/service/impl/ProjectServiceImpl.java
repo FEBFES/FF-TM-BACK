@@ -5,6 +5,7 @@ import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.DashboardMapper;
+import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.util.DateProvider;
@@ -24,7 +25,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     public ProjectEntity createProject(ProjectDto projectDto) {
         ProjectEntity projectEntity = projectRepository.save(
-                createProjectEntity(projectDto.name(), projectDto.description())
+                ProjectMapper.INSTANCE.projectDtoToProject(projectDto, dateProvider.getCurrentDate())
         );
         log.info("Saved project: {}", projectEntity);
         return projectEntity;
@@ -59,7 +60,6 @@ public class ProjectServiceImpl implements ProjectService {
         } else {
             throw new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id);
         }
-
     }
 
     public DashboardDto getDashboard(Long id) {
@@ -67,14 +67,6 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
         log.info("Received dashboard for project with id={}", id);
         return DashboardMapper.INSTANCE.projectToDashboardDto(projectEntity);
-    }
-
-    private ProjectEntity createProjectEntity(String name, String description) {
-        ProjectEntity projectEntity = new ProjectEntity();
-        projectEntity.setName(name);
-        projectEntity.setDescription(description);
-        projectEntity.setCreateDate(dateProvider.getCurrentDate());
-        return projectEntity;
     }
 
 }

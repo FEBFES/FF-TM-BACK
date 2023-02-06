@@ -77,8 +77,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     public void deleteTask(Long id) {
-        TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
-        taskRepository.delete(task);
+        if (taskRepository.existsById(id)) {
+            taskRepository.deleteById(id);
+            log.info("Task with id={} was deleted", id);
+        } else {
+            throw new EntityNotFoundException(TaskEntity.class.getSimpleName(), id);
+        }
     }
 }
