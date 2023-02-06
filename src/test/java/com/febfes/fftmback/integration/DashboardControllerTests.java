@@ -16,7 +16,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 
-public class DashboardControllerTests extends BasicTestClass {
+class DashboardControllerTests extends BasicTestClass {
 
     private static final String PROJECT_NAME = "Project name";
     private static final String COLUMN_NAME = "Column name";
