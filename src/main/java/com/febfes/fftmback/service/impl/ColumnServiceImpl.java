@@ -46,13 +46,4 @@ public class ColumnServiceImpl implements ColumnService {
         }
     }
 
-    private TaskColumnEntity createColumnEntity(String name, Integer columnOrder, Long projectId) {
-        TaskColumnEntity taskColumnEntity = new TaskColumnEntity();
-        taskColumnEntity.setName(name);
-        taskColumnEntity.setColumnOrder(columnOrder);
-        taskColumnEntity.setCreateDate(dateProvider.getCurrentDate());
-        taskColumnEntity.setProjectId(projectId);
-        return taskColumnEntity;
-    }
-
 }
