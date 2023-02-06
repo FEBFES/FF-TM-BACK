@@ -38,22 +38,23 @@ public class ProjectController {
     }
 
     @Operation(summary = "Get project by its id")
-    @ApiGetOne(path = "/{id}")
+    @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public ProjectDto getProject(@PathVariable Long id) {
         return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProject(id));
     }
 
     @Operation(summary = "Edit project by its id")
-    @ApiEdit(path = "/{id}")
-    public void editProject(@PathVariable Long id,
-                            @RequestBody ProjectDto projectDto
+    @ApiEdit(path = "{id}")
+    public void editProject(
+            @PathVariable Long id,
+            @RequestBody ProjectDto projectDto
     ) {
         projectService.editProject(id, projectDto);
     }
 
     @Operation(summary = "Delete project by its id")
-    @ApiDelete(path = "/{id}")
+    @ApiDelete(path = "{id}")
     public void deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
     }

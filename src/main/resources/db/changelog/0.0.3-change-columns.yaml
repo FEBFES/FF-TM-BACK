@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: IvanShish
+      comment: "Change columns in tables"
+      changes:
+        - dropColumn:
+            tableName: task_column
+            columns:
+              - column:
+                  name: description
+        - modifyDataType:
+            columnName: description
+            newDataType: text
+            tableName: task
+        - modifyDataType:
+            columnName: name
+            newDataType: varchar(100)
+            tableName: task
+        - modifyDataType:
+            columnName: name
+            newDataType: varchar(30)
+            tableName: task_column
+  - changeSet:
+      id: 2
+      author: VladisStep
+      comment: "Add unique projectId + columnOrder"
+      changes:
+        - addUniqueConstraint:
+            tableName: task_column
+            columnNames: project_id, column_order

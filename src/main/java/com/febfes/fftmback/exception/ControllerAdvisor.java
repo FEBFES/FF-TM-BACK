@@ -32,17 +32,27 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
-    private ApiErrorDto createResponseBodyForExceptions(HttpStatus status, List<String> errors, String message, String path) {
-        return ApiErrorDto.builder()
-                .timestamp(dateProvider.getCurrentDate())
-                .status(status.value())
-                .errors(errors)
-                .message(message)
-                .path(path)
-                .build();
+    private ApiErrorDto createResponseBodyForExceptions(
+            HttpStatus status,
+            List<String> errors,
+            String message,
+            String path
+    ) {
+        return new ApiErrorDto(
+                dateProvider.getCurrentDate(),
+                status.value(),
+                errors,
+                message,
+                path
+        );
     }
 
-    private ApiErrorDto createResponseBodyForExceptions(HttpStatus status, String error, String message, String path) {
+    private ApiErrorDto createResponseBodyForExceptions(
+            HttpStatus status,
+            String error,
+            String message,
+            String path
+    ) {
         return createResponseBodyForExceptions(status, List.of(error), message, path);
     }
 }

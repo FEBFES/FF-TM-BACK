@@ -1,4 +1,4 @@
-package com.febfes.fftmback.service.Impl;
+package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
@@ -22,7 +22,11 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final DateProvider dateProvider;
 
-    public List<TaskEntity> getTasks(int page, int limit, Long columnId) {
+    public List<TaskEntity> getTasks(
+            int page,
+            int limit,
+            Long columnId
+    ) {
         Pageable pageableRequest = PageRequest.of(page, limit);
         List<TaskEntity> tasks = taskRepository.findAllByColumnId(pageableRequest, columnId)
                 .stream()
@@ -38,7 +42,11 @@ public class TaskServiceImpl implements TaskService {
         return task;
     }
 
-    public TaskEntity createTask(Long projectId, Long columnId, TaskDto taskDto) {
+    public TaskEntity createTask(
+            Long projectId,
+            Long columnId,
+            TaskDto taskDto
+    ) {
         TaskEntity task = TaskEntity.builder()
                 .name(taskDto.name())
                 .description(taskDto.description())
@@ -51,7 +59,12 @@ public class TaskServiceImpl implements TaskService {
         return savedTask;
     }
 
-    public TaskEntity updateTask(Long id, Long projectId, Long columnId, TaskDto taskDto) {
+    public TaskEntity updateTask(
+            Long id,
+            Long projectId,
+            Long columnId,
+            TaskDto taskDto
+    ) {
         TaskEntity task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
         task.setName(taskDto.name());
@@ -64,8 +77,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     public void deleteTask(Long id) {
-        TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
-        taskRepository.delete(task);
+        if (taskRepository.existsById(id)) {
+            taskRepository.deleteById(id);
+            log.info("Task with id={} was deleted", id);
+        } else {
+            throw new EntityNotFoundException(TaskEntity.class.getSimpleName(), id);
+        }
     }
 }

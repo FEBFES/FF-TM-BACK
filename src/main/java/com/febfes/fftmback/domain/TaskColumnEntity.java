@@ -3,6 +3,7 @@ package com.febfes.fftmback.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @Table(name = "task_column")
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class TaskColumnEntity extends AppEntity {
 
     @Column(name = "name")
@@ -18,14 +20,12 @@ public class TaskColumnEntity extends AppEntity {
     @Column(name = "project_id", nullable = false)
     private Long projectId;
 
-    @Column(name = "description")
-    private String description;
-
     @Column(name = "column_order", nullable = false)
     private Integer columnOrder;
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "column_id")
+    @ToString.Exclude
     private List<TaskEntity> taskEntityList;
     //TODO problem when project was deleted
 
