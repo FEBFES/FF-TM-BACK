@@ -22,6 +22,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final DateProvider dateProvider;
 
+    @Override
     public List<TaskEntity> getTasks(
             int page,
             int limit,
@@ -35,6 +36,7 @@ public class TaskServiceImpl implements TaskService {
         return tasks;
     }
 
+    @Override
     public TaskEntity getTaskById(Long id) {
         TaskEntity task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
@@ -42,6 +44,7 @@ public class TaskServiceImpl implements TaskService {
         return task;
     }
 
+    @Override
     public TaskEntity createTask(
             Long projectId,
             Long columnId,
@@ -59,6 +62,7 @@ public class TaskServiceImpl implements TaskService {
         return savedTask;
     }
 
+    @Override
     public TaskEntity updateTask(
             Long id,
             Long projectId,
@@ -76,6 +80,7 @@ public class TaskServiceImpl implements TaskService {
         return task;
     }
 
+    @Override
     public void deleteTask(Long id) {
         if (taskRepository.existsById(id)) {
             taskRepository.deleteById(id);

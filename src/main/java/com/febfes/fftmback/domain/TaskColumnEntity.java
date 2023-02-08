@@ -1,14 +1,15 @@
 package com.febfes.fftmback.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @Table(name = "task_column")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @ToString(callSuper = true)

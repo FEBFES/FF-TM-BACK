@@ -9,13 +9,13 @@ import lombok.*;
 
 @Entity
 @Table(name = "task")
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class TaskEntity extends AppEntity {
 
     @Column(name = "name", nullable = false)
