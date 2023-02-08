@@ -2,15 +2,14 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.util.DatabaseCleanup;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.text.MessageFormat;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,6 +22,14 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
+    @AfterEach
+    void afterEach() {
+        databaseCleanup.execute();
+    }
 
     @Test
     void successfulGetProjectsTest() {
@@ -45,10 +52,6 @@ class ProjectControllerTest extends BasicTestClass {
                 .getInt("data.size()");
         Assertions.assertThat(size)
                 .isEqualTo(2);
-
-        List<Integer> resIds = response.jsonPath().get("id");
-        resIds.forEach(id -> projectService.deleteProject(id.longValue()));
-//        TODO: может сделать типа @BeforeAll, чтобы он очищал базу перед каждым тестом??
     }
 
     @Test
@@ -59,8 +62,6 @@ class ProjectControllerTest extends BasicTestClass {
         response.then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("name", equalTo(PROJECT_NAME));
-
-        projectService.deleteProject(response.jsonPath().getLong("id"));
     }
 
     @Test
@@ -84,19 +85,16 @@ class ProjectControllerTest extends BasicTestClass {
                 .contentType(ContentType.JSON)
                 .body(editProjectDto)
                 .when()
-                .put(MessageFormat.format("{0}/{1}", PATH_TO_PROJECTS_API, createdProjectId))
+                .put("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
         Response getResponse = given()
                 .contentType(ContentType.JSON)
-                .body(editProjectDto)
                 .when()
-                .get(MessageFormat.format("{0}/{1}", PATH_TO_PROJECTS_API, createdProjectId));
+                .get("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId);
         Assertions.assertThat(getResponse.jsonPath().getString("name"))
                 .isEqualTo(newProjectName);
-
-        projectService.deleteProject(createdProjectId);
     }
 
     @Test
@@ -108,7 +106,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .contentType(ContentType.JSON)
                 .body(editProjectDto)
                 .when()
-                .put(MessageFormat.format("{0}/{1}", PATH_TO_PROJECTS_API, wrongProjectId))
+                .put("%s/{id}".formatted(PATH_TO_PROJECTS_API), wrongProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND);
     }
@@ -122,19 +120,19 @@ class ProjectControllerTest extends BasicTestClass {
         given()
                 .contentType(ContentType.JSON)
                 .when()
-                .delete(MessageFormat.format("{0}/{1}", PATH_TO_PROJECTS_API, createdProjectId))
+                .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }
 
     @Test
     void failedDeleteOfProjectTest() {
-        String wrongProjectId = "54731584";
+        String wrongProjectId1 = "54731584";
 
         given()
                 .contentType(ContentType.JSON)
                 .when()
-                .delete(MessageFormat.format("{0}/{1}", PATH_TO_PROJECTS_API, wrongProjectId))
+                .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), wrongProjectId1)
                 .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND);
     }
