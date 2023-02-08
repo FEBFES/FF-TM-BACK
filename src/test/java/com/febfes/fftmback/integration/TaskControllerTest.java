@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-public class TaskControllerTest extends BasicTestClass {
+class TaskControllerTest extends BasicTestClass {
 
     private static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
     private static final String TASK_NAME = "Task name";
