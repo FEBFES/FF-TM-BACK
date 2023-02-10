@@ -6,6 +6,7 @@ import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ public class ProjectController {
 
     @Operation(summary = "Create new project")
     @ApiCreate
-    public ProjectDto createNewProject(@RequestBody ProjectDto projectDto) {
+    public ProjectDto createNewProject(@RequestBody @Valid ProjectDto projectDto) {
         return ProjectMapper.INSTANCE.projectToProjectDto(projectService.createProject(projectDto));
     }
 

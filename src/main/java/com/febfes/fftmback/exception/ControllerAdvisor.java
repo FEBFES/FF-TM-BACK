@@ -6,17 +6,18 @@ import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
-public class ControllerAdvisor extends ResponseEntityExceptionHandler {
+public class ControllerAdvisor {
 
     private final DateProvider dateProvider;
 
@@ -25,10 +26,34 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     @Hidden
     public ApiErrorDto handleEntityNotFoundException(
             EntityNotFoundException ex,
-            WebRequest request,
             HttpServletRequest httpRequest
     ) {
         return createResponseBodyForExceptions(HttpStatus.NOT_FOUND, EntityNotFoundException.class.getSimpleName(),
+                ex.getMessage(), httpRequest.getRequestURI());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @Hidden
+    public ApiErrorDto handleConstraintViolationException(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest httpRequest
+    ) {
+        List<String> errors = ex.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.toList());
+        return createResponseBodyForExceptions(HttpStatus.UNPROCESSABLE_ENTITY, MethodArgumentNotValidException.class.getSimpleName(),
+                errors.toString(), httpRequest.getRequestURI());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @Hidden
+    public ApiErrorDto handleGlobalException(
+            Exception ex,
+            HttpServletRequest httpRequest
+    ) {
+        return createResponseBodyForExceptions(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 

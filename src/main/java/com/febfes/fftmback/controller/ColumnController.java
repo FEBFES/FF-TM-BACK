@@ -9,6 +9,7 @@ import com.febfes.fftmback.mapper.ColumnMapper;
 import com.febfes.fftmback.service.ColumnService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -29,7 +30,7 @@ public class ColumnController {
     @ApiCreate(path = "{projectId}/columns")
     public ColumnDto crateNewColumn(
             @PathVariable Long projectId,
-            @RequestBody ColumnDto columnDto
+            @RequestBody @Valid ColumnDto columnDto
     ) {
 
         return ColumnMapper.INSTANCE.columnToColumnDto(columnService.createColumn(projectId, columnDto));

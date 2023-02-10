@@ -1,5 +1,6 @@
 package com.febfes.fftmback.annotation;
 
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import java.lang.annotation.Target;
 @RequestMapping(method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 @ApiResponse(responseCode = "200", description = "Successfully created")
+@ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = @Content)
 public @interface ApiCreate {
 
     @AliasFor(annotation = RequestMapping.class)

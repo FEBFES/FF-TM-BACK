@@ -9,6 +9,7 @@ import com.febfes.fftmback.mapper.TaskMapper;
 import com.febfes.fftmback.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -55,7 +56,7 @@ public class TaskController {
     @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use ColumnParameters
     public TaskDto createTask(
             @ParameterObject ColumnParameters pathVars,
-            @RequestBody TaskDto taskDto
+            @RequestBody @Valid TaskDto taskDto
     ) {
 
         TaskEntity task = taskService.createTask(pathVars.projectId(), pathVars.columnId(), taskDto);
