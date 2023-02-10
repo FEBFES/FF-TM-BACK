@@ -16,6 +16,9 @@ public record ProjectDto(
         String description,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-        Date createDate
+        Date createDate,
+
+        @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+        Long ownerId
 ) {
 }

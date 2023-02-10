@@ -22,7 +22,10 @@ public record TaskDto(
         Long projectId,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-        Long columnId
+        Long columnId,
+
+        @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+        Long ownerId
 
 ) {
 }

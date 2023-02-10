@@ -36,7 +36,7 @@ class DashboardControllerTests extends BasicTestClass {
     void testSingleSuccessTest1() {
 
         ProjectEntity projectEntity = projectService.createProject(
-                new ProjectDto(null, PROJECT_NAME, null, null)
+                new ProjectDto(null, PROJECT_NAME, null, null, null)
         );
         TaskColumnEntity columnEntity = columnService.createColumn(
                 projectEntity.getId(),
@@ -45,7 +45,7 @@ class DashboardControllerTests extends BasicTestClass {
         taskService.createTask(
                 projectEntity.getId(),
                 columnEntity.getId(),
-                new TaskDto(null, TASK_NAME, null, null, null, null)
+                new TaskDto(null, TASK_NAME, null, null, null, null, null)
         );
 
         given()

@@ -34,10 +34,10 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulGetProjectsTest() {
         projectService.createProject(
-                new ProjectDto(null, PROJECT_NAME + "1", null, null)
+                new ProjectDto(null, PROJECT_NAME + "1", null, null, null)
         );
         projectService.createProject(
-                new ProjectDto(null, PROJECT_NAME + "2", null, null)
+                new ProjectDto(null, PROJECT_NAME + "2", null, null, null)
         );
 
         Response response = given()
@@ -56,7 +56,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfProjectTest() {
-        ProjectDto projectDto = new ProjectDto(null, PROJECT_NAME, null, null);
+        ProjectDto projectDto = new ProjectDto(null, PROJECT_NAME, null, null, null);
 
         Response response = createNewProject(projectDto);
         response.then()
@@ -66,7 +66,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfProjectTest() {
-        ProjectDto projectDto = new ProjectDto(null, null, PROJECT_DESCRIPTION, null);
+        ProjectDto projectDto = new ProjectDto(null, null, PROJECT_DESCRIPTION, null, null);
 
         createNewProject(projectDto).then()
                 .statusCode(HttpStatus.SC_UNPROCESSABLE_ENTITY);
@@ -74,12 +74,12 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditOfProjectTest() {
-        ProjectDto createProjectDto = new ProjectDto(null, PROJECT_NAME, null, null);
+        ProjectDto createProjectDto = new ProjectDto(null, PROJECT_NAME, null, null, null);
         Response createResponse = createNewProject(createProjectDto);
         Long createdProjectId = createResponse.jsonPath().getLong("id");
 
         String newProjectName = PROJECT_NAME + "edit";
-        ProjectDto editProjectDto = new ProjectDto(null, newProjectName, null, null);
+        ProjectDto editProjectDto = new ProjectDto(null, newProjectName, null, null, null);
 
         given()
                 .contentType(ContentType.JSON)
@@ -100,7 +100,7 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void failedEditOfProjectTest() {
         String wrongProjectId = "54731584";
-        ProjectDto editProjectDto = new ProjectDto(null, PROJECT_NAME, null, null);
+        ProjectDto editProjectDto = new ProjectDto(null, PROJECT_NAME, null, null, null);
 
         given()
                 .contentType(ContentType.JSON)
@@ -113,7 +113,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfProjectTest() {
-        ProjectDto createProjectDto = new ProjectDto(null, PROJECT_NAME, null, null);
+        ProjectDto createProjectDto = new ProjectDto(null, PROJECT_NAME, null, null, null);
         Response createResponse = createNewProject(createProjectDto);
         Long createdProjectId = createResponse.jsonPath().getLong("id");
 

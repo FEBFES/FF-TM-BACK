@@ -38,7 +38,7 @@ class ColumnControllerTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         ProjectEntity projectEntity = projectService.createProject(
-                new ProjectDto(null, PROJECT_NAME, null, null)
+                new ProjectDto(null, PROJECT_NAME, null, null, null)
         );
         createdProjectId = projectEntity.getId();
     }
