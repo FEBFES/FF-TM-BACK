@@ -50,14 +50,25 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulGetColumnsTest() {
+        Response beforeResponse = given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("%s/{id}/dashboard".formatted(PATH_TO_PROJECTS_API), createdProjectId);
+        beforeResponse.then()
+                .statusCode(HttpStatus.SC_OK);
+
+        int beforeSize = beforeResponse
+                .jsonPath()
+                .getInt("columns.size()");
+
         columnService.createColumn(
                 createdProjectId,
-                new ColumnDto(null, COLUMN_NAME + "1", null, 1, null)
+                new ColumnDto(null, COLUMN_NAME + "1", null, 4, null)
         );
 
         columnService.createColumn(
                 createdProjectId,
-                new ColumnDto(null, COLUMN_NAME + "2", null, 2, null)
+                new ColumnDto(null, COLUMN_NAME + "2", null, 5, null)
         );
 
         Response response = given()
@@ -71,12 +82,12 @@ class ColumnControllerTest extends BasicTestClass {
                 .jsonPath()
                 .getInt("columns.size()");
         Assertions.assertThat(size)
-                .isEqualTo(2);
+                .isEqualTo(beforeSize + 2);
     }
 
     @Test
     void successfulCreateOfColumnTest() {
-        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 1, null);
+        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
 
         createNewColumn(columnDto)
                 .then()
@@ -86,7 +97,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfColumnTest() {
-        ColumnDto columnDto = new ColumnDto(null, null, null, 1, null);
+        ColumnDto columnDto = new ColumnDto(null, null, null, 4, null);
 
         createNewColumn(columnDto)
                 .then()
@@ -95,12 +106,12 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditOfColumnTest() {
-        ColumnDto createColumnDto = new ColumnDto(null, COLUMN_NAME, null, 1, null);
+        ColumnDto createColumnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
         Response createResponse = createNewColumn(createColumnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 
         String newColumnName = COLUMN_NAME + "edit";
-        ColumnDto editColumnDto = new ColumnDto(null, newColumnName, null, 1, null);
+        ColumnDto editColumnDto = new ColumnDto(null, newColumnName, null, 5, null);
 
         given()
                 .contentType(ContentType.JSON)
@@ -114,7 +125,7 @@ class ColumnControllerTest extends BasicTestClass {
     @Test
     void failedEditOfColumnTest() {
         String wrongColumnId = "54731584";
-        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 1, null);
+        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
 
         given()
                 .contentType(ContentType.JSON)
@@ -127,7 +138,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfColumnTest() {
-        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 1, null);
+        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
         Response createResponse = createNewColumn(columnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 

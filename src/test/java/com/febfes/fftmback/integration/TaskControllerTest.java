@@ -52,7 +52,7 @@ class TaskControllerTest extends BasicTestClass {
 
         TaskColumnEntity columnEntity = columnService.createColumn(
                 createdProjectId,
-                new ColumnDto(null, COLUMN_NAME, null, 1, null)
+                new ColumnDto(null, COLUMN_NAME, null, 4, null)
         );
         createdColumnId = columnEntity.getId();
     }

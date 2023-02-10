@@ -20,7 +20,7 @@ class DashboardControllerTests extends BasicTestClass {
 
     private static final String PROJECT_NAME = "Project name";
     private static final String COLUMN_NAME = "Column name";
-    private static final Integer COLUMN_ORDER = 1;
+    private static final Integer COLUMN_ORDER = 4;
     private static final String TASK_NAME = "Task name";
 
     @Autowired
@@ -54,8 +54,8 @@ class DashboardControllerTests extends BasicTestClass {
                 .get("/api/v1/projects/{id}/dashboard", projectEntity.getId())
                 .then()
                 .statusCode(200)
-                .body("columns[0].name", equalTo(COLUMN_NAME))
-                .body("columns[0].tasks[0].name", equalTo(TASK_NAME));
+                .body("columns[4].name", equalTo(COLUMN_NAME))
+                .body("columns[4].tasks[0].name", equalTo(TASK_NAME));
         //TODO Возможно стоит добавить json парсер и проверять подругому ответ
 
     }
