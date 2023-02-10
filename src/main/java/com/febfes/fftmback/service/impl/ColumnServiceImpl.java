@@ -11,6 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -19,6 +24,14 @@ public class ColumnServiceImpl implements ColumnService {
     private final ColumnRepository columnRepository;
     private final DateProvider dateProvider;
 
+    private static final Map<Integer, String> DEFAULT_COLUMNS = new HashMap<>() {{
+        put(0, "BACKLOG");
+        put(1, "IN PROGRESS");
+        put(2, "REVIEW");
+        put(3, "DONE");
+    }};
+
+    @Override
     public TaskColumnEntity createColumn(Long projectId, ColumnDto columnDto) {
         TaskColumnEntity columnEntity = columnRepository.save(
                 ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId, dateProvider.getCurrentDate())
@@ -27,6 +40,7 @@ public class ColumnServiceImpl implements ColumnService {
         return columnEntity;
     }
 
+    @Override
     public void editColumn(Long id, ColumnDto columnDto) {
         TaskColumnEntity columnEntity = columnRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id));
@@ -37,6 +51,7 @@ public class ColumnServiceImpl implements ColumnService {
 
     }
 
+    @Override
     public void deleteColumn(Long id) {
         if (columnRepository.existsById(id)) {
             columnRepository.deleteById(id);
@@ -44,6 +59,22 @@ public class ColumnServiceImpl implements ColumnService {
         } else {
             throw new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id);
         }
+    }
+
+    @Override
+    public void createDefaultColumnsForProject(Long projectId) {
+        List<TaskColumnEntity> columns = new ArrayList<>();
+        DEFAULT_COLUMNS.forEach((key, value) -> {
+            TaskColumnEntity defaultColumn = TaskColumnEntity.builder()
+                    .name(value)
+                    .createDate(dateProvider.getCurrentDate())
+                    .columnOrder(key)
+                    .projectId(projectId)
+                    .build();
+            columns.add(defaultColumn);
+        });
+        columnRepository.saveAll(columns);
+        log.info("Created default columns with names: {}", DEFAULT_COLUMNS.values());
     }
 
 }

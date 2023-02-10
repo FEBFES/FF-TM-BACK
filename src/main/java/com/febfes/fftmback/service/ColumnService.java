@@ -10,4 +10,6 @@ public interface ColumnService {
     void editColumn(Long id, ColumnDto columnDto);
 
     void deleteColumn(Long id);
+
+    void createDefaultColumnsForProject(Long projectId);
 }
