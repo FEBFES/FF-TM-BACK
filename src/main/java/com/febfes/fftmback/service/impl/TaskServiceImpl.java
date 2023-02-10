@@ -52,11 +52,11 @@ public class TaskServiceImpl implements TaskService {
     ) {
         TaskEntity task = TaskEntity.builder()
                 .name(taskDto.name())
+                .createDate(dateProvider.getCurrentDate())
                 .description(taskDto.description())
                 .columnId(columnId)
                 .projectId(projectId)
                 .build();
-        task.setCreateDate(dateProvider.getCurrentDate());
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
         return savedTask;

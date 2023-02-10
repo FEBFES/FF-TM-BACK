@@ -11,8 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -21,6 +23,13 @@ public class ColumnServiceImpl implements ColumnService {
 
     private final ColumnRepository columnRepository;
     private final DateProvider dateProvider;
+
+    private static final Map<Integer, String> DEFAULT_COLUMNS = new HashMap<>() {{
+        put(0, "BACKLOG");
+        put(1, "IN PROGRESS");
+        put(2, "REVIEW");
+        put(3, "DONE");
+    }};
 
     @Override
     public TaskColumnEntity createColumn(Long projectId, ColumnDto columnDto) {
@@ -54,17 +63,18 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public void createDefaultColumnsForProject(Long projectId) {
-        List<String> defaultColumnsNames = Arrays.asList("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
-        for (int i = 0; i < defaultColumnsNames.size(); i++) {
+        List<TaskColumnEntity> columns = new ArrayList<>();
+        DEFAULT_COLUMNS.forEach((key, value) -> {
             TaskColumnEntity defaultColumn = TaskColumnEntity.builder()
-                    .name(defaultColumnsNames.get(i))
-                    .columnOrder(i)
+                    .name(value)
+                    .createDate(dateProvider.getCurrentDate())
+                    .columnOrder(key)
                     .projectId(projectId)
                     .build();
-            defaultColumn.setCreateDate(dateProvider.getCurrentDate());
-            columnRepository.save(defaultColumn);
-        }
-        log.info("Created default columns with names: {}", defaultColumnsNames);
+            columns.add(defaultColumn);
+        });
+        columnRepository.saveAll(columns);
+        log.info("Created default columns with names: {}", DEFAULT_COLUMNS.values());
     }
 
 }
