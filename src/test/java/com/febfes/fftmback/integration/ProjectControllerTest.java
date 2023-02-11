@@ -58,10 +58,24 @@ class ProjectControllerTest extends BasicTestClass {
     void successfulCreateOfProjectTest() {
         ProjectDto projectDto = new ProjectDto(null, PROJECT_NAME, null, null, null);
 
-        Response response = createNewProject(projectDto);
-        response.then()
+        Response createResponse = createNewProject(projectDto);
+        createResponse.then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("name", equalTo(PROJECT_NAME));
+        Long createdProjectId = createResponse.jsonPath().getLong("id");
+
+        // 4 default columns
+        Response dashboardResponse = given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("%s/{id}/dashboard".formatted(PATH_TO_PROJECTS_API), createdProjectId);
+        dashboardResponse.then()
+                .statusCode(HttpStatus.SC_OK);
+        int size = dashboardResponse
+                .jsonPath()
+                .getInt("columns.size()");
+        Assertions.assertThat(size)
+                .isEqualTo(4);
     }
 
     @Test
