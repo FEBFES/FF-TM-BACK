@@ -21,19 +21,4 @@ public record ColumnDto(
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Long projectId
 ) {
-
-    public static final class Builder {
-
-        String name;
-        Integer columnOrder;
-
-        public Builder(String name, Integer columnOrder) {
-            this.name = name;
-            this.columnOrder = columnOrder;
-        }
-
-        public ColumnDto build() {
-            return new ColumnDto(null, name, null, columnOrder, null);
-        }
-    }
 }

@@ -3,6 +3,7 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.util.DatabaseCleanup;
+import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -26,6 +27,9 @@ class ProjectControllerTest extends BasicTestClass {
     @Autowired
     private DatabaseCleanup databaseCleanup;
 
+    @Autowired
+    private DtoBuilders dtoBuilders;
+
     @AfterEach
     void afterEach() {
         databaseCleanup.execute();
@@ -34,10 +38,10 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulGetProjectsTest() {
         projectService.createProject(
-                new ProjectDto.Builder(PROJECT_NAME + "1").build()
+                dtoBuilders.createProjectDto(PROJECT_NAME + "1")
         );
         projectService.createProject(
-                new ProjectDto.Builder(PROJECT_NAME + "2").build()
+                dtoBuilders.createProjectDto(PROJECT_NAME + "2")
         );
 
         Response response = given()
@@ -56,7 +60,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfProjectTest() {
-        ProjectDto projectDto = new ProjectDto.Builder(PROJECT_NAME).build();
+        ProjectDto projectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
 
         Response createResponse = createNewProject(projectDto);
         createResponse.then()
@@ -80,7 +84,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfProjectTest() {
-        ProjectDto projectDto = new ProjectDto.Builder(null).description(PROJECT_DESCRIPTION).build();
+        ProjectDto projectDto = dtoBuilders.createProjectDto(null, PROJECT_DESCRIPTION);
 
         createNewProject(projectDto).then()
                 .statusCode(HttpStatus.SC_UNPROCESSABLE_ENTITY);
@@ -88,12 +92,12 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditOfProjectTest() {
-        ProjectDto createProjectDto = new ProjectDto.Builder(PROJECT_NAME).build();
+        ProjectDto createProjectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
         Response createResponse = createNewProject(createProjectDto);
         Long createdProjectId = createResponse.jsonPath().getLong("id");
 
         String newProjectName = PROJECT_NAME + "edit";
-        ProjectDto editProjectDto = new ProjectDto.Builder(newProjectName).build();
+        ProjectDto editProjectDto = dtoBuilders.createProjectDto(newProjectName);
 
         given()
                 .contentType(ContentType.JSON)
@@ -114,7 +118,7 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void failedEditOfProjectTest() {
         String wrongProjectId = "54731584";
-        ProjectDto editProjectDto = new ProjectDto.Builder(PROJECT_NAME).build();
+        ProjectDto editProjectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
 
         given()
                 .contentType(ContentType.JSON)
@@ -127,7 +131,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfProjectTest() {
-        ProjectDto createProjectDto = new ProjectDto.Builder(PROJECT_NAME).build();
+        ProjectDto createProjectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
         Response createResponse = createNewProject(createProjectDto);
         Long createdProjectId = createResponse.jsonPath().getLong("id");
 

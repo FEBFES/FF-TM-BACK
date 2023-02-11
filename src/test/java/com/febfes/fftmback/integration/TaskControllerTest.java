@@ -2,13 +2,12 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.domain.TaskColumnEntity;
-import com.febfes.fftmback.dto.ColumnDto;
-import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DatabaseCleanup;
+import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -43,16 +42,19 @@ class TaskControllerTest extends BasicTestClass {
     @Autowired
     private DatabaseCleanup databaseCleanup;
 
+    @Autowired
+    private DtoBuilders dtoBuilders;
+
     @BeforeEach
     void beforeEach() {
         ProjectEntity projectEntity = projectService.createProject(
-                new ProjectDto.Builder(PROJECT_NAME).build()
+                dtoBuilders.createProjectDto(PROJECT_NAME)
         );
         createdProjectId = projectEntity.getId();
 
         TaskColumnEntity columnEntity = columnService.createColumn(
                 createdProjectId,
-                new ColumnDto.Builder(COLUMN_NAME, 4).build()
+                dtoBuilders.createColumnDto(COLUMN_NAME, 4)
         );
         createdColumnId = columnEntity.getId();
     }
@@ -67,13 +69,13 @@ class TaskControllerTest extends BasicTestClass {
         taskService.createTask(
                 createdProjectId,
                 createdColumnId,
-                new TaskDto.Builder(TASK_NAME + "1").build()
+                dtoBuilders.createTaskDto(TASK_NAME + "1")
         );
 
         taskService.createTask(
                 createdProjectId,
                 createdColumnId,
-                new TaskDto.Builder(TASK_NAME + "2").build()
+                dtoBuilders.createTaskDto(TASK_NAME + "2")
         );
 
         Response response = given()
@@ -92,7 +94,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfTaskTest() {
-        TaskDto taskDto = new TaskDto.Builder(TASK_NAME).build();
+        TaskDto taskDto = dtoBuilders.createTaskDto(TASK_NAME);
 
         createNewTask(taskDto)
                 .then()
@@ -102,7 +104,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfTaskTest() {
-        TaskDto taskDto = new TaskDto.Builder(null).build();
+        TaskDto taskDto = dtoBuilders.createTaskDto();
 
         createNewTask(taskDto)
                 .then()
@@ -111,12 +113,12 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditOfTaskTest() {
-        TaskDto createTaskDto = new TaskDto.Builder(TASK_NAME).build();
+        TaskDto createTaskDto = dtoBuilders.createTaskDto(TASK_NAME);
         Response createResponse = createNewTask(createTaskDto);
         long createdTaskId = createResponse.jsonPath().getLong("id");
 
         String newTaskName = TASK_NAME + "edit";
-        TaskDto editTaskDto = new TaskDto.Builder(newTaskName).build();
+        TaskDto editTaskDto = dtoBuilders.createTaskDto(newTaskName);
 
         given()
                 .contentType(ContentType.JSON)
@@ -131,7 +133,7 @@ class TaskControllerTest extends BasicTestClass {
     @Test
     void failedEditOfTaskTest() {
         String wrongTaskId = "54731584";
-        TaskDto createTaskDto = new TaskDto.Builder(TASK_NAME).build();
+        TaskDto createTaskDto = dtoBuilders.createTaskDto(TASK_NAME);
 
         given()
                 .contentType(ContentType.JSON)
@@ -145,7 +147,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfTaskTest() {
-        TaskDto createTaskDto = new TaskDto.Builder(TASK_NAME).build();
+        TaskDto createTaskDto = dtoBuilders.createTaskDto(TASK_NAME);
         Response createResponse = createNewTask(createTaskDto);
         long createdTaskId = createResponse.jsonPath().getLong("id");
 
