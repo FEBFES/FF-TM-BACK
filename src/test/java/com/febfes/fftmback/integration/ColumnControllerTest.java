@@ -38,7 +38,7 @@ class ColumnControllerTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         ProjectEntity projectEntity = projectService.createProject(
-                new ProjectDto(null, PROJECT_NAME, null, null, null)
+                new ProjectDto.Builder(PROJECT_NAME).build()
         );
         createdProjectId = projectEntity.getId();
     }
@@ -63,12 +63,12 @@ class ColumnControllerTest extends BasicTestClass {
 
         columnService.createColumn(
                 createdProjectId,
-                new ColumnDto(null, COLUMN_NAME + "1", null, 4, null)
+                new ColumnDto.Builder(COLUMN_NAME + "1", 4).build()
         );
 
         columnService.createColumn(
                 createdProjectId,
-                new ColumnDto(null, COLUMN_NAME + "2", null, 5, null)
+                new ColumnDto.Builder(COLUMN_NAME + "1", 5).build()
         );
 
         Response response = given()
@@ -87,7 +87,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfColumnTest() {
-        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
+        ColumnDto columnDto = new ColumnDto.Builder(COLUMN_NAME, 4).build();
 
         createNewColumn(columnDto)
                 .then()
@@ -97,7 +97,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfColumnTest() {
-        ColumnDto columnDto = new ColumnDto(null, null, null, 4, null);
+        ColumnDto columnDto = new ColumnDto.Builder(null, 4).build();
 
         createNewColumn(columnDto)
                 .then()
@@ -106,12 +106,12 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditOfColumnTest() {
-        ColumnDto createColumnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
+        ColumnDto createColumnDto = new ColumnDto.Builder(COLUMN_NAME, 4).build();
         Response createResponse = createNewColumn(createColumnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 
         String newColumnName = COLUMN_NAME + "edit";
-        ColumnDto editColumnDto = new ColumnDto(null, newColumnName, null, 5, null);
+        ColumnDto editColumnDto = new ColumnDto.Builder(newColumnName, 5).build();
 
         given()
                 .contentType(ContentType.JSON)
@@ -125,7 +125,7 @@ class ColumnControllerTest extends BasicTestClass {
     @Test
     void failedEditOfColumnTest() {
         String wrongColumnId = "54731584";
-        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
+        ColumnDto columnDto = new ColumnDto.Builder(COLUMN_NAME, 4).build();
 
         given()
                 .contentType(ContentType.JSON)
@@ -138,7 +138,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfColumnTest() {
-        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
+        ColumnDto columnDto = new ColumnDto.Builder(COLUMN_NAME, 4).build();
         Response createResponse = createNewColumn(columnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 

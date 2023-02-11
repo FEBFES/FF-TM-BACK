@@ -46,13 +46,13 @@ class TaskControllerTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         ProjectEntity projectEntity = projectService.createProject(
-                new ProjectDto(null, PROJECT_NAME, null, null, null)
+                new ProjectDto.Builder(PROJECT_NAME).build()
         );
         createdProjectId = projectEntity.getId();
 
         TaskColumnEntity columnEntity = columnService.createColumn(
                 createdProjectId,
-                new ColumnDto(null, COLUMN_NAME, null, 4, null)
+                new ColumnDto.Builder(COLUMN_NAME, 4).build()
         );
         createdColumnId = columnEntity.getId();
     }
@@ -67,13 +67,13 @@ class TaskControllerTest extends BasicTestClass {
         taskService.createTask(
                 createdProjectId,
                 createdColumnId,
-                new TaskDto(null, TASK_NAME + "1", null, null, null, null, null)
+                new TaskDto.Builder(TASK_NAME + "1").build()
         );
 
         taskService.createTask(
                 createdProjectId,
                 createdColumnId,
-                new TaskDto(null, TASK_NAME + "2", null, null, null, null, null)
+                new TaskDto.Builder(TASK_NAME + "2").build()
         );
 
         Response response = given()
@@ -92,7 +92,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfTaskTest() {
-        TaskDto taskDto = new TaskDto(null, TASK_NAME, null, null, null, null, null);
+        TaskDto taskDto = new TaskDto.Builder(TASK_NAME).build();
 
         createNewTask(taskDto)
                 .then()
@@ -102,7 +102,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfTaskTest() {
-        TaskDto taskDto = new TaskDto(null, null, null, null, null, null, null);
+        TaskDto taskDto = new TaskDto.Builder(null).build();
 
         createNewTask(taskDto)
                 .then()
@@ -111,12 +111,12 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditOfTaskTest() {
-        TaskDto createTaskDto = new TaskDto(null, TASK_NAME, null, null, null, null, null);
+        TaskDto createTaskDto = new TaskDto.Builder(TASK_NAME).build();
         Response createResponse = createNewTask(createTaskDto);
         long createdTaskId = createResponse.jsonPath().getLong("id");
 
         String newTaskName = TASK_NAME + "edit";
-        TaskDto editTaskDto = new TaskDto(null, newTaskName, null, null, null, null, null);
+        TaskDto editTaskDto = new TaskDto.Builder(newTaskName).build();
 
         given()
                 .contentType(ContentType.JSON)
@@ -131,7 +131,7 @@ class TaskControllerTest extends BasicTestClass {
     @Test
     void failedEditOfTaskTest() {
         String wrongTaskId = "54731584";
-        TaskDto createTaskDto = new TaskDto(null, TASK_NAME, null, null, null, null, null);
+        TaskDto createTaskDto = new TaskDto.Builder(TASK_NAME).build();
 
         given()
                 .contentType(ContentType.JSON)
@@ -145,7 +145,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfTaskTest() {
-        TaskDto createTaskDto = new TaskDto(null, TASK_NAME, null, null, null, null, null);
+        TaskDto createTaskDto = new TaskDto.Builder(TASK_NAME).build();
         Response createResponse = createNewTask(createTaskDto);
         long createdTaskId = createResponse.jsonPath().getLong("id");
 

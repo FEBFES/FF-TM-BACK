@@ -69,4 +69,4 @@ You need to specify database url, username and password in [liquibase.properties
 
 Roll one changeset back:
 
-`.\mvnw liquibase:rollback liquibase:rollbackOneChangeSetSQL`
+`./mvnw liquibase:rollback -Dliquibase.rollbackCount=1`

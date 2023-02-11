@@ -28,4 +28,17 @@ public record TaskDto(
         Long ownerId
 
 ) {
+
+    public static final class Builder {
+
+        String name;
+
+        public Builder(String name) {
+            this.name = name;
+        }
+
+        public TaskDto build() {
+            return new TaskDto(null, name, null, null, null, null, null);
+        }
+    }
 }

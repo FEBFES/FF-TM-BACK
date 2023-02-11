@@ -21,4 +21,23 @@ public record ProjectDto(
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Long ownerId
 ) {
+
+    public static final class Builder {
+
+        String name;
+        String description;
+
+        public Builder(String name) {
+            this.name = name;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public ProjectDto build() {
+            return new ProjectDto(null, name, description, null, null);
+        }
+    }
 }
