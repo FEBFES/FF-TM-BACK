@@ -2,29 +2,33 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.ColumnDto;
+import com.febfes.fftmback.dto.auth.UserDetailsDto;
+import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.util.DatabaseCleanup;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
+import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
+import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 class ColumnControllerTest extends BasicTestClass {
 
-    private static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
-    private static final String COLUMN_NAME = "Column name";
-    private static final String PROJECT_NAME = "Project name";
+    public static final String COLUMN_NAME = "Column name";
 
     private Long createdProjectId;
+    private String token;
 
     @Autowired
     private ColumnService columnService;
@@ -33,27 +37,31 @@ class ColumnControllerTest extends BasicTestClass {
     private ProjectService projectService;
 
     @Autowired
-    private DatabaseCleanup databaseCleanup;
+    private AuthenticationService authenticationService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private DtoBuilders dtoBuilders;
 
     @BeforeEach
     void beforeEach() {
+        token = authenticationService.registerUser(
+                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+        ).token();
+        String createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
+
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME)
+                dtoBuilders.createProjectDto(PROJECT_NAME),
+                createdUsername
         );
         createdProjectId = projectEntity.getId();
     }
 
-    @AfterEach
-    void afterEach() {
-        databaseCleanup.execute();
-    }
-
     @Test
     void successfulGetColumnsTest() {
-        Response beforeResponse = given()
+        Response beforeResponse = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get("%s/{id}/dashboard".formatted(PATH_TO_PROJECTS_API), createdProjectId);
@@ -74,7 +82,7 @@ class ColumnControllerTest extends BasicTestClass {
                 dtoBuilders.createColumnDto(COLUMN_NAME + "1", 5)
         );
 
-        Response response = given()
+        Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get("%s/{id}/dashboard".formatted(PATH_TO_PROJECTS_API), createdProjectId);
@@ -116,7 +124,7 @@ class ColumnControllerTest extends BasicTestClass {
         String newColumnName = COLUMN_NAME + "edit";
         ColumnDto editColumnDto = dtoBuilders.createColumnDto(newColumnName, 5);
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editColumnDto)
                 .when()
@@ -130,7 +138,7 @@ class ColumnControllerTest extends BasicTestClass {
         String wrongColumnId = "54731584";
         ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME, 4);
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(columnDto)
                 .when()
@@ -145,7 +153,7 @@ class ColumnControllerTest extends BasicTestClass {
         Response createResponse = createNewColumn(columnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .delete("%s/{projectId}/columns/{columnId}".formatted(PATH_TO_PROJECTS_API), createdProjectId, createdColumnId)
@@ -157,7 +165,7 @@ class ColumnControllerTest extends BasicTestClass {
     void failedDeleteOfColumnTest() {
         String wrongColumnId = "54731584";
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .delete("%s/{projectId}/columns/{columnId}".formatted(PATH_TO_PROJECTS_API), createdProjectId, wrongColumnId)
@@ -166,10 +174,14 @@ class ColumnControllerTest extends BasicTestClass {
     }
 
     private Response createNewColumn(ColumnDto columnDto) {
-        return given()
+        return requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(columnDto)
                 .when()
                 .post("%s/{projectId}/columns".formatted(PATH_TO_PROJECTS_API), createdProjectId);
+    }
+
+    private RequestSpecification requestWithBearerToken() {
+        return given().header("Authorization", "Bearer " + token);
     }
 }

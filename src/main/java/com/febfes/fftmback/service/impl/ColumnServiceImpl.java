@@ -32,7 +32,10 @@ public class ColumnServiceImpl implements ColumnService {
     }};
 
     @Override
-    public TaskColumnEntity createColumn(Long projectId, ColumnDto columnDto) {
+    public TaskColumnEntity createColumn(
+            Long projectId,
+            ColumnDto columnDto
+    ) {
         TaskColumnEntity columnEntity = columnRepository.save(
                 ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId, dateProvider.getCurrentDate())
         );
@@ -41,7 +44,10 @@ public class ColumnServiceImpl implements ColumnService {
     }
 
     @Override
-    public void editColumn(Long id, ColumnDto columnDto) {
+    public void editColumn(
+            Long id,
+            ColumnDto columnDto
+    ) {
         TaskColumnEntity columnEntity = columnRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id));
         columnEntity.setName(columnDto.name());

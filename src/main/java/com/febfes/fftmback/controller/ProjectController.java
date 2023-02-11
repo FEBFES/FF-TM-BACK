@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("v1/projects")
 @RequiredArgsConstructor
+@ProtectedApi
 @Tag(name = "Project")
 public class ProjectController {
 
@@ -35,7 +38,10 @@ public class ProjectController {
     @Operation(summary = "Create new project")
     @ApiCreate
     public ProjectDto createNewProject(@RequestBody @Valid ProjectDto projectDto) {
-        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.createProject(projectDto));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ProjectMapper.INSTANCE.projectToProjectDto(
+                projectService.createProject(projectDto, authentication.getName())
+        );
     }
 
     @Operation(summary = "Get project by its id")

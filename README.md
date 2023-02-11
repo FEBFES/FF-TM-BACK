@@ -17,10 +17,13 @@ db.username = your postgres username
 
 db.password = your postgres password
 
+jwt.secret = jwt secret key
+
 ```
 -Dspring.datasource.url=db.url
 -Dspring.datasource.username=db.username
 -Dspring.datasource.password=db.password
+-Djwt.secret=jwt.secret
 ```
 
 ## Style

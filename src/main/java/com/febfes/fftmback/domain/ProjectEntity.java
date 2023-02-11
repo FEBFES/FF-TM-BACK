@@ -32,4 +32,7 @@ public class ProjectEntity extends AppEntity {
     private List<TaskEntity> taskEntityList;
     //TODO problem when project was deleted
 
+    @Column(name = "owner_id")
+    private Long ownerId;
+
 }

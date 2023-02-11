@@ -30,4 +30,7 @@ public class TaskEntity extends AppEntity {
 
     @Column(name = "column_id")
     private Long columnId;
+
+    @Column(name = "owner_id")
+    private Long ownerId;
 }

@@ -7,7 +7,7 @@ import com.febfes.fftmback.dto.ProjectDto;
 import java.util.List;
 
 public interface ProjectService {
-    ProjectEntity createProject(ProjectDto projectDto);
+    ProjectEntity createProject(ProjectDto projectDto, String username);
 
     List<ProjectEntity> getProjects();
 

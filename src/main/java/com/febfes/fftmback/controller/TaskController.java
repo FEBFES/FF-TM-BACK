@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("v1/projects")
 @RequiredArgsConstructor
+@ProtectedApi
 @Tag(name = "Task")
 public class TaskController {
 
@@ -58,8 +61,13 @@ public class TaskController {
             @ParameterObject ColumnParameters pathVars,
             @RequestBody @Valid TaskDto taskDto
     ) {
-
-        TaskEntity task = taskService.createTask(pathVars.projectId(), pathVars.columnId(), taskDto);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        TaskEntity task = taskService.createTask(
+                pathVars.projectId(),
+                pathVars.columnId(),
+                taskDto,
+                authentication.getName()
+        );
         return TaskMapper.INSTANCE.taskToTaskDto(task);
     }
 

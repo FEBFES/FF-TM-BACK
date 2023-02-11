@@ -3,6 +3,7 @@ package com.febfes.fftmback.controller;
 import com.febfes.fftmback.annotation.ApiCreate;
 import com.febfes.fftmback.annotation.ApiDelete;
 import com.febfes.fftmback.annotation.ApiEdit;
+import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
 import com.febfes.fftmback.mapper.ColumnMapper;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("v1/projects")
 @RequiredArgsConstructor
+@ProtectedApi
 @Tag(name = "Column")
 public class ColumnController {
 
@@ -32,8 +34,9 @@ public class ColumnController {
             @PathVariable Long projectId,
             @RequestBody @Valid ColumnDto columnDto
     ) {
-
-        return ColumnMapper.INSTANCE.columnToColumnDto(columnService.createColumn(projectId, columnDto));
+        return ColumnMapper.INSTANCE.columnToColumnDto(
+                columnService.createColumn(projectId, columnDto)
+        );
     }
 
     @Operation(summary = "Edit column by its columnId")

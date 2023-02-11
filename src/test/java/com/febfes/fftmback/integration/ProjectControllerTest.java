@@ -1,50 +1,65 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.dto.auth.UserDetailsDto;
+import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.util.DatabaseCleanup;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 class ProjectControllerTest extends BasicTestClass {
 
-    private static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
-    private static final String PROJECT_NAME = "Project name";
-    private static final String PROJECT_DESCRIPTION = "Project description";
+    public static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
+    public static final String PROJECT_NAME = "Project name";
+    public static final String PROJECT_DESCRIPTION = "Project description";
+
+    private String createdUsername;
+    private String token;
 
     @Autowired
     private ProjectService projectService;
 
     @Autowired
-    private DatabaseCleanup databaseCleanup;
+    private AuthenticationService authenticationService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private DtoBuilders dtoBuilders;
 
-    @AfterEach
-    void afterEach() {
-        databaseCleanup.execute();
+    @BeforeEach
+    void beforeEach() {
+        token = authenticationService.registerUser(
+                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+        ).token();
+        createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
     }
 
     @Test
     void successfulGetProjectsTest() {
         projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME + "1")
+                dtoBuilders.createProjectDto(PROJECT_NAME + "1"),
+                createdUsername
         );
         projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME + "2")
+                dtoBuilders.createProjectDto(PROJECT_NAME + "2"),
+                createdUsername
         );
 
-        Response response = given()
+        Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get(PATH_TO_PROJECTS_API);
@@ -69,7 +84,7 @@ class ProjectControllerTest extends BasicTestClass {
         Long createdProjectId = createResponse.jsonPath().getLong("id");
 
         // 4 default columns
-        Response dashboardResponse = given()
+        Response dashboardResponse = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get("%s/{id}/dashboard".formatted(PATH_TO_PROJECTS_API), createdProjectId);
@@ -99,7 +114,7 @@ class ProjectControllerTest extends BasicTestClass {
         String newProjectName = PROJECT_NAME + "edit";
         ProjectDto editProjectDto = dtoBuilders.createProjectDto(newProjectName);
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editProjectDto)
                 .when()
@@ -107,7 +122,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        Response getResponse = given()
+        Response getResponse = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId);
@@ -120,7 +135,7 @@ class ProjectControllerTest extends BasicTestClass {
         String wrongProjectId = "54731584";
         ProjectDto editProjectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editProjectDto)
                 .when()
@@ -135,7 +150,7 @@ class ProjectControllerTest extends BasicTestClass {
         Response createResponse = createNewProject(createProjectDto);
         Long createdProjectId = createResponse.jsonPath().getLong("id");
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
@@ -147,7 +162,7 @@ class ProjectControllerTest extends BasicTestClass {
     void failedDeleteOfProjectTest() {
         String wrongProjectId1 = "54731584";
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), wrongProjectId1)
@@ -156,10 +171,14 @@ class ProjectControllerTest extends BasicTestClass {
     }
 
     private Response createNewProject(ProjectDto projectDto) {
-        return given()
+        return requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(projectDto)
                 .when()
                 .post(PATH_TO_PROJECTS_API);
+    }
+
+    private RequestSpecification requestWithBearerToken() {
+        return given().header("Authorization", "Bearer " + token);
     }
 }

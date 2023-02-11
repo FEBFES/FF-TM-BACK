@@ -32,6 +32,17 @@ public class ControllerAdvisor {
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
+    @ExceptionHandler(EntityAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @Hidden
+    public ApiErrorDto handleEntityAlreadyExistsException(
+            EntityAlreadyExistsException ex,
+            HttpServletRequest httpRequest
+    ) {
+        return createResponseBodyForExceptions(HttpStatus.CONFLICT, EntityAlreadyExistsException.class.getSimpleName(),
+                ex.getMessage(), httpRequest.getRequestURI());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @Hidden
