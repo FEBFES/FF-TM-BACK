@@ -2,10 +2,10 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.ColumnDto;
-import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.util.DatabaseCleanup;
+import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -35,10 +35,13 @@ class ColumnControllerTest extends BasicTestClass {
     @Autowired
     private DatabaseCleanup databaseCleanup;
 
+    @Autowired
+    private DtoBuilders dtoBuilders;
+
     @BeforeEach
     void beforeEach() {
         ProjectEntity projectEntity = projectService.createProject(
-                new ProjectDto(null, PROJECT_NAME, null, null)
+                dtoBuilders.createProjectDto(PROJECT_NAME)
         );
         createdProjectId = projectEntity.getId();
     }
@@ -63,12 +66,12 @@ class ColumnControllerTest extends BasicTestClass {
 
         columnService.createColumn(
                 createdProjectId,
-                new ColumnDto(null, COLUMN_NAME + "1", null, 4, null)
+                dtoBuilders.createColumnDto(COLUMN_NAME + "1", 4)
         );
 
         columnService.createColumn(
                 createdProjectId,
-                new ColumnDto(null, COLUMN_NAME + "2", null, 5, null)
+                dtoBuilders.createColumnDto(COLUMN_NAME + "1", 5)
         );
 
         Response response = given()
@@ -87,7 +90,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfColumnTest() {
-        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
+        ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME, 4);
 
         createNewColumn(columnDto)
                 .then()
@@ -97,7 +100,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfColumnTest() {
-        ColumnDto columnDto = new ColumnDto(null, null, null, 4, null);
+        ColumnDto columnDto = dtoBuilders.createColumnDto(4);
 
         createNewColumn(columnDto)
                 .then()
@@ -106,12 +109,12 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditOfColumnTest() {
-        ColumnDto createColumnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
+        ColumnDto createColumnDto = dtoBuilders.createColumnDto(COLUMN_NAME, 4);
         Response createResponse = createNewColumn(createColumnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 
         String newColumnName = COLUMN_NAME + "edit";
-        ColumnDto editColumnDto = new ColumnDto(null, newColumnName, null, 5, null);
+        ColumnDto editColumnDto = dtoBuilders.createColumnDto(newColumnName, 5);
 
         given()
                 .contentType(ContentType.JSON)
@@ -125,7 +128,7 @@ class ColumnControllerTest extends BasicTestClass {
     @Test
     void failedEditOfColumnTest() {
         String wrongColumnId = "54731584";
-        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
+        ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME, 4);
 
         given()
                 .contentType(ContentType.JSON)
@@ -138,7 +141,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfColumnTest() {
-        ColumnDto columnDto = new ColumnDto(null, COLUMN_NAME, null, 4, null);
+        ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME, 4);
         Response createResponse = createNewColumn(columnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 

@@ -5,3 +5,5 @@ databaseChangeLog:
       file: /db/changelog/0.0.2-add-task-fks.yaml
   - include:
       file: /db/changelog/0.0.3-change-columns.yaml
+  - include:
+      file: /db/changelog/0.0.4-add-user-table.yaml
