@@ -9,6 +9,7 @@ import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +25,19 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final DateProvider dateProvider;
     private final ColumnService columnService;
+    private final UserService userService;
 
     @Override
-    public ProjectEntity createProject(ProjectDto projectDto) {
+    public ProjectEntity createProject(
+            ProjectDto projectDto,
+            String username
+    ) {
         ProjectEntity projectEntity = projectRepository.save(
-                ProjectMapper.INSTANCE.projectDtoToProject(projectDto, dateProvider.getCurrentDate())
+                ProjectMapper.INSTANCE.projectDtoToProject(
+                        projectDto,
+                        dateProvider.getCurrentDate(),
+                        userService.getUserIdByUsername(username)
+                )
         );
         log.info("Saved project: {}", projectEntity);
         columnService.createDefaultColumnsForProject(projectEntity.getId());

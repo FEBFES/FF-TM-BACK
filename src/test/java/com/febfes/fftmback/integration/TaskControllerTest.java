@@ -3,20 +3,19 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.TaskService;
-import com.febfes.fftmback.util.DatabaseCleanup;
+import com.febfes.fftmback.dto.auth.UserDetailsDto;
+import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -29,6 +28,8 @@ class TaskControllerTest extends BasicTestClass {
 
     private Long createdProjectId;
     private Long createdColumnId;
+    private String createdUsername;
+    private String token;
 
     @Autowired
     private TaskService taskService;
@@ -40,15 +41,24 @@ class TaskControllerTest extends BasicTestClass {
     private ProjectService projectService;
 
     @Autowired
-    private DatabaseCleanup databaseCleanup;
+    private AuthenticationService authenticationService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private DtoBuilders dtoBuilders;
 
     @BeforeEach
     void beforeEach() {
+        token = authenticationService.registerUser(
+                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+        ).token();
+        createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
+
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME)
+                dtoBuilders.createProjectDto(PROJECT_NAME),
+                createdUsername
         );
         createdProjectId = projectEntity.getId();
 
@@ -59,26 +69,23 @@ class TaskControllerTest extends BasicTestClass {
         createdColumnId = columnEntity.getId();
     }
 
-    @AfterEach
-    void afterEach() {
-        databaseCleanup.execute();
-    }
-
     @Test
     void successfulGetTasksTest() {
         taskService.createTask(
                 createdProjectId,
                 createdColumnId,
-                dtoBuilders.createTaskDto(TASK_NAME + "1")
+                dtoBuilders.createTaskDto(TASK_NAME + "1"),
+                createdUsername
         );
 
         taskService.createTask(
                 createdProjectId,
                 createdColumnId,
-                dtoBuilders.createTaskDto(TASK_NAME + "2")
+                dtoBuilders.createTaskDto(TASK_NAME + "2"),
+                createdUsername
         );
 
-        Response response = given()
+        Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get("%s/{projectId}/columns/{columnId}/tasks".formatted(PATH_TO_PROJECTS_API), createdProjectId, createdColumnId);
@@ -120,7 +127,7 @@ class TaskControllerTest extends BasicTestClass {
         String newTaskName = TASK_NAME + "edit";
         TaskDto editTaskDto = dtoBuilders.createTaskDto(newTaskName);
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editTaskDto)
                 .when()
@@ -135,7 +142,7 @@ class TaskControllerTest extends BasicTestClass {
         String wrongTaskId = "54731584";
         TaskDto createTaskDto = dtoBuilders.createTaskDto(TASK_NAME);
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(createTaskDto)
                 .when()
@@ -151,7 +158,7 @@ class TaskControllerTest extends BasicTestClass {
         Response createResponse = createNewTask(createTaskDto);
         long createdTaskId = createResponse.jsonPath().getLong("id");
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .delete("%s/{projectId}/columns/{columnId}/tasks/{taskId}".formatted(PATH_TO_PROJECTS_API),
@@ -164,7 +171,7 @@ class TaskControllerTest extends BasicTestClass {
     void failedDeleteOfTaskTest() {
         String wrongTaskId = "54731584";
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .delete("%s/{projectId}/columns/{columnId}/tasks/{taskId}".formatted(PATH_TO_PROJECTS_API),
@@ -174,11 +181,15 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     private Response createNewTask(TaskDto taskDto) {
-        return given()
+        return requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(taskDto)
                 .when()
                 .post("%s/{projectId}/columns/{columnId}/tasks".formatted(PATH_TO_PROJECTS_API),
                         createdProjectId, createdColumnId);
+    }
+
+    private RequestSpecification requestWithBearerToken() {
+        return given().header("Authorization", "Bearer " + token);
     }
 }

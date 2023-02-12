@@ -11,7 +11,7 @@ public interface TaskService {
 
     TaskEntity getTaskById(Long id);
 
-    TaskEntity createTask(Long projectId, Long columnId, TaskDto taskDto);
+    TaskEntity createTask(Long projectId, Long columnId, TaskDto taskDto, String username);
 
     TaskEntity updateTask(Long id, Long projectId, Long columnId, TaskDto taskDto);
 

@@ -1,6 +1,7 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiGetOne;
+import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("v1/projects")
 @RequiredArgsConstructor
+@ProtectedApi
 @Tag(name = "Project")
 public class DashboardController {
 

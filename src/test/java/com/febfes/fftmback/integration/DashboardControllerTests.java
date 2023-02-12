@@ -2,14 +2,16 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.domain.TaskColumnEntity;
-import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.dto.auth.UserDetailsDto;
+import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -21,6 +23,9 @@ class DashboardControllerTests extends BasicTestClass {
     private static final Integer COLUMN_ORDER = 4;
     private static final String TASK_NAME = "Task name";
 
+    private String createdUsername;
+    private String token;
+
     @Autowired
     private ProjectService projectService;
 
@@ -31,12 +36,27 @@ class DashboardControllerTests extends BasicTestClass {
     private TaskService taskService;
 
     @Autowired
+    private AuthenticationService authenticationService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
     private DtoBuilders dtoBuilders;
+
+    @BeforeEach
+    void beforeEach() {
+        token = authenticationService.registerUser(
+                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+        ).token();
+        createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
+    }
 
     @Test
     void testSingleSuccessTest1() {
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME)
+                dtoBuilders.createProjectDto(PROJECT_NAME),
+                createdUsername
         );
         TaskColumnEntity columnEntity = columnService.createColumn(
                 projectEntity.getId(),
@@ -45,10 +65,11 @@ class DashboardControllerTests extends BasicTestClass {
         taskService.createTask(
                 projectEntity.getId(),
                 columnEntity.getId(),
-                dtoBuilders.createTaskDto(TASK_NAME)
+                dtoBuilders.createTaskDto(TASK_NAME),
+                createdUsername
         );
 
-        given()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get("/api/v1/projects/{id}/dashboard", projectEntity.getId())
@@ -60,4 +81,7 @@ class DashboardControllerTests extends BasicTestClass {
 
     }
 
+    private RequestSpecification requestWithBearerToken() {
+        return given().header("Authorization", "Bearer " + token);
+    }
 }

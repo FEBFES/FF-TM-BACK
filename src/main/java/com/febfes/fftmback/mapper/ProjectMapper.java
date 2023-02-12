@@ -16,4 +16,8 @@ public interface ProjectMapper {
 
     @Mapping(target = "createDate", source = "createDate")
     ProjectEntity projectDtoToProject(ProjectDto projectDto, Date createDate);
+
+    @Mapping(target = "createDate", source = "createDate")
+    @Mapping(target = "ownerId", source = "ownerId")
+    ProjectEntity projectDtoToProject(ProjectDto projectDto, Date createDate, Long ownerId);
 }

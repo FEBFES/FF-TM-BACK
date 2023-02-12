@@ -1,8 +1,11 @@
 package com.febfes.fftmback.integration;
 
 
+import com.febfes.fftmback.util.DatabaseCleanup;
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -17,6 +20,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @ActiveProfiles("test")
 public class BasicTestClass {
+
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
 
     @LocalServerPort
     private Integer port;
@@ -33,6 +39,11 @@ public class BasicTestClass {
     @BeforeEach
     void setUp() {
         RestAssured.baseURI = "http://localhost:" + port;
+    }
+
+    @AfterEach
+    void afterEach() {
+        databaseCleanup.execute();
     }
 }
 

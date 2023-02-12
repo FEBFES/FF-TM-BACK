@@ -5,6 +5,7 @@ import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DateProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final DateProvider dateProvider;
+    private final UserService userService;
 
     @Override
     public List<TaskEntity> getTasks(
@@ -48,14 +50,17 @@ public class TaskServiceImpl implements TaskService {
     public TaskEntity createTask(
             Long projectId,
             Long columnId,
-            TaskDto taskDto
+            TaskDto taskDto,
+            String username
     ) {
+        // TODO: use mapper
         TaskEntity task = TaskEntity.builder()
                 .name(taskDto.name())
                 .createDate(dateProvider.getCurrentDate())
                 .description(taskDto.description())
                 .columnId(columnId)
                 .projectId(projectId)
+                .ownerId(userService.getUserIdByUsername(username))
                 .build();
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
