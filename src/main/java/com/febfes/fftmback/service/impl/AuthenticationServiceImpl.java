@@ -31,13 +31,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationDto registerUser(UserDetailsDto userDetailsDto) {
-        if (userRepository.existsByUsername(userDetailsDto.username())) {
-            throw new EntityAlreadyExistsException(UserEntity.class.getSimpleName(), "username",
-                    userDetailsDto.username());
-        }
-        if (userRepository.existsByEmail(userDetailsDto.email())) {
-            throw new EntityAlreadyExistsException(UserEntity.class.getSimpleName(), "email",
-                    userDetailsDto.email());
+        if (userRepository.existsByEmailOrUsername(userDetailsDto.email(), userDetailsDto.username())) {
+            throw new EntityAlreadyExistsException(UserEntity.class.getSimpleName());
         }
 
         UserEntity user = UserMapper.INSTANCE.userDetailsDtoToUser(

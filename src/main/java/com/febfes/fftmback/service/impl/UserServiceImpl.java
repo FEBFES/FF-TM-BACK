@@ -23,4 +23,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getSimpleName(),
                         "username", username));
     }
+
+    @Override
+    public Long getUserIdByUsername(String username) {
+        return userRepository.getIdByUsername(username);
+    }
 }

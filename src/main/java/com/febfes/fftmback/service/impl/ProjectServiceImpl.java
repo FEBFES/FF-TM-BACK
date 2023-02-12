@@ -1,7 +1,6 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.ProjectEntity;
-import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
@@ -33,10 +32,12 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectDto projectDto,
             String username
     ) {
-        UserEntity userEntity = (UserEntity) userService.loadUserByUsername(username);
-
         ProjectEntity projectEntity = projectRepository.save(
-                ProjectMapper.INSTANCE.projectDtoToProject(projectDto, dateProvider.getCurrentDate(), userEntity.getId())
+                ProjectMapper.INSTANCE.projectDtoToProject(
+                        projectDto,
+                        dateProvider.getCurrentDate(),
+                        userService.getUserIdByUsername(username)
+                )
         );
         log.info("Saved project: {}", projectEntity);
         columnService.createDefaultColumnsForProject(projectEntity.getId());

@@ -1,6 +1,10 @@
 package com.febfes.fftmback.exception;
 
 public class EntityAlreadyExistsException extends RuntimeException {
+    public EntityAlreadyExistsException(String entity) {
+        super("%s already exists");
+    }
+
     public EntityAlreadyExistsException(
             String entity,
             String fieldName,

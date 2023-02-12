@@ -1,7 +1,6 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.TaskEntity;
-import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.TaskRepository;
@@ -54,8 +53,6 @@ public class TaskServiceImpl implements TaskService {
             TaskDto taskDto,
             String username
     ) {
-        UserEntity userEntity = (UserEntity) userService.loadUserByUsername(username);
-
         // TODO: use mapper
         TaskEntity task = TaskEntity.builder()
                 .name(taskDto.name())
@@ -63,7 +60,7 @@ public class TaskServiceImpl implements TaskService {
                 .description(taskDto.description())
                 .columnId(columnId)
                 .projectId(projectId)
-                .ownerId(userEntity.getId())
+                .ownerId(userService.getUserIdByUsername(username))
                 .build();
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
