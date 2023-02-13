@@ -32,15 +32,14 @@ public class WebSecurity {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-//                .requestMatchers(
-//                        "/v1/auth/**",
-//                        "/swagger-ui/**",
-//                        "/v3/api-docs/**"
-//                )
-                .anyRequest()
+                .requestMatchers(
+                        "/v1/auth/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**"
+                )
                 .permitAll()
-//                .anyRequest()
-//                .authenticated()
+                .anyRequest()
+                .authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
