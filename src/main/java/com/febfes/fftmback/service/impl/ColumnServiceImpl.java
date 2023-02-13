@@ -7,6 +7,7 @@ import com.febfes.fftmback.mapper.ColumnMapper;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.util.DateProvider;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,15 @@ public class ColumnServiceImpl implements ColumnService {
     private final ColumnRepository columnRepository;
     private final DateProvider dateProvider;
 
-    private static final Map<Integer, String> DEFAULT_COLUMNS = new HashMap<>() {{
-        put(0, "BACKLOG");
-        put(1, "IN PROGRESS");
-        put(2, "REVIEW");
-        put(3, "DONE");
-    }};
+    private static final Map<Integer, String> DEFAULT_COLUMNS = new HashMap<>();
+
+    @PostConstruct
+    private void postConstruct() {
+        DEFAULT_COLUMNS.put(0, "BACKLOG");
+        DEFAULT_COLUMNS.put(1, "IN PROGRESS");
+        DEFAULT_COLUMNS.put(2, "REVIEW");
+        DEFAULT_COLUMNS.put(3, "DONE");
+    }
 
     @Override
     public TaskColumnEntity createColumn(

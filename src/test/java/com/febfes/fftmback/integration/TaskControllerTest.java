@@ -16,15 +16,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
+import static com.febfes.fftmback.integration.ColumnControllerTest.COLUMN_NAME;
+import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
+import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 class TaskControllerTest extends BasicTestClass {
 
-    private static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
-    private static final String TASK_NAME = "Task name";
-    private static final String COLUMN_NAME = "Column name";
-    private static final String PROJECT_NAME = "Project name";
+    public static final String TASK_NAME = "Task name";
 
     private Long createdProjectId;
     private Long createdColumnId;

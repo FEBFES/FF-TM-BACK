@@ -2,7 +2,7 @@ package com.febfes.fftmback.exception;
 
 public class EntityAlreadyExistsException extends RuntimeException {
     public EntityAlreadyExistsException(String entity) {
-        super("%s already exists");
+        super("%s already exists".formatted(entity));
     }
 
     public EntityAlreadyExistsException(
@@ -10,6 +10,6 @@ public class EntityAlreadyExistsException extends RuntimeException {
             String fieldName,
             String fieldValue
     ) {
-        super("%s with %s=%s already exists");
+        super("%s with %s=%s already exists".formatted(entity, fieldName, fieldValue));
     }
 }

@@ -2,6 +2,7 @@ package com.febfes.fftmback.mapper;
 
 import com.febfes.fftmback.domain.Role;
 import com.febfes.fftmback.domain.UserEntity;
+import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,4 +23,6 @@ public interface UserMapper {
             String encryptedPassword,
             Role role
     );
+
+    UserDto userToUserDto(UserEntity userEntity);
 }
