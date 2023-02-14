@@ -13,7 +13,7 @@ public class DateProvider {
         return new Date();
     }
 
-    public Date getCurrentDatePlusMs(int ms) {
-        return new Date(System.currentTimeMillis() + ms);
+    public Date getCurrentDatePlusSeconds(int seconds) {
+        return new Date(System.currentTimeMillis() + seconds * 1000L);
     }
 }

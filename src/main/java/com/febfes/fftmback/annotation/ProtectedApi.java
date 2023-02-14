@@ -12,6 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @SecurityRequirement(name = "Bearer Authentication")
+@ApiResponse(responseCode = "401", description = "Token expired", content = @Content)
 @ApiResponse(
         responseCode = "403",
         description = "User has valid credentials but not enough privileges to perform an action on a resource",
