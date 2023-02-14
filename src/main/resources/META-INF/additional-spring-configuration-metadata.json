@@ -6,9 +6,9 @@
       "description": "JWT secret key."
     },
     {
-      "name": "jwt.expirationDateInMs",
+      "name": "jwt.expirationDateInSeconds",
       "type": "java.lang.Integer",
-      "description": "JWT expiration date in ms."
+      "description": "JWT expiration date in seconds."
     }
   ]
 }

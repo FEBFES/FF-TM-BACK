@@ -2,6 +2,7 @@ package com.febfes.fftmback.exception;
 
 import com.febfes.fftmback.dto.ApiErrorDto;
 import com.febfes.fftmback.util.DateProvider;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,17 @@ public class ControllerAdvisor {
                 .collect(Collectors.toList());
         return createResponseBodyForExceptions(HttpStatus.UNPROCESSABLE_ENTITY, MethodArgumentNotValidException.class.getSimpleName(),
                 errors.toString(), httpRequest.getRequestURI());
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @Hidden
+    public ApiErrorDto handleExpiredJwtException(
+            ExpiredJwtException ex,
+            HttpServletRequest httpRequest
+    ) {
+        return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, ExpiredJwtException.class.getSimpleName(),
+                ex.getMessage(), httpRequest.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)

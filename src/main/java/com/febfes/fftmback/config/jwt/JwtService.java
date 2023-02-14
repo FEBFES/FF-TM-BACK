@@ -24,8 +24,8 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expirationDateInMs}")
-    private int jwtExpirationInMs;
+    @Value("${jwt.expirationDateInSeconds}")
+    private int jwtExpirationDateInSeconds;
 
     private final DateProvider dateProvider;
 
@@ -54,7 +54,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(dateProvider.getCurrentDate())
-                .setExpiration(dateProvider.getCurrentDatePlusMs(jwtExpirationInMs))
+                .setExpiration(dateProvider.getCurrentDatePlusSeconds(jwtExpirationDateInSeconds))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
