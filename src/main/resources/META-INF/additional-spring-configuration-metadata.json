@@ -9,6 +9,11 @@
       "name": "jwt.expirationDateInSeconds",
       "type": "java.lang.Integer",
       "description": "JWT expiration date in seconds."
+    },
+    {
+      "name": "jwt.refreshExpirationDateInSeconds",
+      "type": "java.lang.Integer",
+      "description": "Refresh JWT expiration date in seconds."
     }
   ]
 }

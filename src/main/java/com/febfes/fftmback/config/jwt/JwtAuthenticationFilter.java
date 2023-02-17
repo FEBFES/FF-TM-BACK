@@ -24,7 +24,7 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String BEARER = "Bearer ";
+    public static final String BEARER = "Bearer ";
 
     private final JwtService jwtService;
     private final UserService userService;

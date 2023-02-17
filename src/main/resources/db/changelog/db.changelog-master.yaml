@@ -9,3 +9,5 @@ databaseChangeLog:
       file: /db/changelog/0.0.4-add-user-table.yaml
   - include:
       file: /db/changelog/0.0.5-change-column-order.yaml
+  - include:
+      file: /db/changelog/0.0.6-create-refresh-token-table.yaml

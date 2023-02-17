@@ -76,8 +76,6 @@ class DashboardControllerTests extends BasicTestClass {
                 .statusCode(200)
                 .body("columns[4].name", equalTo(COLUMN_NAME))
                 .body("columns[4].tasks[0].name", equalTo(TASK_NAME));
-        //TODO Возможно стоит добавить json парсер и проверять подругому ответ
-
     }
 
     private RequestSpecification requestWithBearerToken() {
