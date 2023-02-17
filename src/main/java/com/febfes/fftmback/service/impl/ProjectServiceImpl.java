@@ -4,21 +4,24 @@ import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.mapper.DashboardMapper;
+import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DateProvider;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
+@Transactional
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
@@ -81,9 +84,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public DashboardDto getDashboard(Long id) {
-        ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
-        log.info("Received dashboard for project with id={}", id);
-        return DashboardMapper.INSTANCE.projectToDashboardDto(projectEntity);
+        return new DashboardDto(
+                columnService
+                        .getColumnListWithOrder(id)
+                        .stream()
+                        .map(ColumnWithTasksMapper.INSTANCE::columnToColumnWithTasksDto)
+                        .collect(Collectors.toList())
+        );
     }
 }

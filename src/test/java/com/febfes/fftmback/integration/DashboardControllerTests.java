@@ -20,7 +20,6 @@ class DashboardControllerTests extends BasicTestClass {
 
     private static final String PROJECT_NAME = "Project name";
     private static final String COLUMN_NAME = "Column name";
-    private static final Integer COLUMN_ORDER = 4;
     private static final String TASK_NAME = "Task name";
 
     private String createdUsername;
@@ -60,7 +59,7 @@ class DashboardControllerTests extends BasicTestClass {
         );
         TaskColumnEntity columnEntity = columnService.createColumn(
                 projectEntity.getId(),
-                dtoBuilders.createColumnDto(COLUMN_NAME, COLUMN_ORDER)
+                dtoBuilders.createColumnDto(COLUMN_NAME)
         );
         taskService.createTask(
                 projectEntity.getId(),

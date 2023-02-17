@@ -54,7 +54,6 @@ public class ColumnController {
     @ApiDelete(path = "{projectId}/columns/{columnId}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use ColumnParameters
     public void deleteColumn(@ParameterObject ColumnParameters pathVars) {
-
         columnService.deleteColumn(pathVars.columnId());
     }
 }

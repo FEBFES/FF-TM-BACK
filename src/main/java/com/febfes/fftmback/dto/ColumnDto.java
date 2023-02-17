@@ -19,6 +19,11 @@ public record ColumnDto(
         Integer columnOrder,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-        Long projectId
+        Long projectId,
+
+        Long childTaskColumnId
 ) {
+        public ColumnDto(String name) {
+                this(null, name, null, null, null, null);
+        }
 }

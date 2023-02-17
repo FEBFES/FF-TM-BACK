@@ -16,6 +16,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class TaskColumnEntity extends AppEntity {
 
+
     @Column(name = "name")
     private String name;
 
@@ -24,6 +25,9 @@ public class TaskColumnEntity extends AppEntity {
 
     @Column(name = "column_order", nullable = false)
     private Integer columnOrder;
+
+    @Column(name = "child_task_column_id")
+    private Long childTaskColumnId;
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "column_id")
