@@ -99,6 +99,7 @@ public class ColumnServiceImpl implements ColumnService {
             result.add(column);
             currentColumnId = column.getId();
         }
+
         Collections.reverse(result);
         return result;
     }

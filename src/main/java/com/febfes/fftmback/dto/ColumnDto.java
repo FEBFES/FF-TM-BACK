@@ -15,7 +15,7 @@ public record ColumnDto(
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Date createDate,
 
-        @Schema(description = "Column order on the board. Starts at 0")
+        @Schema(description = "Column order on the board. Starts at 1")
         Integer columnOrder,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)

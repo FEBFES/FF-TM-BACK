@@ -16,7 +16,7 @@ public interface ColumnService {
     void createDefaultColumnsForProject(Long projectId);
 
     /**
-     * Возвращает колонки проекта, с порядком
+     * Return project's columns with order
      */
     List<TaskColumnEntity> getColumnListWithOrder(Long projectId);
 }

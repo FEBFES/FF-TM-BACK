@@ -13,7 +13,7 @@ public interface ColumnRepository extends JpaRepository<TaskColumnEntity, Long> 
     List<TaskColumnEntity> findAllByProjectId(Long projectId);
 
     /**
-     * Меняет id дочерней колнки с oldChildId на oldChildId
+     * Change id of a child column from oldChildId to newChildId
      */
     @Modifying
     @Query("UPDATE TaskColumnEntity " +

@@ -191,8 +191,12 @@ class ColumnControllerTest extends BasicTestClass {
             }
             dashboardDto = getDashboard();
         }
-        List<Long> columnIdWithOrderList = dashboardDto.columns().stream().map(ColumnWithTasksDto::id).collect(Collectors.toList());
-        //Поменяем местами 2 и 3 колонки
+        List<Long> columnIdWithOrderList = dashboardDto
+                .columns()
+                .stream()
+                .map(ColumnWithTasksDto::id)
+                .collect(Collectors.toList());
+        //swap 2 and 3 columns
         ColumnWithTasksDto thirdColumn = dashboardDto.columns().get(2);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
