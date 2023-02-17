@@ -15,10 +15,15 @@ public record ColumnDto(
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Date createDate,
 
-        @Schema(description = "Column order on the board. Starts at 0")
+        @Schema(description = "Column order on the board. Starts at 1")
         Integer columnOrder,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-        Long projectId
+        Long projectId,
+
+        Long childTaskColumnId
 ) {
+        public ColumnDto(String name) {
+                this(null, name, null, null, null, null);
+        }
 }

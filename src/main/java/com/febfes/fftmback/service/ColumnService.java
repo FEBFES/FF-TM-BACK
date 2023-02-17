@@ -3,6 +3,8 @@ package com.febfes.fftmback.service;
 import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 
+import java.util.List;
+
 public interface ColumnService {
 
     TaskColumnEntity createColumn(Long projectId, ColumnDto columnDto);
@@ -12,4 +14,9 @@ public interface ColumnService {
     void deleteColumn(Long id);
 
     void createDefaultColumnsForProject(Long projectId);
+
+    /**
+     * Return project's columns with order
+     */
+    List<TaskColumnEntity> getColumnListWithOrder(Long projectId);
 }

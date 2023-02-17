@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: VladisStep
+      comment: "Add child column"
+      changes:
+        - addColumn:
+            tableName: task_column
+            columns:
+              - column:
+                  name: child_task_column_id
+                  type: bigint
+        - dropUniqueConstraint:
+            tableName: task_column
+            constraintName: task_column_project_id_column_order_key
+        - dropNotNullConstraint:
+            tableName: task_column
+            columnName: column_order

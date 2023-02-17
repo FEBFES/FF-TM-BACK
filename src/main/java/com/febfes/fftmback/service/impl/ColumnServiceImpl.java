@@ -7,33 +7,25 @@ import com.febfes.fftmback.mapper.ColumnMapper;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.util.DateProvider;
-import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
+@Transactional
 @RequiredArgsConstructor
 public class ColumnServiceImpl implements ColumnService {
 
     private final ColumnRepository columnRepository;
     private final DateProvider dateProvider;
 
-    private static final Map<Integer, String> DEFAULT_COLUMNS = new HashMap<>();
-
-    @PostConstruct
-    private void postConstruct() {
-        DEFAULT_COLUMNS.put(0, "BACKLOG");
-        DEFAULT_COLUMNS.put(1, "IN PROGRESS");
-        DEFAULT_COLUMNS.put(2, "REVIEW");
-        DEFAULT_COLUMNS.put(3, "DONE");
-    }
+    private static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
 
     @Override
     public TaskColumnEntity createColumn(
@@ -43,6 +35,7 @@ public class ColumnServiceImpl implements ColumnService {
         TaskColumnEntity columnEntity = columnRepository.save(
                 ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId, dateProvider.getCurrentDate())
         );
+        columnRepository.updateChildColumn(columnEntity.getId(), columnEntity.getChildTaskColumnId(), projectId);
         log.info("Saved column: {}", columnEntity);
         return columnEntity;
     }
@@ -55,7 +48,19 @@ public class ColumnServiceImpl implements ColumnService {
         TaskColumnEntity columnEntity = columnRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id));
         columnEntity.setName(columnDto.name());
-        columnEntity.setColumnOrder(columnDto.columnOrder());
+        if (!Objects.equals(columnEntity.getChildTaskColumnId(), columnDto.childTaskColumnId())) {
+            columnRepository.updateChildColumn(
+                    columnEntity.getChildTaskColumnId(),
+                    columnEntity.getId(),
+                    columnEntity.getProjectId()
+            );
+            columnRepository.updateChildColumn(
+                    columnEntity.getId(),
+                    columnDto.childTaskColumnId(),
+                    columnEntity.getProjectId()
+            );
+            columnEntity.setChildTaskColumnId(columnDto.childTaskColumnId());
+        }
         columnRepository.save(columnEntity);
         log.info("Updated column: {}", columnEntity);
 
@@ -63,28 +68,40 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public void deleteColumn(Long id) {
-        if (columnRepository.existsById(id)) {
-            columnRepository.deleteById(id);
-            log.info("Column with id={} deleted", id);
-        } else {
-            throw new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id);
-        }
+        TaskColumnEntity columnEntity = columnRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id));
+        columnRepository.updateChildColumn(
+                columnEntity.getChildTaskColumnId(),
+                columnEntity.getId(),
+                columnEntity.getProjectId()
+        );
+        columnRepository.delete(columnEntity);
+        log.info("Column with id={} deleted", id);
     }
 
     @Override
     public void createDefaultColumnsForProject(Long projectId) {
-        List<TaskColumnEntity> columns = new ArrayList<>();
-        DEFAULT_COLUMNS.forEach((key, value) -> {
-            TaskColumnEntity defaultColumn = TaskColumnEntity.builder()
-                    .name(value)
-                    .createDate(dateProvider.getCurrentDate())
-                    .columnOrder(key)
-                    .projectId(projectId)
-                    .build();
-            columns.add(defaultColumn);
-        });
-        columnRepository.saveAll(columns);
-        log.info("Created default columns with names: {}", DEFAULT_COLUMNS.values());
+        DEFAULT_COLUMNS.forEach(columnName -> createColumn(projectId, new ColumnDto(columnName)));
+        log.info("Created default columns with names: {}", DEFAULT_COLUMNS);
+    }
+
+    @Override
+    public List<TaskColumnEntity> getColumnListWithOrder(Long projectId) {
+        Map<Long, TaskColumnEntity> childIdToColumnEntity = columnRepository
+                .findAllByProjectId(projectId)
+                .stream()
+                .collect(Collectors.toMap(TaskColumnEntity::getChildTaskColumnId, Function.identity()));
+        List<TaskColumnEntity> result = new ArrayList<>();
+        Long currentColumnId = null;
+        for (int i = childIdToColumnEntity.size(); i > 0; i--) {
+            TaskColumnEntity column = childIdToColumnEntity.get(currentColumnId);
+            column.setColumnOrder(i);
+            result.add(column);
+            currentColumnId = column.getId();
+        }
+
+        Collections.reverse(result);
+        return result;
     }
 
 }

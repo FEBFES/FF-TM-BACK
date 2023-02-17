@@ -17,12 +17,16 @@ public class DtoBuilders {
         return new ProjectDto(null, name, description, null, null);
     }
 
-    public ColumnDto createColumnDto(Integer columnOrder) {
-        return new ColumnDto(null, null, null, columnOrder, null);
+    public ColumnDto createColumnDto() {
+        return new ColumnDto(null, null, null, null, null, null);
     }
 
-    public ColumnDto createColumnDto(String name, Integer columnOrder) {
-        return new ColumnDto(null, name, null, columnOrder, null);
+    public ColumnDto createColumnDto(String name) {
+        return new ColumnDto(null, name, null, null, null, null);
+    }
+
+    public ColumnDto createColumnDto(String name, Long childTaskColumnId) {
+        return new ColumnDto(null, name, null, null, null, childTaskColumnId);
     }
 
     public TaskDto createTaskDto() {
