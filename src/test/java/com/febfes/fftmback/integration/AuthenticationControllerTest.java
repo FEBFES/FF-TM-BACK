@@ -2,6 +2,7 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.RefreshTokenEntity;
 import com.febfes.fftmback.dto.auth.RefreshTokenDto;
+import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.service.RefreshTokenService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -86,9 +87,10 @@ public class AuthenticationControllerTest extends BasicTestClass {
     @Test
     void successfulRefreshTokenTest() {
         RefreshTokenDto refreshTokenDto = getRefreshTokenDto();
+        TokenDto tokenDto = new TokenDto(refreshTokenDto.refreshToken());
         given()
                 .contentType(ContentType.JSON)
-                .body(refreshTokenDto.refreshToken())
+                .body(tokenDto)
                 .when()
                 .post("%s/refresh-token".formatted(PATH_TO_AUTH_API))
                 .then()
