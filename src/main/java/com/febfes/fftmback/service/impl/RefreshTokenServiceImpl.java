@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Value("${jwt.refreshExpirationDateInSeconds}")
@@ -66,7 +68,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public void deleteByUserId(Long userId) {
-        refreshTokenRepository.deleteByUserId(userId);
+        if (refreshTokenRepository.existsByUserId(userId)) {
+            refreshTokenRepository.deleteByUserId(userId);
+        } else {
+            throw new EntityNotFoundException(ProjectEntity.class.getSimpleName(), "userId", userId.toString());
+        }
     }
 
     @Override

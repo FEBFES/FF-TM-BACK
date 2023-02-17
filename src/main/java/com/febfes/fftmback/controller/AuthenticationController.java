@@ -55,6 +55,7 @@ public class AuthenticationController {
     @Operation(summary = "Logout user")
     @PostMapping("logout")
     @ProtectedApi
+    @ApiResponse(responseCode = "404", description = "Token not found in db by userId", content = @Content)
     public void logoutUser() {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = user.getId();
