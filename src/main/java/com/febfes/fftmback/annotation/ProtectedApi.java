@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.METHOD})
 @SecurityRequirement(name = "Bearer Authentication")
 @ApiResponse(responseCode = "401", description = "Token expired", content = @Content)
 @ApiResponse(

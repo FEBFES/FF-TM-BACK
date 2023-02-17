@@ -1,11 +1,12 @@
 package com.febfes.fftmback.service;
 
-import com.febfes.fftmback.dto.auth.AuthenticationDto;
+import com.febfes.fftmback.dto.auth.RefreshTokenDto;
+import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 
 public interface AuthenticationService {
 
-    AuthenticationDto registerUser(UserDetailsDto userDetailsDto);
+    TokenDto registerUser(UserDetailsDto userDetailsDto);
 
-    AuthenticationDto authenticateUser(UserDetailsDto userDetailsDto);
+    RefreshTokenDto authenticateUser(UserDetailsDto userDetailsDto);
 }
