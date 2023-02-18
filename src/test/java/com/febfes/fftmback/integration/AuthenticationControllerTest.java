@@ -75,7 +75,6 @@ public class AuthenticationControllerTest extends BasicTestClass {
                 .body(userDetailsDto)
                 .when()
                 .post("%s/authenticate".formatted(PATH_TO_AUTH_API));
-
         response.then()
                 .statusCode(HttpStatus.SC_OK);
 
@@ -106,6 +105,23 @@ public class AuthenticationControllerTest extends BasicTestClass {
                 .post("%s/logout".formatted(PATH_TO_AUTH_API))
                 .then()
                 .statusCode(HttpStatus.SC_OK);
+    }
+
+    @Test
+    void successfulHasTokenExpiredTest() {
+        RefreshTokenDto refreshTokenDto = getRefreshTokenDto();
+        TokenDto tokenDto = new TokenDto(refreshTokenDto.accessToken());
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .body(tokenDto)
+                .when()
+                .post("%s/has-token-expired".formatted(PATH_TO_AUTH_API));
+        Boolean hasTokenExpired = response.then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(Boolean.class);
+        Assertions.assertFalse(hasTokenExpired);
     }
 
     private Response registerUser(UserDetailsDto userDetailsDto) {

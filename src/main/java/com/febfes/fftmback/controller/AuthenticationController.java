@@ -61,4 +61,11 @@ public class AuthenticationController {
         Long userId = user.getId();
         refreshTokenService.deleteByUserId(userId);
     }
+
+    @Operation(summary = "Checking if the token has expired")
+    @PostMapping("has-token-expired")
+    @ApiResponse(responseCode = "401", description = "Access token you sent has expired", content = @Content)
+    public boolean hasTokenExpired(@RequestBody TokenDto tokenDto) {
+        return authenticationService.hasTokenExpired(tokenDto.token());
+    }
 }

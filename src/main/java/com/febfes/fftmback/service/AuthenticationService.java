@@ -9,4 +9,6 @@ public interface AuthenticationService {
     TokenDto registerUser(UserDetailsDto userDetailsDto);
 
     RefreshTokenDto authenticateUser(UserDetailsDto userDetailsDto);
+
+    boolean hasTokenExpired(String token);
 }
