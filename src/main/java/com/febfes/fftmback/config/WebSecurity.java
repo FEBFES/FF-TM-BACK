@@ -47,6 +47,7 @@ public class WebSecurity {
                         "/v1/auth/register",
                         "/v1/auth/authenticate",
                         "/v1/auth/refresh-token",
+                        "/v1/auth/has-token-expired",
                         "/swagger-ui/**",
                         "/v3/api-docs/**"
                 )
