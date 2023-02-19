@@ -16,5 +16,5 @@ public interface ColumnService {
     /**
      * Return project's columns with order
      */
-    List<TaskColumnEntity> getColumnListWithOrder(Long projectId);
+    List<TaskColumnEntity> getColumnListWithOrder(Long projectId, String taskFilter);
 }

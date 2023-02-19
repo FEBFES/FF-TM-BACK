@@ -76,10 +76,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public DashboardDto getDashboard(Long id) {
+    public DashboardDto getDashboard(Long id, String taskFilter) {
         return new DashboardDto(
                 columnService
-                        .getColumnListWithOrder(id)
+                        .getColumnListWithOrder(id, taskFilter)
                         .stream()
                         .map(ColumnWithTasksMapper.INSTANCE::columnToColumnWithTasksDto)
                         .collect(Collectors.toList())

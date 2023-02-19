@@ -1,6 +1,7 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiGetOne;
+import com.febfes.fftmback.annotation.FilterParam;
 import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.service.ProjectService;
@@ -10,6 +11,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,7 +26,10 @@ public class DashboardController {
     @Operation(summary = "Get dashboard by project id")
     @ApiGetOne(path = "{id}/dashboard")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
-    public DashboardDto getDashboard(@PathVariable Long id) {
-        return projectService.getDashboard(id);
+    public DashboardDto getDashboard(
+            @PathVariable Long id,
+            @RequestParam(value = "taskFilter", required = false) @FilterParam String taskFilter
+    ) {
+        return projectService.getDashboard(id, taskFilter);
     }
 }
