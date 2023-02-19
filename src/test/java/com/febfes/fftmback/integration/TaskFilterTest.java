@@ -1,12 +1,13 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.query.FilterRequest;
+import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.exception.NoSuitableTypeFilterException;
 import com.febfes.fftmback.exception.ValueFilterException;
-import com.febfes.fftmback.repository.filter.TaskFilterRepository;
+import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskService;
@@ -29,7 +30,7 @@ import static com.febfes.fftmback.util.DateUtils.STANDARD_DATE_PATTERN;
 class TaskFilterTest extends BasicTestClass {
 
     @Autowired
-    private TaskFilterRepository taskFilterRepository;
+    private TaskRepository taskRepository;
 
     private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(STANDARD_DATE_PATTERN);
 
@@ -131,7 +132,7 @@ class TaskFilterTest extends BasicTestClass {
                         .value(TASK_NAME)
                         .build()
         );
-        Assertions.assertEquals(1, taskFilterRepository.getQueryResult(filters).size());
+        Assertions.assertEquals(1, taskRepository.findAll(new FilterSpecification<>(filters)).size());
 
         List<FilterRequest> filtersProjectId = List.of(
                 FilterRequest.builder()
@@ -140,7 +141,7 @@ class TaskFilterTest extends BasicTestClass {
                         .value(1)
                         .build()
         );
-        Assertions.assertEquals(4, taskFilterRepository.getQueryResult(filtersProjectId).size());
+        Assertions.assertEquals(4, taskRepository.findAll(new FilterSpecification<>(filtersProjectId)).size());
 
         List<FilterRequest> filtersProjectIdAndName = List.of(
                 FilterRequest.builder()
@@ -154,7 +155,7 @@ class TaskFilterTest extends BasicTestClass {
                         .value(TASK_NAME)
                         .build()
         );
-        Assertions.assertEquals(1, taskFilterRepository.getQueryResult(filtersProjectIdAndName).size());
+        Assertions.assertEquals(1, taskRepository.findAll(new FilterSpecification<>(filtersProjectIdAndName)).size());
     }
 
     @Test
@@ -166,7 +167,7 @@ class TaskFilterTest extends BasicTestClass {
                         .value(TASK_NAME)
                         .build()
         );
-        Assertions.assertEquals(4, taskFilterRepository.getQueryResult(filters).size());
+        Assertions.assertEquals(4, taskRepository.findAll(new FilterSpecification<>(filters)).size());
 
         List<FilterRequest> filtersOwnerId = List.of(
                 FilterRequest.builder()
@@ -175,7 +176,7 @@ class TaskFilterTest extends BasicTestClass {
                         .value(1)
                         .build()
         );
-        Assertions.assertEquals(2, taskFilterRepository.getQueryResult(filtersOwnerId).size());
+        Assertions.assertEquals(2, taskRepository.findAll(new FilterSpecification<>(filtersOwnerId)).size());
     }
 
     @Test
@@ -187,7 +188,7 @@ class TaskFilterTest extends BasicTestClass {
                         .value(TASK_NAME)
                         .build()
         );
-        Assertions.assertEquals(5, taskFilterRepository.getQueryResult(filters).size());
+        Assertions.assertEquals(5, taskRepository.findAll(new FilterSpecification<>(filters)).size());
 
         // it will fail as LIKE operator only accept strings
         List<FilterRequest> filtersFailed = List.of(
@@ -199,7 +200,7 @@ class TaskFilterTest extends BasicTestClass {
         );
         Assertions.assertThrows(
                 NoSuitableTypeFilterException.class,
-                () -> taskFilterRepository.getQueryResult(filtersFailed)
+                () -> taskRepository.findAll(new FilterSpecification<>(filtersFailed))
         );
     }
 
@@ -212,7 +213,7 @@ class TaskFilterTest extends BasicTestClass {
                         .values(List.of(TASK_NAME + "1", TASK_NAME + "2"))
                         .build()
         );
-        Assertions.assertEquals(2, taskFilterRepository.getQueryResult(filters).size());
+        Assertions.assertEquals(2, taskRepository.findAll(new FilterSpecification<>(filters)).size());
 
         // it will fail as IN operator only accept values belong to the same class
         List<FilterRequest> filtersFailed = List.of(
@@ -224,7 +225,7 @@ class TaskFilterTest extends BasicTestClass {
         );
         Assertions.assertThrows(
                 ValueFilterException.class,
-                () -> taskFilterRepository.getQueryResult(filtersFailed)
+                () -> taskRepository.findAll(new FilterSpecification<>(filtersFailed))
         );
     }
 
@@ -244,7 +245,7 @@ class TaskFilterTest extends BasicTestClass {
                         .valueTo(valueToString)
                         .build()
         );
-        Assertions.assertEquals(5, taskFilterRepository.getQueryResult(filters).size());
+        Assertions.assertEquals(5, taskRepository.findAll(new FilterSpecification<>(filters)).size());
 
         // it will fail as BETWEEN operator only accept value and valueTo belong to the same class
         List<FilterRequest> filtersFailed = List.of(
@@ -257,7 +258,7 @@ class TaskFilterTest extends BasicTestClass {
         );
         Assertions.assertThrows(
                 ValueFilterException.class,
-                () -> taskFilterRepository.getQueryResult(filtersFailed)
+                () -> taskRepository.findAll(new FilterSpecification<>(filtersFailed))
         );
     }
 }

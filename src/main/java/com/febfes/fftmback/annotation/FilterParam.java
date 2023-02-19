@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
                 4. ValueTo - for BETWEEN operator (value=1 BETWEEN valueTo=2)
                 5. Values - for IN filter (IN (1, 2, 3))
                                 
-                For example: filter=["property":"name","operator":"LIKE","value":"string"]
+                For example: filter=[{"property":"name","operator":"LIKE","value":"string"}]
                 """
 )
 public @interface FilterParam {
