@@ -2,11 +2,15 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
+import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +80,38 @@ class DashboardControllerTests extends BasicTestClass {
                 .statusCode(200)
                 .body("columns[4].name", equalTo(COLUMN_NAME))
                 .body("columns[4].tasks[0].name", equalTo(TASK_NAME));
+    }
+
+    @Test
+    void successfulDashboardWithFilterTest() {
+        ProjectEntity projectEntity = projectService.createProject(
+                dtoBuilders.createProjectDto(PROJECT_NAME),
+                createdUsername
+        );
+        taskService.createTask(
+                projectEntity.getId(),
+                1L,
+                dtoBuilders.createTaskDto(TASK_NAME),
+                createdUsername
+        );
+        taskService.createTask(
+                projectEntity.getId(),
+                1L,
+                dtoBuilders.createTaskDto(TASK_NAME + "2"),
+                createdUsername
+        );
+
+        Response response = requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .params("taskFilter", "[{\"property\":\"name\",\"operator\":\"EQUAL\",\"value\":\"%s\"}]".formatted(TASK_NAME))
+                .when()
+                .get("/api/v1/projects/{id}/dashboard", projectEntity.getId());
+        DashboardDto dashboardDto = response.then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(DashboardDto.class);
+        Assertions.assertEquals(1, dashboardDto.columns().get(0).tasks().size());
     }
 
     private RequestSpecification requestWithBearerToken() {

@@ -6,6 +6,7 @@ import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ColumnMapper;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DateUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class ColumnServiceImpl implements ColumnService {
 
     private final ColumnRepository columnRepository;
+    private final TaskService taskService;
 
     private static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
 
@@ -85,10 +87,14 @@ public class ColumnServiceImpl implements ColumnService {
     }
 
     @Override
-    public List<TaskColumnEntity> getColumnListWithOrder(Long projectId) {
+    public List<TaskColumnEntity> getColumnListWithOrder(Long projectId, String taskFilter) {
         Map<Long, TaskColumnEntity> childIdToColumnEntity = columnRepository
                 .findAllByProjectId(projectId)
                 .stream()
+                /* TODO: as I understand it, there will be an extra request to the database. Gotta do something about it
+                    also we need to do something with pageable (constants 0, 100 for now)
+                 */
+                .peek(column -> column.setTaskEntityList(taskService.getTasks(0, 100, column.getId(), taskFilter)))
                 .collect(Collectors.toMap(TaskColumnEntity::getChildTaskColumnId, Function.identity()));
         List<TaskColumnEntity> result = new ArrayList<>();
         Long currentColumnId = null;

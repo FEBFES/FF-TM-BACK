@@ -17,5 +17,5 @@ public interface ProjectService {
 
     void deleteProject(Long id);
 
-    DashboardDto getDashboard(Long id);
+    DashboardDto getDashboard(Long id, String taskFilter);
 }
