@@ -1,6 +1,6 @@
 package com.febfes.fftmback.service;
 
-import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.ProjectDto;
 
@@ -17,5 +17,5 @@ public interface ProjectService {
 
     void deleteProject(Long id);
 
-    DashboardDto getDashboard(Long id);
+    DashboardDto getDashboard(Long id, String taskFilter);
 }

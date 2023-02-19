@@ -1,12 +1,13 @@
 package com.febfes.fftmback.service.impl;
 
-import com.febfes.fftmback.domain.TaskColumnEntity;
+import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ColumnMapper;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.util.DateProvider;
+import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.util.DateUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class ColumnServiceImpl implements ColumnService {
 
     private final ColumnRepository columnRepository;
-    private final DateProvider dateProvider;
+    private final TaskService taskService;
 
     private static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
 
@@ -33,7 +34,7 @@ public class ColumnServiceImpl implements ColumnService {
             ColumnDto columnDto
     ) {
         TaskColumnEntity columnEntity = columnRepository.save(
-                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId, dateProvider.getCurrentDate())
+                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId, DateUtils.getCurrentDate())
         );
         columnRepository.updateChildColumn(columnEntity.getId(), columnEntity.getChildTaskColumnId(), projectId);
         log.info("Saved column: {}", columnEntity);
@@ -86,10 +87,13 @@ public class ColumnServiceImpl implements ColumnService {
     }
 
     @Override
-    public List<TaskColumnEntity> getColumnListWithOrder(Long projectId) {
+    public List<TaskColumnEntity> getColumnListWithOrder(Long projectId, String taskFilter) {
         Map<Long, TaskColumnEntity> childIdToColumnEntity = columnRepository
                 .findAllByProjectId(projectId)
                 .stream()
+                /* TODO: as I understand it, there will be an extra request to the database. Gotta do something about it
+                 */
+                .peek(column -> column.setTaskEntityList(taskService.getTasks(column.getId(), taskFilter)))
                 .collect(Collectors.toMap(TaskColumnEntity::getChildTaskColumnId, Function.identity()));
         List<TaskColumnEntity> result = new ArrayList<>();
         Long currentColumnId = null;

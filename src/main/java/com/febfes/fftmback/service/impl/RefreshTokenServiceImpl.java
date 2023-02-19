@@ -1,15 +1,15 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.config.jwt.JwtService;
-import com.febfes.fftmback.domain.ProjectEntity;
-import com.febfes.fftmback.domain.RefreshTokenEntity;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.dto.auth.RefreshTokenDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.RefreshTokenExpiredException;
 import com.febfes.fftmback.repository.RefreshTokenRepository;
 import com.febfes.fftmback.service.RefreshTokenService;
 import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.DateProvider;
+import com.febfes.fftmback.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +31,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserService userService;
     private final JwtService jwtService;
-    private final DateProvider dateProvider;
 
     @Override
     public RefreshTokenEntity getByToken(String token) {
@@ -45,9 +44,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshTokenEntity createRefreshToken(Long userId) {
         RefreshTokenEntity refreshToken = refreshTokenRepository.save(
                 RefreshTokenEntity.builder()
-                        .createDate(dateProvider.getCurrentDate())
+                        .createDate(DateUtils.getCurrentDate())
                         .userEntity(userService.getUserById(userId))
-                        .expiryDate(dateProvider.getCurrentDatePlusSeconds(jwtRefreshExpirationDateInSeconds))
+                        .expiryDate(DateUtils.getCurrentDatePlusSeconds(jwtRefreshExpirationDateInSeconds))
                         .token(UUID.randomUUID().toString())
                         .build()
         );
@@ -57,7 +56,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshTokenEntity verifyExpiration(RefreshTokenEntity refreshToken) {
-        if (refreshToken.getExpiryDate().before(dateProvider.getCurrentDate())) {
+        if (refreshToken.getExpiryDate().before(DateUtils.getCurrentDate())) {
             refreshTokenRepository.delete(refreshToken);
             throw new RefreshTokenExpiredException(refreshToken.getToken());
         }

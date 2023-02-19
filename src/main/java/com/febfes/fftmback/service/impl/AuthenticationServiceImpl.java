@@ -4,9 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.febfes.fftmback.config.jwt.JwtService;
-import com.febfes.fftmback.domain.RefreshTokenEntity;
-import com.febfes.fftmback.domain.Role;
-import com.febfes.fftmback.domain.UserEntity;
+import com.febfes.fftmback.domain.common.Role;
+import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.auth.RefreshTokenDto;
 import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
@@ -16,7 +16,7 @@ import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.RefreshTokenService;
-import com.febfes.fftmback.util.DateProvider;
+import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,6 @@ import java.util.Date;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
-    private final DateProvider dateProvider;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
@@ -47,7 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         UserEntity user = UserMapper.INSTANCE.userDetailsDtoToUser(
                 userDetailsDto,
-                dateProvider.getCurrentDate(),
+                DateUtils.getCurrentDate(),
                 passwordEncoder.encode(userDetailsDto.password()),
                 Role.MEMBER
         );
@@ -82,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             DecodedJWT decodedJWT = JWT.decode(token);
             Date expiresAt = decodedJWT.getExpiresAt();
-            return expiresAt.before(dateProvider.getCurrentDate());
+            return expiresAt.before(DateUtils.getCurrentDate());
         } catch (JWTDecodeException e) {
             log.error(e.getMessage());
             throw new ExpiredJwtException(null, null, e.getMessage(), e.getCause());
