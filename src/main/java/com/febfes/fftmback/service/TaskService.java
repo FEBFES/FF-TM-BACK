@@ -9,6 +9,10 @@ public interface TaskService {
 
     List<TaskEntity> getTasks(int page, int limit, Long columnId, String filter);
 
+    List<TaskEntity> getTasks(Long columnId, String filter);
+
+    List<TaskEntity> getTasks(String filter);
+
     TaskEntity getTaskById(Long id);
 
     TaskEntity createTask(Long projectId, Long columnId, TaskDto taskDto, String username);

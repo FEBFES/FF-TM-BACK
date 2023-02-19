@@ -92,9 +92,8 @@ public class ColumnServiceImpl implements ColumnService {
                 .findAllByProjectId(projectId)
                 .stream()
                 /* TODO: as I understand it, there will be an extra request to the database. Gotta do something about it
-                    also we need to do something with pageable (constants 0, 100 for now)
                  */
-                .peek(column -> column.setTaskEntityList(taskService.getTasks(0, 100, column.getId(), taskFilter)))
+                .peek(column -> column.setTaskEntityList(taskService.getTasks(column.getId(), taskFilter)))
                 .collect(Collectors.toMap(TaskColumnEntity::getChildTaskColumnId, Function.identity()));
         List<TaskColumnEntity> result = new ArrayList<>();
         Long currentColumnId = null;

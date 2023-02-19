@@ -2,12 +2,12 @@ package com.febfes.fftmback.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.febfes.fftmback.domain.common.query.FilterRequest;
+import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.TaskRepository;
-import com.febfes.fftmback.repository.filter.TaskFilterRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DateUtils;
@@ -29,7 +29,6 @@ import static java.util.Objects.nonNull;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
-    private final TaskFilterRepository taskFilterRepository;
     private final UserService userService;
 
     @Override
@@ -40,19 +39,24 @@ public class TaskServiceImpl implements TaskService {
             String filter
     ) {
         Pageable pageableRequest = PageRequest.of(page, limit);
-        List<FilterRequest> filters = new ArrayList<>();
-        filters.add(FilterRequest.builder()
-                .property("columnId")
-                .operator(Operator.EQUAL)
-                .value(columnId)
-                .build());
-        if (nonNull(filter)) {
-            log.info("Receiving tasks with a filter: {}", filter);
-            List<FilterRequest> additionalFilters = JsonUtils.convertStringToObject(filter, new TypeReference<>() {
-            });
-            filters.addAll(additionalFilters);
-        }
-        List<TaskEntity> tasks = taskFilterRepository.getQueryResultWithPagination(filters, pageableRequest);
+        List<TaskEntity> tasks = taskRepository.findAll(makeTasksFilter(columnId, filter), pageableRequest).getContent();
+        log.info("Received tasks size: {}", tasks.size());
+        return tasks;
+    }
+
+    @Override
+    public List<TaskEntity> getTasks(
+            Long columnId,
+            String filter
+    ) {
+        List<TaskEntity> tasks = taskRepository.findAll(makeTasksFilter(columnId, filter));
+        log.info("Received tasks size: {}", tasks.size());
+        return tasks;
+    }
+
+    @Override
+    public List<TaskEntity> getTasks(String filter) {
+        List<TaskEntity> tasks = taskRepository.findAll(makeTasksFilter(filter));
         log.info("Received tasks size: {}", tasks.size());
         return tasks;
     }
@@ -112,5 +116,34 @@ public class TaskServiceImpl implements TaskService {
         } else {
             throw new EntityNotFoundException(TaskEntity.class.getSimpleName(), id);
         }
+    }
+
+    private FilterSpecification<TaskEntity> makeTasksFilter(String filter) {
+        if (nonNull(filter)) {
+            log.info("Receiving tasks with a filter: {}", filter);
+            List<FilterRequest> filters = JsonUtils.convertStringToObject(filter, new TypeReference<>() {
+            });
+            return new FilterSpecification<>(filters);
+        }
+        return new FilterSpecification<>(new ArrayList<>());
+    }
+
+    private FilterSpecification<TaskEntity> makeTasksFilter(
+            Long columnId,
+            String filter
+    ) {
+        List<FilterRequest> filters = new ArrayList<>();
+        filters.add(FilterRequest.builder()
+                .property("columnId")
+                .operator(Operator.EQUAL)
+                .value(columnId)
+                .build());
+        if (nonNull(filter)) {
+            log.info("Receiving tasks with a filter: {}", filter);
+            List<FilterRequest> additionalFilters = JsonUtils.convertStringToObject(filter, new TypeReference<>() {
+            });
+            filters.addAll(additionalFilters);
+        }
+        return new FilterSpecification<>(filters);
     }
 }
