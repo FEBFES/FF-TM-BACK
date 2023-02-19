@@ -1,5 +1,6 @@
-package com.febfes.fftmback.domain;
+package com.febfes.fftmback.domain.dao;
 
+import com.febfes.fftmback.domain.common.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -7,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,6 +22,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class UserEntity extends AppEntity implements UserDetails {
+
+    @Serial
+    private static final long serialVersionUID = 7365026142938847634L;
 
     @Column(name = "email")
     private String email;

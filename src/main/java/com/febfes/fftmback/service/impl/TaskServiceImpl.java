@@ -1,19 +1,27 @@
 package com.febfes.fftmback.service.impl;
 
-import com.febfes.fftmback.domain.TaskEntity;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.febfes.fftmback.domain.common.query.FilterRequest;
+import com.febfes.fftmback.domain.common.query.Operator;
+import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.TaskRepository;
+import com.febfes.fftmback.repository.filter.TaskFilterRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DateProvider;
+import com.febfes.fftmback.util.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Objects.nonNull;
 
 @Service
 @Slf4j
@@ -21,6 +29,7 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final TaskFilterRepository taskFilterRepository;
     private final DateProvider dateProvider;
     private final UserService userService;
 
@@ -28,12 +37,23 @@ public class TaskServiceImpl implements TaskService {
     public List<TaskEntity> getTasks(
             int page,
             int limit,
-            Long columnId
+            Long columnId,
+            String filter
     ) {
         Pageable pageableRequest = PageRequest.of(page, limit);
-        List<TaskEntity> tasks = taskRepository.findAllByColumnId(pageableRequest, columnId)
-                .stream()
-                .toList();
+        List<FilterRequest> filters = new ArrayList<>();
+        filters.add(FilterRequest.builder()
+                .property("columnId")
+                .operator(Operator.EQUAL)
+                .value(columnId)
+                .build());
+        if (nonNull(filter)) {
+            log.info("Receiving tasks with a filter: {}", filter);
+            List<FilterRequest> additionalFilters = JsonUtils.convertStringToObject(filter, new TypeReference<>() {
+            });
+            filters.addAll(additionalFilters);
+        }
+        List<TaskEntity> tasks = taskFilterRepository.getQueryResultWithPagination(filters, pageableRequest);
         log.info("Received tasks size: {}", tasks.size());
         return tasks;
     }

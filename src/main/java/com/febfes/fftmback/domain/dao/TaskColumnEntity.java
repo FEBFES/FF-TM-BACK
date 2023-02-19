@@ -1,4 +1,4 @@
-package com.febfes.fftmback.domain;
+package com.febfes.fftmback.domain.dao;
 
 import jakarta.persistence.*;
 import lombok.*;

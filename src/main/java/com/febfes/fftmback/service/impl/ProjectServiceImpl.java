@@ -1,6 +1,6 @@
 package com.febfes.fftmback.service.impl;
 
-import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;

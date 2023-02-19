@@ -1,8 +1,8 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.config.jwt.JwtService;
-import com.febfes.fftmback.domain.ProjectEntity;
-import com.febfes.fftmback.domain.RefreshTokenEntity;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.dto.auth.RefreshTokenDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.RefreshTokenExpiredException;

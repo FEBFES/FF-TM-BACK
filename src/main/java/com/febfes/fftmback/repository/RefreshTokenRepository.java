@@ -1,6 +1,6 @@
 package com.febfes.fftmback.repository;
 
-import com.febfes.fftmback.domain.RefreshTokenEntity;
+import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

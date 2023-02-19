@@ -1,7 +1,7 @@
 package com.febfes.fftmback.mapper;
 
-import com.febfes.fftmback.domain.Role;
-import com.febfes.fftmback.domain.UserEntity;
+import com.febfes.fftmback.domain.common.Role;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import org.mapstruct.Mapper;
