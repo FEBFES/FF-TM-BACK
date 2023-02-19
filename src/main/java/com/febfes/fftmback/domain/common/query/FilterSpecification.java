@@ -78,18 +78,24 @@ public record FilterSpecification<T>(
         }
     }
 
-    private boolean isValueADate(FilterRequest filter) {
+    private boolean canParseToDate(Object value) {
         try {
-            LocalDateTime.parse((String) filter.getValue(), FORMATTER);
-            if (nonNull(filter.getValueTo())) {
-                try {
-                    LocalDateTime.parse((String) filter.getValueTo(), FORMATTER);
-                } catch (Exception ignored) {
-                    throw new ValueFilterException(filter.getValue(), filter.getValueTo());
-                }
-            }
+            LocalDateTime.parse((String) value, FORMATTER);
             return true;
         } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    private boolean isValueADate(FilterRequest filter) {
+        if (canParseToDate(filter.getValue())) {
+            if (nonNull(filter.getValueTo())) {
+                if (canParseToDate(filter.getValueTo())) {
+                    return true;
+                }
+                throw new ValueFilterException(filter.getValue(), filter.getValueTo());
+            }
+            return true;
         }
 
         return false;
