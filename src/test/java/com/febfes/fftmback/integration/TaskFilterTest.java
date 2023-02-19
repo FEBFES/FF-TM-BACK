@@ -5,28 +5,33 @@ import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.exception.NoSuitableTypeFilterException;
+import com.febfes.fftmback.exception.ValueFilterException;
 import com.febfes.fftmback.repository.filter.TaskFilterRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.util.DatabaseCleanup;
+import com.febfes.fftmback.util.DateUtils;
 import com.febfes.fftmback.util.DtoBuilders;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME;
 import static com.febfes.fftmback.integration.TaskControllerTest.TASK_NAME;
+import static com.febfes.fftmback.util.DateUtils.STANDARD_DATE_PATTERN;
 
 class TaskFilterTest extends BasicTestClass {
 
     @Autowired
     private TaskFilterRepository taskFilterRepository;
+
+    private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(STANDARD_DATE_PATTERN);
 
     @BeforeAll
     static void beforeAll(
@@ -110,6 +115,11 @@ class TaskFilterTest extends BasicTestClass {
     @Override
     void afterEach() {
 
+    }
+
+    @AfterAll
+    static void afterAll(@Autowired DatabaseCleanup databaseCleanup) {
+        databaseCleanup.execute();
     }
 
     @Test
@@ -203,17 +213,51 @@ class TaskFilterTest extends BasicTestClass {
                         .build()
         );
         Assertions.assertEquals(2, taskFilterRepository.getQueryResult(filters).size());
+
+        // it will fail as IN operator only accept values belong to the same class
+        List<FilterRequest> filtersFailed = List.of(
+                FilterRequest.builder()
+                        .property("name")
+                        .operator(Operator.IN)
+                        .values(List.of(TASK_NAME, 1))
+                        .build()
+        );
+        Assertions.assertThrows(
+                ValueFilterException.class,
+                () -> taskFilterRepository.getQueryResult(filtersFailed)
+        );
     }
 
     @Test
     void betweenFilterTest() {
+        LocalDateTime value = DateUtils.convertDateToLocalDateTime(DateUtils.getCurrentDatePlusSeconds(-1000));
+        String valueString = FORMATTER.format(value);
+
+        LocalDateTime valueTo = DateUtils.convertDateToLocalDateTime(DateUtils.getCurrentDatePlusSeconds(1000));
+        String valueToString = FORMATTER.format(valueTo);
+
         List<FilterRequest> filters = List.of(
                 FilterRequest.builder()
-                        .property("name")
-                        .operator(Operator.IN)
-                        .values(List.of(TASK_NAME + "1", TASK_NAME + "2"))
+                        .property("createDate")
+                        .operator(Operator.BETWEEN)
+                        .value(valueString)
+                        .valueTo(valueToString)
                         .build()
         );
-        Assertions.assertEquals(2, taskFilterRepository.getQueryResult(filters).size());
+        Assertions.assertEquals(5, taskFilterRepository.getQueryResult(filters).size());
+
+        // it will fail as BETWEEN operator only accept value and valueTo belong to the same class
+        List<FilterRequest> filtersFailed = List.of(
+                FilterRequest.builder()
+                        .property("name")
+                        .operator(Operator.BETWEEN)
+                        .value(1)
+                        .valueTo(valueToString)
+                        .build()
+        );
+        Assertions.assertThrows(
+                ValueFilterException.class,
+                () -> taskFilterRepository.getQueryResult(filtersFailed)
+        );
     }
 }

@@ -10,7 +10,7 @@ import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.repository.filter.TaskFilterRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.DateProvider;
+import com.febfes.fftmback.util.DateUtils;
 import com.febfes.fftmback.util.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,6 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskFilterRepository taskFilterRepository;
-    private final DateProvider dateProvider;
     private final UserService userService;
 
     @Override
@@ -76,7 +75,7 @@ public class TaskServiceImpl implements TaskService {
         // TODO: use mapper
         TaskEntity task = TaskEntity.builder()
                 .name(taskDto.name())
-                .createDate(dateProvider.getCurrentDate())
+                .createDate(DateUtils.getCurrentDate())
                 .description(taskDto.description())
                 .columnId(columnId)
                 .projectId(projectId)

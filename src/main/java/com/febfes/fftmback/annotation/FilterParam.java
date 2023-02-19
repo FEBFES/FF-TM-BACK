@@ -16,6 +16,8 @@ import java.lang.annotation.Target;
                 1. Property - property name in entity. For example: name
                 2. Operator - EQUAL, NOT_EQUAL, LIKE (strings), IN (dates, numbers, strings), BETWEEN (dates and numbers)
                 3. Value - value to filter. Date format (send like string): dd-MM-yyyy HH:mm:ss
+                4. ValueTo - for BETWEEN operator (value=1 BETWEEN valueTo=2)
+                5. Values - for IN filter (IN (1, 2, 3))
                                 
                 For example: filter=["property":"name","operator":"LIKE","value":"string"]
                 """

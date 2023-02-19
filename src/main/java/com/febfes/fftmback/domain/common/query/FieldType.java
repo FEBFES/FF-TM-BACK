@@ -7,7 +7,7 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static com.febfes.fftmback.util.DateProvider.STANDARD_DATE_PATTERN;
+import static com.febfes.fftmback.util.DateUtils.STANDARD_DATE_PATTERN;
 
 @Slf4j
 public enum FieldType {
@@ -44,31 +44,6 @@ public enum FieldType {
             return number;
         }
     },
-
-//    TODO: after testing delete it if it's necessary
-//    DOUBLE {
-//        public Object parse(String value) {
-//            return Double.valueOf(value);
-//        }
-//    },
-//
-//    INTEGER {
-//        public Object parse(String value) {
-//            return Integer.valueOf(value);
-//        }
-//    },
-//
-//    LONG {
-//        public Object parse(String value) {
-//            return Long.valueOf(value);
-//        }
-//    },
-//
-//    CHAR {
-//        public Object parse(String value) {
-//            return value.charAt(0);
-//        }
-//    },
 
     STRING {
         public Object parse(String value) {
