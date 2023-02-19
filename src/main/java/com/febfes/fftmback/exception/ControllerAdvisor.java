@@ -1,7 +1,7 @@
 package com.febfes.fftmback.exception;
 
 import com.febfes.fftmback.dto.ApiErrorDto;
-import com.febfes.fftmback.util.DateProvider;
+import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ControllerAdvisor {
-
-    private final DateProvider dateProvider;
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -107,7 +105,7 @@ public class ControllerAdvisor {
             String path
     ) {
         return new ApiErrorDto(
-                dateProvider.getCurrentDate(),
+                DateUtils.getCurrentDate(),
                 status.value(),
                 errors,
                 message,

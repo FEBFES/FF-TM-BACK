@@ -1,6 +1,6 @@
 package com.febfes.fftmback.config.jwt;
 
-import com.febfes.fftmback.util.DateProvider;
+import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,8 +27,6 @@ public class JwtService {
     @Value("${jwt.expirationDateInSeconds}")
     private int jwtExpirationDateInSeconds;
 
-    private final DateProvider dateProvider;
-
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -53,8 +51,8 @@ public class JwtService {
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
-                .setIssuedAt(dateProvider.getCurrentDate())
-                .setExpiration(dateProvider.getCurrentDatePlusSeconds(jwtExpirationDateInSeconds))
+                .setIssuedAt(DateUtils.getCurrentDate())
+                .setExpiration(DateUtils.getCurrentDatePlusSeconds(jwtExpirationDateInSeconds))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -68,7 +66,7 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(dateProvider.getCurrentDate());
+        return extractExpiration(token).before(DateUtils.getCurrentDate());
     }
 
     private Date extractExpiration(String token) {

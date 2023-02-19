@@ -14,7 +14,7 @@ import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.RefreshTokenService;
-import com.febfes.fftmback.util.DateProvider;
+import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,6 @@ import java.util.Date;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
-    private final DateProvider dateProvider;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
@@ -42,7 +41,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (userRepository.existsByEmailOrUsername(user.getEmail(), user.getUsername())) {
             throw new EntityAlreadyExistsException(UserEntity.class.getSimpleName());
         }
-        user.setCreateDate(dateProvider.getCurrentDate());
+        user.setCreateDate(DateUtils.getCurrentDate());
         user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.MEMBER);
         userRepository.save(user);
@@ -75,7 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             DecodedJWT decodedJWT = JWT.decode(token);
             Date expiresAt = decodedJWT.getExpiresAt();
-            return expiresAt.before(dateProvider.getCurrentDate());
+            return expiresAt.before(DateUtils.getCurrentDate());
         } catch (JWTDecodeException e) {
             log.error(e.getMessage());
             throw new ExpiredJwtException(null, null, e.getMessage(), e.getCause());

@@ -1,5 +1,6 @@
 package com.febfes.fftmback.domain.common.query;
 
+import com.febfes.fftmback.util.DateUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
@@ -67,7 +68,7 @@ public enum Operator {
         }
     },
 
-    IN(List.of(Date.class, Number.class, String.class)) {
+    IN(List.of(Number.class, String.class)) {
         /*
         Example: SELECT * FROM table WHERE field IN (?)
          */
@@ -99,9 +100,9 @@ public enum Operator {
             Object value = request.getFieldType().parse(request.getValue().toString());
             Object valueTo = request.getFieldType().parse(request.getValueTo().toString());
             if (request.getFieldType().equals(FieldType.DATE)) {
-                LocalDateTime startDate = (LocalDateTime) value;
-                LocalDateTime endDate = (LocalDateTime) valueTo;
-                Expression<LocalDateTime> property = root.get(request.getProperty());
+                Date startDate = DateUtils.convertLocalDateTimeToDate((LocalDateTime) value);
+                Date endDate = DateUtils.convertLocalDateTimeToDate((LocalDateTime) valueTo);
+                Expression<Date> property = root.get(request.getProperty());
                 return cb.and(
                         cb.and(
                                 cb.greaterThanOrEqualTo(property, startDate),
@@ -111,18 +112,10 @@ public enum Operator {
                 );
             }
 
-//            TODO: mb delete this list as we have possibleClasses property
-            List<FieldType> typesCantUseBetween = List.of(FieldType.BOOLEAN, FieldType.STRING);
-            if (typesCantUseBetween.contains(request.getFieldType())) {
-                log.error("Can not use between for {} field type", request.getFieldType());
-                return predicate;
-            } else {
-                Number start = (Number) value;
-                Number end = (Number) valueTo;
-                Expression<Number> property = root.get(request.getProperty());
-                return cb.and(cb.and(cb.ge(property, start), cb.le(property, end)), predicate);
-            }
-
+            Number start = (Number) value;
+            Number end = (Number) valueTo;
+            Expression<Number> property = root.get(request.getProperty());
+            return cb.and(cb.and(cb.ge(property, start), cb.le(property, end)), predicate);
         }
     };
 

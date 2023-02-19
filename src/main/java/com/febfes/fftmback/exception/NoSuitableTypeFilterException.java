@@ -10,6 +10,6 @@ public class NoSuitableTypeFilterException extends RuntimeException {
     private static final long serialVersionUID = 2467263745000453160L;
 
     public NoSuitableTypeFilterException(Object value, Operator operator) {
-        super("No suitable field type for value=" + value + " and operator=" + operator.name());
+        super("No suitable field type for value=%s and operator=%s".formatted(value, operator.name()));
     }
 }
