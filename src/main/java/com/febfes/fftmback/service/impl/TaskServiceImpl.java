@@ -31,6 +31,8 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
 
+    private static final String RECEIVED_TASKS_SIZE_LOG = "Received tasks size: {}";
+
     @Override
     public List<TaskEntity> getTasks(
             int page,
@@ -40,7 +42,7 @@ public class TaskServiceImpl implements TaskService {
     ) {
         Pageable pageableRequest = PageRequest.of(page, limit);
         List<TaskEntity> tasks = taskRepository.findAll(makeTasksFilter(columnId, filter), pageableRequest).getContent();
-        log.info("Received tasks size: {}", tasks.size());
+        log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
         return tasks;
     }
 
@@ -50,14 +52,14 @@ public class TaskServiceImpl implements TaskService {
             String filter
     ) {
         List<TaskEntity> tasks = taskRepository.findAll(makeTasksFilter(columnId, filter));
-        log.info("Received tasks size: {}", tasks.size());
+        log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
         return tasks;
     }
 
     @Override
     public List<TaskEntity> getTasks(String filter) {
         List<TaskEntity> tasks = taskRepository.findAll(makeTasksFilter(filter));
-        log.info("Received tasks size: {}", tasks.size());
+        log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
         return tasks;
     }
 
@@ -65,7 +67,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskEntity getTaskById(Long id) {
         TaskEntity task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
-        log.info("Received task: {}", task);
+        log.info(RECEIVED_TASKS_SIZE_LOG, task);
         return task;
     }
 
