@@ -36,4 +36,8 @@ public class DtoBuilders {
     public TaskDto createTaskDto(String name) {
         return new TaskDto(null, name, null, null, null, null, null);
     }
+
+    public TaskDto createTaskDto(String name, String description) {
+        return new TaskDto(null, name, description, null, null, null, null);
+    }
 }

@@ -1,7 +1,6 @@
 package com.febfes.fftmback.service;
 
-import com.febfes.fftmback.domain.TaskColumnEntity;
-
+import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import java.util.List;
 
 public interface ColumnService {

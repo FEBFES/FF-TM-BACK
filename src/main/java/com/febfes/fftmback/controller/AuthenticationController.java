@@ -2,7 +2,7 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiCreate;
 import com.febfes.fftmback.annotation.ProtectedApi;
-import com.febfes.fftmback.domain.UserEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.auth.RefreshTokenDto;
 import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;

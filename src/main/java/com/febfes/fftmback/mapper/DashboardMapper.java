@@ -1,6 +1,6 @@
 package com.febfes.fftmback.mapper;
 
-import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

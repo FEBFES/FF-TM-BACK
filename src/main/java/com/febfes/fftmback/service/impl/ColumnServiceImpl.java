@@ -1,10 +1,10 @@
 package com.febfes.fftmback.service.impl;
 
-import com.febfes.fftmback.domain.TaskColumnEntity;
+import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.util.DateProvider;
+import com.febfes.fftmback.util.DateUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +21,12 @@ import java.util.stream.Collectors;
 public class ColumnServiceImpl implements ColumnService {
 
     private final ColumnRepository columnRepository;
-    private final DateProvider dateProvider;
 
     private static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
 
     @Override
     public TaskColumnEntity createColumn(TaskColumnEntity column) {
-        column.setCreateDate(dateProvider.getCurrentDate());
+        column.setCreateDate(DateUtils.getCurrentDate());
         TaskColumnEntity savedColumn = columnRepository.save(column);
         columnRepository.updateChildColumn(
                 savedColumn.getId(),

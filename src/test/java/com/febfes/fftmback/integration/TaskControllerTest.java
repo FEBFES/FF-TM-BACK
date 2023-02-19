@@ -1,9 +1,8 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.ProjectEntity;
-import com.febfes.fftmback.domain.TaskColumnEntity;
-import com.febfes.fftmback.domain.TaskEntity;
-import com.febfes.fftmback.domain.UserEntity;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.TaskColumnEntity;
+import com.febfes.fftmback.domain.dto.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
@@ -11,7 +10,7 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,8 +103,38 @@ class TaskControllerTest extends BasicTestClass {
         int size = response
                 .jsonPath()
                 .getInt("data.size()");
-        Assertions.assertThat(size)
-                .isEqualTo(2);
+        Assertions.assertEquals(2, size);
+    }
+
+    @Test
+    void successfulGetTasksWithFilterTest() {
+        taskService.createTask(
+                createdProjectId,
+                createdColumnId,
+                dtoBuilders.createTaskDto(TASK_NAME + "1"),
+                createdUsername
+        );
+
+        taskService.createTask(
+                createdProjectId,
+                createdColumnId,
+                dtoBuilders.createTaskDto(TASK_NAME + "2"),
+                createdUsername
+        );
+
+        Response response = requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .params("filter", "[{\"property\":\"name\",\"operator\":\"LIKE\",\"value\":\"%s\"}]".formatted(TASK_NAME))
+                .pathParams("projectId", createdProjectId, "columnId", createdColumnId)
+                .when()
+                .get("%s/{projectId}/columns/{columnId}/tasks".formatted(PATH_TO_PROJECTS_API));
+        response.then()
+                .statusCode(HttpStatus.SC_OK);
+
+        int size = response
+                .jsonPath()
+                .getInt("data.size()");
+        Assertions.assertEquals(2, size);
     }
 
     @Test

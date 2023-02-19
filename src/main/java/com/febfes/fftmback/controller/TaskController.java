@@ -1,7 +1,7 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
-import com.febfes.fftmback.domain.TaskEntity;
+import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
 import com.febfes.fftmback.dto.parameter.TaskParameters;
@@ -38,10 +38,11 @@ public class TaskController {
     public List<TaskDto> getTasks(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
+            @RequestParam(value = "filter", required = false) @FilterParam String filter,
             @ParameterObject ColumnParameters pathVars
     ) {
 
-        List<TaskEntity> tasks = taskService.getTasks(page, limit, pathVars.columnId());
+        List<TaskEntity> tasks = taskService.getTasks(page, limit, pathVars.columnId(), filter);
         return tasks.stream()
                 .map(TaskMapper.INSTANCE::taskToTaskDto)
                 .collect(Collectors.toList());

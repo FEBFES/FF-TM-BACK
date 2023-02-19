@@ -1,6 +1,6 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.RefreshTokenEntity;
+import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.dto.auth.RefreshTokenDto;
 import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
