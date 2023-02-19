@@ -1,5 +1,9 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.domain.TaskColumnEntity;
+import com.febfes.fftmback.domain.TaskEntity;
+import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dto.TaskEntity;

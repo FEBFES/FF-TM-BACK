@@ -1,5 +1,6 @@
 package com.febfes.fftmback.service.impl;
 
+import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.ColumnRepository;
