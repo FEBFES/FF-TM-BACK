@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.febfes.fftmback.util.DateUtils.STANDARD_DATE_PATTERN;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Slf4j
@@ -47,49 +48,26 @@ public record FilterSpecification<T>(
         return predicate;
     }
 
-    private boolean isValueBelongsToClass(Object value, Class<?> clazz) {
-        return value.getClass().isInstance(clazz)
-                || clazz.isAssignableFrom(value.getClass());
-    }
-
     private void setFieldTypeToFilter(FilterRequest filter) {
         boolean fieldTypeSet = filter.getOperator().possibleClasses.stream()
                 .anyMatch(possibleClass -> {
-                    if (possibleClass.equals(Date.class)) {
-                        try {
-                            LocalDateTime.parse((String) filter.getValue(), FORMATTER);
-                            filter.setFieldType(FieldType.DATE);
-                            if (nonNull(filter.getValueTo())) {
-                                try {
-                                    LocalDateTime.parse((String) filter.getValueTo(), FORMATTER);
-                                } catch (Exception ignored) {
-                                    throw new ValueFilterException(filter.getValue(), filter.getValueTo());
-                                }
-                            }
-                            return true;
-                        } catch (Exception ignored) {
-                        }
+                    if (possibleClass.equals(Date.class) && isValueADate(filter)) {
+                        filter.setFieldType(FieldType.DATE);
+                        return true;
                     }
 
-                    if (nonNull(filter.getValue()) && isValueBelongsToClass(filter.getValue(), possibleClass)) {
+                    if (isValueBelongsToClass(filter.getValue(), possibleClass)) {
                         filter.setFieldType(FieldType.valueOf(possibleClass.getSimpleName().toUpperCase(Locale.ROOT)));
 
-                        if (nonNull(filter.getValueTo()) && !isValueBelongsToClass(filter.getValueTo(), possibleClass)) {
+                        if (isValueNotBelongsToClass(filter.getValueTo(), possibleClass)) {
                             throw new ValueFilterException(filter.getValue(), filter.getValueTo());
                         }
                         return true;
                     }
 
-                    if (nonNull(filter.getValues())) {
-                        if (isValueBelongsToClass(filter.getValues().get(0), possibleClass)) {
-                            boolean allValuesBelongToClass = filter.getValues().stream()
-                                    .allMatch(value -> isValueBelongsToClass(value, possibleClass));
-                            if (!allValuesBelongToClass) {
-                                throw new ValueFilterException(filter.getValues());
-                            }
-                            filter.setFieldType(FieldType.valueOf(possibleClass.getSimpleName().toUpperCase(Locale.ROOT)));
-                            return true;
-                        }
+                    if (doAllValuesBelongToClass(filter.getValues(), possibleClass)) {
+                        filter.setFieldType(FieldType.valueOf(possibleClass.getSimpleName().toUpperCase(Locale.ROOT)));
+                        return true;
                     }
 
                     return false;
@@ -98,5 +76,48 @@ public record FilterSpecification<T>(
         if (!fieldTypeSet) {
             throw new NoSuitableTypeFilterException(filter.getValue(), filter.getOperator());
         }
+    }
+
+    private boolean isValueADate(FilterRequest filter) {
+        try {
+            LocalDateTime.parse((String) filter.getValue(), FORMATTER);
+            if (nonNull(filter.getValueTo())) {
+                try {
+                    LocalDateTime.parse((String) filter.getValueTo(), FORMATTER);
+                } catch (Exception ignored) {
+                    throw new ValueFilterException(filter.getValue(), filter.getValueTo());
+                }
+            }
+            return true;
+        } catch (Exception ignored) {
+        }
+
+        return false;
+    }
+
+    private boolean isValueBelongsToClass(Object value, Class<?> clazz) {
+        return nonNull(value) && (value.getClass().isInstance(clazz)
+                || clazz.isAssignableFrom(value.getClass()));
+    }
+
+    private boolean isValueNotBelongsToClass(Object value, Class<?> clazz) {
+        return nonNull(value) && !(value.getClass().isInstance(clazz)
+                || clazz.isAssignableFrom(value.getClass()));
+    }
+
+    private boolean doAllValuesBelongToClass(List<Object> values, Class<?> clazz) {
+        if (isNull(values)) {
+            return false;
+        }
+
+        if (isValueBelongsToClass(values.get(0), clazz)) {
+            boolean allValuesBelongToClass = values.stream()
+                    .allMatch(value -> isValueBelongsToClass(value, clazz));
+            if (!allValuesBelongToClass) {
+                throw new ValueFilterException(values);
+            }
+            return true;
+        }
+        return false;
     }
 }
