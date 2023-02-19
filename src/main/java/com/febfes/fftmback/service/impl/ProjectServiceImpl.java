@@ -2,10 +2,8 @@ package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
-import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
@@ -32,16 +30,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectEntity createProject(
-            ProjectDto projectDto,
+            ProjectEntity project,
             String username
     ) {
-        ProjectEntity projectEntity = projectRepository.save(
-                ProjectMapper.INSTANCE.projectDtoToProject(
-                        projectDto,
-                        dateProvider.getCurrentDate(),
-                        userService.getUserIdByUsername(username)
-                )
-        );
+        project.setCreateDate(dateProvider.getCurrentDate());
+        project.setOwnerId(userService.getUserIdByUsername(username));
+        ProjectEntity projectEntity = projectRepository.save(project);
         log.info("Saved project: {}", projectEntity);
         columnService.createDefaultColumnsForProject(projectEntity.getId());
         return projectEntity;
@@ -63,11 +57,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void editProject(Long id, ProjectDto projectDto) {
+    public void editProject(Long id, ProjectEntity project) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
-        projectEntity.setName(projectDto.name());
-        projectEntity.setDescription(projectDto.description());
+        projectEntity.setName(project.getName());
+        projectEntity.setDescription(project.getDescription());
         projectRepository.save(projectEntity);
         log.info("Updated project: {}", projectEntity);
     }

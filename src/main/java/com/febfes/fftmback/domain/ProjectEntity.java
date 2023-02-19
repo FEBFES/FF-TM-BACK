@@ -2,8 +2,10 @@ package com.febfes.fftmback.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -11,6 +13,8 @@ import java.util.List;
 @Table(name = "project")
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
 @ToString(callSuper = true)
 public class ProjectEntity extends AppEntity {
 

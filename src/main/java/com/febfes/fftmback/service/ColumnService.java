@@ -1,15 +1,14 @@
 package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.TaskColumnEntity;
-import com.febfes.fftmback.dto.ColumnDto;
 
 import java.util.List;
 
 public interface ColumnService {
 
-    TaskColumnEntity createColumn(Long projectId, ColumnDto columnDto);
+    TaskColumnEntity createColumn(TaskColumnEntity column);
 
-    void editColumn(Long id, ColumnDto columnDto);
+    void editColumn(TaskColumnEntity columnDto);
 
     void deleteColumn(Long id);
 

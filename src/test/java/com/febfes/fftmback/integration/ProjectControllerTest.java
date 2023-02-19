@@ -1,7 +1,8 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.UserService;
@@ -43,7 +44,7 @@ class ProjectControllerTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         token = authenticationService.registerUser(
-                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).token();
         createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
     }
@@ -51,11 +52,11 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulGetProjectsTest() {
         projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME + "1"),
+                ProjectEntity.builder().name(PROJECT_NAME + "1").build(),
                 createdUsername
         );
         projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME + "2"),
+                ProjectEntity.builder().name(PROJECT_NAME + "2").build(),
                 createdUsername
         );
 

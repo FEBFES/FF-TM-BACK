@@ -2,9 +2,9 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.ProjectEntity;
 import com.febfes.fftmback.domain.TaskColumnEntity;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
+import com.febfes.fftmback.domain.TaskEntity;
+import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.service.*;
-import com.febfes.fftmback.util.DtoBuilders;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,13 +40,10 @@ class DashboardControllerTests extends BasicTestClass {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private DtoBuilders dtoBuilders;
-
     @BeforeEach
     void beforeEach() {
         token = authenticationService.registerUser(
-                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).token();
         createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
     }
@@ -54,17 +51,22 @@ class DashboardControllerTests extends BasicTestClass {
     @Test
     void testSingleSuccessTest1() {
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME),
+                ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername
         );
-        TaskColumnEntity columnEntity = columnService.createColumn(
-                projectEntity.getId(),
-                dtoBuilders.createColumnDto(COLUMN_NAME)
+        TaskColumnEntity columnEntity = columnService.createColumn(TaskColumnEntity
+                .builder()
+                .name(COLUMN_NAME)
+                .projectId(projectEntity.getId())
+                .build()
         );
         taskService.createTask(
-                projectEntity.getId(),
-                columnEntity.getId(),
-                dtoBuilders.createTaskDto(TASK_NAME),
+                TaskEntity
+                        .builder()
+                        .projectId(projectEntity.getId())
+                        .columnId(columnEntity.getId())
+                        .name(TASK_NAME)
+                        .build(),
                 createdUsername
         );
 

@@ -4,6 +4,7 @@ import com.febfes.fftmback.annotation.ApiCreate;
 import com.febfes.fftmback.annotation.ApiDelete;
 import com.febfes.fftmback.annotation.ApiEdit;
 import com.febfes.fftmback.annotation.ProtectedApi;
+import com.febfes.fftmback.domain.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
 import com.febfes.fftmback.mapper.ColumnMapper;
@@ -34,9 +35,10 @@ public class ColumnController {
             @PathVariable Long projectId,
             @RequestBody @Valid ColumnDto columnDto
     ) {
-        return ColumnMapper.INSTANCE.columnToColumnDto(
-                columnService.createColumn(projectId, columnDto)
+        TaskColumnEntity newColumn = columnService.createColumn(
+                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId)
         );
+        return ColumnMapper.INSTANCE.columnToColumnDto(newColumn);
     }
 
     @Operation(summary = "Edit column by its columnId")
@@ -46,8 +48,9 @@ public class ColumnController {
             @ParameterObject ColumnParameters pathVars,
             @RequestBody ColumnDto columnDto
     ) {
-
-        columnService.editColumn(pathVars.columnId(), columnDto);
+        columnService.editColumn(
+                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, pathVars.columnId(), pathVars.projectId())
+        );
     }
 
     @Operation(summary = "Delete column by its columnId")

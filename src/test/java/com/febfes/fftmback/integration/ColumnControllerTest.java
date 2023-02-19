@@ -1,10 +1,11 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.domain.TaskColumnEntity;
+import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
@@ -57,12 +58,12 @@ class ColumnControllerTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         token = authenticationService.registerUser(
-                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).token();
         String createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
 
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME),
+                ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername
         );
         createdProjectId = projectEntity.getId();
@@ -81,14 +82,19 @@ class ColumnControllerTest extends BasicTestClass {
                 .jsonPath()
                 .getInt("columns.size()");
 
-        columnService.createColumn(
-                createdProjectId,
-                dtoBuilders.createColumnDto(COLUMN_NAME + "1")
+
+        columnService.createColumn(TaskColumnEntity
+                .builder()
+                .name(COLUMN_NAME + "1")
+                .projectId(createdProjectId)
+                .build()
         );
 
-        columnService.createColumn(
-                createdProjectId,
-                dtoBuilders.createColumnDto(COLUMN_NAME + "1")
+        columnService.createColumn(TaskColumnEntity
+                .builder()
+                .name(COLUMN_NAME + "2")
+                .projectId(createdProjectId)
+                .build()
         );
 
         Response response = requestWithBearerToken()

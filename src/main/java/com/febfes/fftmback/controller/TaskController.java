@@ -63,9 +63,7 @@ public class TaskController {
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         TaskEntity task = taskService.createTask(
-                pathVars.projectId(),
-                pathVars.columnId(),
-                taskDto,
+                TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), taskDto),
                 authentication.getName()
         );
         return TaskMapper.INSTANCE.taskToTaskDto(task);

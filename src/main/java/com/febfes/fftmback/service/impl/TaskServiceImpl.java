@@ -48,20 +48,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskEntity createTask(
-            Long projectId,
-            Long columnId,
-            TaskDto taskDto,
+            TaskEntity task,
             String username
     ) {
-        // TODO: use mapper
-        TaskEntity task = TaskEntity.builder()
-                .name(taskDto.name())
-                .createDate(dateProvider.getCurrentDate())
-                .description(taskDto.description())
-                .columnId(columnId)
-                .projectId(projectId)
-                .ownerId(userService.getUserIdByUsername(username))
-                .build();
+        task.setCreateDate(dateProvider.getCurrentDate());
+        task.setOwnerId(userService.getUserIdByUsername(username));
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
         return savedTask;

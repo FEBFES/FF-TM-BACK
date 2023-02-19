@@ -1,7 +1,7 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.UserService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -34,7 +34,7 @@ class UserControllerTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         token = authenticationService.registerUser(
-                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).token();
         createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
     }
