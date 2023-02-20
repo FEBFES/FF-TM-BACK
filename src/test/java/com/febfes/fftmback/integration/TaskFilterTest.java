@@ -4,7 +4,8 @@ import com.febfes.fftmback.domain.common.query.FilterRequest;
 import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
+import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.exception.NoSuitableTypeFilterException;
 import com.febfes.fftmback.exception.ValueFilterException;
 import com.febfes.fftmback.repository.TaskRepository;
@@ -14,7 +15,6 @@ import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DatabaseCleanup;
 import com.febfes.fftmback.util.DateUtils;
-import com.febfes.fftmback.util.DtoBuilders;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,63 +39,86 @@ class TaskFilterTest extends BasicTestClass {
             @Autowired AuthenticationService authenticationService,
             @Autowired UserService userService,
             @Autowired ProjectService projectService,
-            @Autowired TaskService taskService,
-            @Autowired DtoBuilders dtoBuilders
+            @Autowired TaskService taskService
     ) {
         authenticationService.registerUser(
-                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         );
         String createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
 
-        authenticationService.registerUser(
-                new UserDetailsDto("new_" + USER_EMAIL, "new" + USER_USERNAME, USER_PASSWORD)
+        authenticationService.registerUser(UserEntity
+                .builder()
+                .email("new_" + USER_EMAIL)
+                .username("new" + USER_USERNAME)
+                .encryptedPassword(USER_PASSWORD)
+                .build()
         );
         String createdUsername2 = userService.loadUserByUsername("new" + USER_USERNAME).getUsername();
 
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME),
+                ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername
         );
         Long createdProjectId = projectEntity.getId();
 
         ProjectEntity projectEntity2 = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME),
+                ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername2
         );
         Long createdProjectId2 = projectEntity2.getId();
 
         taskService.createTask(
-                createdProjectId,
-                1L,
-                dtoBuilders.createTaskDto(TASK_NAME + "1", "123"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(1L)
+                        .name(TASK_NAME + "1")
+                        .description("123")
+                        .build(),
                 createdUsername
         );
 
         taskService.createTask(
-                createdProjectId,
-                1L,
-                dtoBuilders.createTaskDto(TASK_NAME + "2", "12345"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(1L)
+                        .name(TASK_NAME + "2")
+                        .description("12345")
+                        .build(),
                 createdUsername
         );
 
         taskService.createTask(
-                createdProjectId,
-                2L,
-                dtoBuilders.createTaskDto(TASK_NAME, "12345"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(2L)
+                        .name(TASK_NAME)
+                        .description("12345")
+                        .build(),
                 createdUsername
         );
 
         taskService.createTask(
-                createdProjectId,
-                1L,
-                dtoBuilders.createTaskDto(TASK_NAME + "another", "12345"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(1L)
+                        .name(TASK_NAME + "another")
+                        .description("12345")
+                        .build(),
                 createdUsername2
         );
 
         taskService.createTask(
-                createdProjectId2,
-                1L,
-                dtoBuilders.createTaskDto(TASK_NAME + "another", "12345"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId2)
+                        .columnId(1L)
+                        .name(TASK_NAME + "another")
+                        .description("12345")
+                        .build(),
                 createdUsername2
         );
 

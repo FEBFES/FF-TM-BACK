@@ -9,10 +9,8 @@ import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.auth.RefreshTokenDto;
 import com.febfes.fftmback.dto.auth.TokenDto;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.exception.EntityAlreadyExistsException;
 import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.RefreshTokenService;
@@ -39,18 +37,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public TokenDto registerUser(UserDetailsDto userDetailsDto) {
-        if (userRepository.existsByEmailOrUsername(userDetailsDto.email(), userDetailsDto.username())) {
+    public TokenDto registerUser(UserEntity user) {
+        if (userRepository.existsByEmailOrUsername(user.getEmail(), user.getUsername())) {
             throw new EntityAlreadyExistsException(UserEntity.class.getSimpleName());
         }
-
-        UserEntity user = UserMapper.INSTANCE.userDetailsDtoToUser(
-                userDetailsDto,
-                DateUtils.getCurrentDate(),
-                passwordEncoder.encode(userDetailsDto.password()),
-                Role.MEMBER
-        );
-
+        user.setCreateDate(DateUtils.getCurrentDate());
+        user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.MEMBER);
         userRepository.save(user);
         log.info("User saved: {}", user);
         String jwtToken = jwtService.generateToken(user);
@@ -58,20 +51,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public RefreshTokenDto authenticateUser(UserDetailsDto userDetailsDto) {
+    public RefreshTokenDto authenticateUser(UserEntity user) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        userDetailsDto.username(),
-                        userDetailsDto.password()
+                        user.getUsername(),
+                        user.getPassword()
                 )
         );
-        UserEntity user = userRepository.findByUsername(userDetailsDto.username())
+        UserEntity receivedUser = userRepository.findByUsername(user.getUsername())
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getSimpleName(),
-                        "username", userDetailsDto.username()));
+                        "username", user.getUsername()));
 
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(receivedUser);
 
-        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(receivedUser.getId());
         log.info("User authenticated");
         return new RefreshTokenDto(jwtToken, refreshToken.getToken());
     }

@@ -38,6 +38,6 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody EditUserDto editUserDto
     ) {
-        userService.updateUser(editUserDto, id);
+        userService.updateUser(UserMapper.INSTANCE.editUserDtoToUser(editUserDto), id);
     }
 }

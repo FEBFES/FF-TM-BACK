@@ -2,18 +2,17 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.dto.ProjectDto;
 
 import java.util.List;
 
 public interface ProjectService {
-    ProjectEntity createProject(ProjectDto projectDto, String username);
+    ProjectEntity createProject(ProjectEntity project, String username);
 
     List<ProjectEntity> getProjects();
 
     ProjectEntity getProject(Long id);
 
-    void editProject(Long id, ProjectDto projectDto);
+    void editProject(Long id, ProjectEntity project);
 
     void deleteProject(Long id);
 

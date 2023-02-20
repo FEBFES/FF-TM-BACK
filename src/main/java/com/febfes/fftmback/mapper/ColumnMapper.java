@@ -6,8 +6,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import java.util.Date;
-
 @Mapper
 public interface ColumnMapper {
 
@@ -16,6 +14,10 @@ public interface ColumnMapper {
     ColumnDto columnToColumnDto(TaskColumnEntity columnEntity);
 
     @Mapping(target = "projectId", source = "projectId")
-    @Mapping(target = "createDate", source = "createDate")
-    TaskColumnEntity columnDtoToColumn(ColumnDto columnDto, Long projectId, Date createDate);
+    TaskColumnEntity columnDtoToColumn(ColumnDto columnDto, Long projectId);
+
+    @Mapping(target = "id", source = "columnId")
+    @Mapping(target = "projectId", source = "projectId")
+    TaskColumnEntity columnDtoToColumn(ColumnDto columnDto, Long columnId, Long projectId);
+
 }

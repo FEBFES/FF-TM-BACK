@@ -1,9 +1,7 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
-import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.mapper.ColumnMapper;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
@@ -29,41 +27,38 @@ public class ColumnServiceImpl implements ColumnService {
     private static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
 
     @Override
-    public TaskColumnEntity createColumn(
-            Long projectId,
-            ColumnDto columnDto
-    ) {
-        TaskColumnEntity columnEntity = columnRepository.save(
-                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId, DateUtils.getCurrentDate())
+    public TaskColumnEntity createColumn(TaskColumnEntity column) {
+        column.setCreateDate(DateUtils.getCurrentDate());
+        TaskColumnEntity savedColumn = columnRepository.save(column);
+        columnRepository.updateChildColumn(
+                savedColumn.getId(),
+                savedColumn.getChildTaskColumnId(),
+                savedColumn.getProjectId()
         );
-        columnRepository.updateChildColumn(columnEntity.getId(), columnEntity.getChildTaskColumnId(), projectId);
-        log.info("Saved column: {}", columnEntity);
-        return columnEntity;
+        log.info("Saved column: {}", savedColumn);
+        return savedColumn;
     }
 
     @Override
-    public void editColumn(
-            Long id,
-            ColumnDto columnDto
-    ) {
-        TaskColumnEntity columnEntity = columnRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id));
-        columnEntity.setName(columnDto.name());
-        if (!Objects.equals(columnEntity.getChildTaskColumnId(), columnDto.childTaskColumnId())) {
+    public void editColumn(TaskColumnEntity column) {
+        TaskColumnEntity oldColumn = columnRepository.findById(column.getId())
+                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), column.getId()));
+        oldColumn.setName(column.getName());
+        if (!Objects.equals(oldColumn.getChildTaskColumnId(), column.getChildTaskColumnId())) {
             columnRepository.updateChildColumn(
-                    columnEntity.getChildTaskColumnId(),
-                    columnEntity.getId(),
-                    columnEntity.getProjectId()
+                    oldColumn.getChildTaskColumnId(),
+                    oldColumn.getId(),
+                    oldColumn.getProjectId()
             );
             columnRepository.updateChildColumn(
-                    columnEntity.getId(),
-                    columnDto.childTaskColumnId(),
-                    columnEntity.getProjectId()
+                    oldColumn.getId(),
+                    column.getChildTaskColumnId(),
+                    oldColumn.getProjectId()
             );
-            columnEntity.setChildTaskColumnId(columnDto.childTaskColumnId());
+            oldColumn.setChildTaskColumnId(column.getChildTaskColumnId());
         }
-        columnRepository.save(columnEntity);
-        log.info("Updated column: {}", columnEntity);
+        columnRepository.save(oldColumn);
+        log.info("Updated column: {}", oldColumn);
 
     }
 
@@ -82,7 +77,12 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public void createDefaultColumnsForProject(Long projectId) {
-        DEFAULT_COLUMNS.forEach(columnName -> createColumn(projectId, new ColumnDto(columnName)));
+        DEFAULT_COLUMNS.forEach(columnName -> createColumn(TaskColumnEntity
+                .builder()
+                .name(columnName)
+                .projectId(projectId)
+                .build()
+        ));
         log.info("Created default columns with names: {}", DEFAULT_COLUMNS);
     }
 
@@ -103,7 +103,6 @@ public class ColumnServiceImpl implements ColumnService {
             result.add(column);
             currentColumnId = column.getId();
         }
-
         Collections.reverse(result);
         return result;
     }

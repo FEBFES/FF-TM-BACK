@@ -1,7 +1,6 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.UserService;
@@ -42,15 +41,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(
-            EditUserDto editUserDto,
+            UserEntity user,
             Long id
     ) {
-        UserEntity userEntity = userRepository.findById(id)
+        UserEntity userToUpdate = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getSimpleName(), id));
-        userEntity.setFirstName(editUserDto.firstName());
-        userEntity.setLastName(editUserDto.lastName());
-        userEntity.setEncryptedPassword(passwordEncoder.encode(editUserDto.password()));
-        userRepository.save(userEntity);
-        log.info("Updated user: {}", userEntity);
+        userToUpdate.setFirstName(user.getFirstName());
+        userToUpdate.setLastName(user.getLastName());
+        userToUpdate.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(userToUpdate);
+        log.info("Updated user: {}", userToUpdate);
     }
 }

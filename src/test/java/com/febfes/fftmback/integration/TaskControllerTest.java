@@ -2,8 +2,9 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
+import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -52,19 +53,21 @@ class TaskControllerTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         token = authenticationService.registerUser(
-                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).token();
         createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
 
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME),
+                ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername
         );
         createdProjectId = projectEntity.getId();
 
-        TaskColumnEntity columnEntity = columnService.createColumn(
-                createdProjectId,
-                dtoBuilders.createColumnDto(COLUMN_NAME)
+        TaskColumnEntity columnEntity = columnService.createColumn(TaskColumnEntity
+                .builder()
+                .name(COLUMN_NAME)
+                .projectId(createdProjectId)
+                .build()
         );
         createdColumnId = columnEntity.getId();
     }
@@ -72,16 +75,22 @@ class TaskControllerTest extends BasicTestClass {
     @Test
     void successfulGetTasksTest() {
         taskService.createTask(
-                createdProjectId,
-                createdColumnId,
-                dtoBuilders.createTaskDto(TASK_NAME + "1"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(createdColumnId)
+                        .name(TASK_NAME + "1")
+                        .build(),
                 createdUsername
         );
 
         taskService.createTask(
-                createdProjectId,
-                createdColumnId,
-                dtoBuilders.createTaskDto(TASK_NAME + "2"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(createdColumnId)
+                        .name(TASK_NAME + "2")
+                        .build(),
                 createdUsername
         );
 
@@ -101,16 +110,22 @@ class TaskControllerTest extends BasicTestClass {
     @Test
     void successfulGetTasksWithFilterTest() {
         taskService.createTask(
-                createdProjectId,
-                createdColumnId,
-                dtoBuilders.createTaskDto(TASK_NAME + "1"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(createdColumnId)
+                        .name(TASK_NAME + "1")
+                        .build(),
                 createdUsername
         );
 
         taskService.createTask(
-                createdProjectId,
-                createdColumnId,
-                dtoBuilders.createTaskDto(TASK_NAME + "2"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(createdColumnId)
+                        .name(TASK_NAME + "2")
+                        .build(),
                 createdUsername
         );
 

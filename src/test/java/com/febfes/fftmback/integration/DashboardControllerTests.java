@@ -1,11 +1,13 @@
 package com.febfes.fftmback.integration;
 
+
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
+import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.service.*;
-import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -44,13 +46,10 @@ class DashboardControllerTests extends BasicTestClass {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private DtoBuilders dtoBuilders;
-
     @BeforeEach
     void beforeEach() {
         token = authenticationService.registerUser(
-                new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD)
+                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).token();
         createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
     }
@@ -58,17 +57,22 @@ class DashboardControllerTests extends BasicTestClass {
     @Test
     void testSingleSuccessTest1() {
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME),
+                ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername
         );
-        TaskColumnEntity columnEntity = columnService.createColumn(
-                projectEntity.getId(),
-                dtoBuilders.createColumnDto(COLUMN_NAME)
+        TaskColumnEntity columnEntity = columnService.createColumn(TaskColumnEntity
+                .builder()
+                .name(COLUMN_NAME)
+                .projectId(projectEntity.getId())
+                .build()
         );
         taskService.createTask(
-                projectEntity.getId(),
-                columnEntity.getId(),
-                dtoBuilders.createTaskDto(TASK_NAME),
+                TaskEntity
+                        .builder()
+                        .projectId(projectEntity.getId())
+                        .columnId(columnEntity.getId())
+                        .name(TASK_NAME)
+                        .build(),
                 createdUsername
         );
 
@@ -85,19 +89,15 @@ class DashboardControllerTests extends BasicTestClass {
     @Test
     void successfulDashboardWithFilterTest() {
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME),
+                ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername
         );
         taskService.createTask(
-                projectEntity.getId(),
-                1L,
-                dtoBuilders.createTaskDto(TASK_NAME),
+                TaskEntity.builder().projectId(projectEntity.getId()).columnId(1L).name(TASK_NAME).build(),
                 createdUsername
         );
         taskService.createTask(
-                projectEntity.getId(),
-                1L,
-                dtoBuilders.createTaskDto(TASK_NAME + "2"),
+                TaskEntity.builder().projectId(projectEntity.getId()).columnId(1L).name(TASK_NAME + "2").build(),
                 createdUsername
         );
 

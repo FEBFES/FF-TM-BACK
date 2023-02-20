@@ -6,6 +6,7 @@ import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.auth.RefreshTokenDto;
 import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
+import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,14 +34,14 @@ public class AuthenticationController {
     @ApiCreate(path = "register")
     @ApiResponse(responseCode = "409", description = "User already exists", content = @Content)
     public TokenDto register(@RequestBody @Valid UserDetailsDto userDetailsDto) {
-        return authenticationService.registerUser(userDetailsDto);
+        return authenticationService.registerUser(UserMapper.INSTANCE.userDetailsDtoToUser(userDetailsDto));
     }
 
     @Operation(summary = "User authentication using username and password")
     @ApiCreate(path = "authenticate")
     @ApiResponse(responseCode = "404", description = "User not found by username", content = @Content)
     public RefreshTokenDto authenticate(@RequestBody @Valid UserDetailsDto userDetailsDto) {
-        return authenticationService.authenticateUser(userDetailsDto);
+        return authenticationService.authenticateUser(UserMapper.INSTANCE.userDetailsDtoToUser(userDetailsDto));
     }
 
     @Operation(summary = "Get refresh token. You need to send an existent Refresh Token")

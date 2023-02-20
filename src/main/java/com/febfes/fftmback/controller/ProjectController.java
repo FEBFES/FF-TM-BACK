@@ -1,6 +1,7 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
@@ -39,9 +40,10 @@ public class ProjectController {
     @ApiCreate
     public ProjectDto createNewProject(@RequestBody @Valid ProjectDto projectDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ProjectMapper.INSTANCE.projectToProjectDto(
-                projectService.createProject(projectDto, authentication.getName())
+        ProjectEntity project = projectService.createProject(
+                ProjectMapper.INSTANCE.projectDtoToProject(projectDto), authentication.getName()
         );
+        return ProjectMapper.INSTANCE.projectToProjectDto(project);
     }
 
     @Operation(summary = "Get project by its id")
@@ -57,7 +59,7 @@ public class ProjectController {
             @PathVariable Long id,
             @RequestBody ProjectDto projectDto
     ) {
-        projectService.editProject(id, projectDto);
+        projectService.editProject(id, ProjectMapper.INSTANCE.projectDtoToProject(projectDto));
     }
 
     @Operation(summary = "Delete project by its id")
