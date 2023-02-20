@@ -80,8 +80,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .map(this::verifyExpiration)
                 .map(RefreshTokenEntity::getUserEntity)
                 .map(userEntity -> {
-                    String refreshToken = jwtService.generateToken(userEntity);
-                    return new RefreshTokenDto(token, refreshToken);
+                    String accessToken = jwtService.generateToken(userEntity);
+                    return new RefreshTokenDto(accessToken, token);
                 })
                 .get(); // we are sure that there will be no null here, since we handle the exception in getByToken
         log.info("Received refresh token: {}", refreshTokenDto);
