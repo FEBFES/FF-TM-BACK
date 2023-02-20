@@ -1,5 +1,6 @@
 package com.febfes.fftmback.mapper;
 
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.common.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.dto.UserDto;

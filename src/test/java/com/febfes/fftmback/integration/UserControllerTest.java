@@ -1,6 +1,6 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.UserEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.UserService;

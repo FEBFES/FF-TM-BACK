@@ -1,7 +1,7 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
-import com.febfes.fftmback.domain.ProjectEntity;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;

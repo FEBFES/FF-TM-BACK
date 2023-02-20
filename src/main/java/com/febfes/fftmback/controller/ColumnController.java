@@ -4,7 +4,7 @@ import com.febfes.fftmback.annotation.ApiCreate;
 import com.febfes.fftmback.annotation.ApiDelete;
 import com.febfes.fftmback.annotation.ApiEdit;
 import com.febfes.fftmback.annotation.ProtectedApi;
-import com.febfes.fftmback.domain.TaskColumnEntity;
+import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
 import com.febfes.fftmback.mapper.ColumnMapper;

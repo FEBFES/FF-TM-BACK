@@ -58,13 +58,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         user.getPassword()
                 )
         );
-        UserEntity recivedUser = userRepository.findByUsername(user.getUsername())
+        UserEntity receivedUser = userRepository.findByUsername(user.getUsername())
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getSimpleName(),
                         "username", user.getUsername()));
 
-        String jwtToken = jwtService.generateToken(recivedUser);
+        String jwtToken = jwtService.generateToken(receivedUser);
 
-        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(recivedUser.getId());
+        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(receivedUser.getId());
         log.info("User authenticated");
         return new RefreshTokenDto(jwtToken, refreshToken.getToken());
     }

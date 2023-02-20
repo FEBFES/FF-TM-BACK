@@ -1,11 +1,9 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.ProjectEntity;
-import com.febfes.fftmback.domain.TaskColumnEntity;
-import com.febfes.fftmback.domain.TaskEntity;
-import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
+import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dto.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.service.*;
@@ -113,16 +111,22 @@ class TaskControllerTest extends BasicTestClass {
     @Test
     void successfulGetTasksWithFilterTest() {
         taskService.createTask(
-                createdProjectId,
-                createdColumnId,
-                dtoBuilders.createTaskDto(TASK_NAME + "1"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(createdColumnId)
+                        .name(TASK_NAME + "1")
+                        .build(),
                 createdUsername
         );
 
         taskService.createTask(
-                createdProjectId,
-                createdColumnId,
-                dtoBuilders.createTaskDto(TASK_NAME + "2"),
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(createdColumnId)
+                        .name(TASK_NAME + "2")
+                        .build(),
                 createdUsername
         );
 

@@ -1,6 +1,5 @@
 package com.febfes.fftmback.service.impl;
 
-import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.domain.UserEntity;

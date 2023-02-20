@@ -1,9 +1,6 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.ProjectEntity;
-import com.febfes.fftmback.domain.TaskColumnEntity;
-import com.febfes.fftmback.domain.TaskEntity;
-import com.febfes.fftmback.domain.UserEntity;
+
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.dto.DashboardDto;
@@ -11,7 +8,6 @@ import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.service.*;
-import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -93,19 +89,15 @@ class DashboardControllerTests extends BasicTestClass {
     @Test
     void successfulDashboardWithFilterTest() {
         ProjectEntity projectEntity = projectService.createProject(
-                dtoBuilders.createProjectDto(PROJECT_NAME),
+                ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername
         );
         taskService.createTask(
-                projectEntity.getId(),
-                1L,
-                dtoBuilders.createTaskDto(TASK_NAME),
+                TaskEntity.builder().projectId(projectEntity.getId()).columnId(1L).name(TASK_NAME).build(),
                 createdUsername
         );
         taskService.createTask(
-                projectEntity.getId(),
-                1L,
-                dtoBuilders.createTaskDto(TASK_NAME + "2"),
+                TaskEntity.builder().projectId(projectEntity.getId()).columnId(1L).name(TASK_NAME + "2").build(),
                 createdUsername
         );
 

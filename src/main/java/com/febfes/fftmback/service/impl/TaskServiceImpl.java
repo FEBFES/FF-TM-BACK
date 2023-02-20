@@ -76,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
             TaskEntity task,
             String username
     ) {
-        task.setCreateDate(dateProvider.getCurrentDate());
+        task.setCreateDate(DateUtils.getCurrentDate());
         task.setOwnerId(userService.getUserIdByUsername(username));
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
