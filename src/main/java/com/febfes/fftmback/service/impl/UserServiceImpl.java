@@ -1,8 +1,6 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.dto.EditUserDto;
-import com.febfes.fftmback.domain.UserEntity;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.UserService;

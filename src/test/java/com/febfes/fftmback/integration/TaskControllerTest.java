@@ -4,7 +4,6 @@ import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.domain.dto.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
