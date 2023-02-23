@@ -41,9 +41,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectEntity> getProjects() {
-        List<ProjectEntity> projectEntityList = projectRepository.findAll();
-        log.info("Received {} projects", projectEntityList.size());
+    public List<ProjectEntity> getProjectsByOwnerId(Long ownerId) {
+        List<ProjectEntity> projectEntityList = projectRepository.findAllByOwnerId(ownerId);
+        log.info("Received {} projects for owner with id={}", projectEntityList.size(), ownerId);
         return projectEntityList;
     }
 
