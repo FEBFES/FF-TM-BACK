@@ -2,6 +2,7 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
@@ -28,10 +29,12 @@ public class ProjectController {
 
     private final @NonNull ProjectService projectService;
 
-    @Operation(summary = "Get all projects")
+    @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
-    public List<ProjectDto> getProjects() {
-        return projectService.getProjects().stream()
+    public List<ProjectDto> getProjectsForUser() {
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = user.getId();
+        return projectService.getProjectsByOwnerId(userId).stream()
                 .map(ProjectMapper.INSTANCE::projectToProjectDto)
                 .toList();
     }
