@@ -74,7 +74,7 @@ class UserControllerTest extends BasicTestClass {
         requestWithBearerToken()
                 .multiPart("image", imageFile, "multipart/form-data")
                 .when()
-                .post("%s/{userId}/save-user-pic".formatted(PATH_TO_USERS_API), userId)
+                .post("%s/{userId}/user-pic".formatted(PATH_TO_USERS_API), userId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }
@@ -85,7 +85,7 @@ class UserControllerTest extends BasicTestClass {
         userService.saveUserPic(userId, new MockMultipartFile("image", new byte[]{1}));
         requestWithBearerToken()
                 .when()
-                .get("%s/{userId}/get-user-pic".formatted(PATH_TO_USERS_API), userId)
+                .get("%s/{userId}/user-pic".formatted(PATH_TO_USERS_API), userId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }

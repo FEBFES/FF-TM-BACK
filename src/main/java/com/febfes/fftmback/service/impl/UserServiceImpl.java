@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUserPic(Long userId, MultipartFile pic) {
-        UserPicEntity userPic = userPicRepository.getUserPicEntitiesByUserId(userId)
+        UserPicEntity userPic = userPicRepository.findUserPicEntityByUserId(userId)
                 .orElseGet(() -> UserPicEntity.builder().userId(userId).build());
         try {
             userPic.setCreateDate(DateUtils.getCurrentDate());
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserPicEntity getUserPic(Long userId) {
-        return userPicRepository.getUserPicEntitiesByUserId(userId)
+        return userPicRepository.findUserPicEntityByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(UserPicEntity.class.getSimpleName(), userId));
     }
 }

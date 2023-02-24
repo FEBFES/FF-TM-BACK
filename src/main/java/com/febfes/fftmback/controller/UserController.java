@@ -8,6 +8,8 @@ import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +44,7 @@ public class UserController {
 
     @Operation(summary = "Upload user pic")
     @PostMapping(
-            path = "/{userId}/save-user-pic",
+            path = "/{userId}/user-pic",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.MULTIPART_FORM_DATA_VALUE
     )
@@ -55,10 +57,11 @@ public class UserController {
 
     @Operation(summary = "Get user pic")
     @GetMapping(
-            path = "/{userId}/get-user-pic",
+            path = "/{userId}/user-pic",
             produces = MediaType.IMAGE_JPEG_VALUE
     )
-    public @ResponseBody byte[] getImageWithMediaType(@PathVariable Long userId) {
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content)
+    public byte[] getImageWithMediaType(@PathVariable Long userId) {
         return userService.getUserPic(userId).getPic();
     }
 }

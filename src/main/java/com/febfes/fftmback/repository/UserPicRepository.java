@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface UserPicRepository extends JpaRepository<UserPicEntity, Long> {
 
-    Optional<UserPicEntity> getUserPicEntitiesByUserId(Long userId);
+    Optional<UserPicEntity> findUserPicEntityByUserId(Long userId);
 
 }

@@ -25,6 +25,8 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     unique: true
+                    foreignKeyName: fk_user
+                    references: user_entity(id)
               - column:
                   name: pic
                   type: bytea
