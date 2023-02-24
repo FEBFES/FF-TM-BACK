@@ -1,15 +1,22 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.dao.UserPicEntity;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.SaveFileException;
+import com.febfes.fftmback.repository.UserPicRepository;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @Slf4j
@@ -17,6 +24,8 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    private final UserPicRepository userPicRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -51,5 +60,24 @@ public class UserServiceImpl implements UserService {
         userToUpdate.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(userToUpdate);
         log.info("Updated user: {}", userToUpdate);
+    }
+
+    @Override
+    public void saveUserPic(Long userId, MultipartFile pic) {
+        UserPicEntity userPic = userPicRepository.getUserPicEntitiesByUserId(userId)
+                .orElseGet(() -> UserPicEntity.builder().userId(userId).build());
+        try {
+            userPic.setCreateDate(DateUtils.getCurrentDate());
+            userPic.setPic(pic.getBytes());
+            userPicRepository.save(userPic);
+        } catch (IOException e) {
+            throw new SaveFileException(pic.getName());
+        }
+    }
+
+    @Override
+    public UserPicEntity getUserPic(Long userId) {
+        return userPicRepository.getUserPicEntitiesByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException(UserPicEntity.class.getSimpleName(), userId));
     }
 }

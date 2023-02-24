@@ -11,10 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("v1/users")
@@ -39,5 +38,29 @@ public class UserController {
             @RequestBody EditUserDto editUserDto
     ) {
         userService.updateUser(UserMapper.INSTANCE.editUserDtoToUser(editUserDto), id);
+    }
+
+    @Operation(summary = "Upload user pic")
+    @RequestMapping(
+            path = "/{userId}/save-user-pic",
+            method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public void saveUserPic(
+            @PathVariable Long userId,
+            @RequestParam("image") MultipartFile userPic
+    ) {
+        userService.saveUserPic(userId, userPic);
+    }
+
+    @Operation(summary = "Get user pic")
+    @RequestMapping(
+            path = "/{userId}/get-user-pic",
+            method = RequestMethod.GET,
+            produces = MediaType.IMAGE_JPEG_VALUE
+    )
+    public @ResponseBody byte[] getImageWithMediaType(@PathVariable Long userId) {
+        return userService.getUserPic(userId).getPic();
     }
 }
