@@ -88,7 +88,7 @@ public class ControllerAdvisor {
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({Exception.class, SaveFileException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @Hidden
     public ApiErrorDto handleGlobalException(

@@ -12,4 +12,6 @@ databaseChangeLog:
   - include:
       file: /db/changelog/0.0.6-create-refresh-token-table.yaml
   - include:
-      file: /db/changelog/0.0.7-change-user-id-in-refresh-token.yaml
+      file: /db/changelog/0.0.7-create-user-pic.yaml
+  - include:
+      file: /db/changelog/0.0.8-change-user-id-in-refresh-token.yaml
