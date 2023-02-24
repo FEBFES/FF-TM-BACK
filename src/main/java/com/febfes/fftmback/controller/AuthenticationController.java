@@ -48,9 +48,9 @@ public class AuthenticationController {
     }
 
     @Operation(summary = "Checking if the token has expired")
-    @PostMapping("has-token-expired")
+    @PostMapping("check-token-expiration")
     @ApiResponse(responseCode = "401", description = "Access token you sent has expired", content = @Content)
-    public void hasTokenExpired(@RequestBody AccessTokenDto accessTokenDto) {
+    public void checkAccessTokenExpiration(@RequestBody AccessTokenDto accessTokenDto) {
         authenticationService.checkAccessTokenExpiration(accessTokenDto.accessToken());
     }
 }

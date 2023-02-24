@@ -10,7 +10,6 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import com.google.gson.Gson;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,14 +97,14 @@ public class AuthenticationControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulHasTokenExpiredTest() {
+    void successfulCheckTokenExpirationTest() {
         TokenDto refreshTokenDto = getRefreshTokenDto();
         AccessTokenDto accessTokenDto = new AccessTokenDto(refreshTokenDto.accessToken());
         given()
                 .contentType(ContentType.JSON)
                 .body(accessTokenDto)
                 .when()
-                .post("%s/has-token-expired".formatted(PATH_TO_AUTH_API))
+                .post("%s/check-token-expiration".formatted(PATH_TO_AUTH_API))
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }
@@ -116,10 +115,6 @@ public class AuthenticationControllerTest extends BasicTestClass {
                 .body(userDetailsDto)
                 .when()
                 .post("%s/register".formatted(PATH_TO_AUTH_API));
-    }
-
-    private RequestSpecification requestWithBearerToken(String token) {
-        return given().header("Authorization", "Bearer " + token);
     }
 
     private TokenDto getRefreshTokenDto() {
