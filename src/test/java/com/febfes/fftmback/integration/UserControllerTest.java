@@ -10,6 +10,9 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
+
+import java.io.File;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static io.restassured.RestAssured.given;
@@ -55,7 +58,6 @@ class UserControllerTest extends BasicTestClass {
     void successfulUpdateUserTest() {
         Long userId = userService.getUserIdByUsername(createdUsername);
         EditUserDto editUserDto = new EditUserDto(FIRST_NAME, LAST_NAME, PASSWORD);
-
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editUserDto)
@@ -64,6 +66,30 @@ class UserControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }
+
+    @Test
+    void successfulLoadUserPic() {
+        Long userId = userService.getUserIdByUsername(createdUsername);
+        File imageFile = new File("src/test/resources/image.jpg");
+        requestWithBearerToken()
+                .multiPart("image", imageFile, "multipart/form-data")
+                .when()
+                .post("%s/{userId}/user-pic".formatted(PATH_TO_USERS_API), userId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+    }
+
+    @Test
+    void successfulGetUserPic() {
+        Long userId = userService.getUserIdByUsername(createdUsername);
+        userService.saveUserPic(userId, new MockMultipartFile("image", new byte[]{1}));
+        requestWithBearerToken()
+                .when()
+                .get("%s/{userId}/user-pic".formatted(PATH_TO_USERS_API), userId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+    }
+
 
     private RequestSpecification requestWithBearerToken() {
         return given().header("Authorization", "Bearer " + token);
