@@ -3,6 +3,7 @@ package com.febfes.fftmback.mapper;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.dto.UserDto;
+import com.febfes.fftmback.dto.auth.AuthenticationDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,6 +15,9 @@ public interface UserMapper {
 
     @Mapping(target = "encryptedPassword", source = "password")
     UserEntity userDetailsDtoToUser(UserDetailsDto userDetailsDto);
+
+    @Mapping(target = "encryptedPassword", source = "password")
+    UserEntity authenticationDtoToUser(AuthenticationDto authenticationDto);
 
     @Mapping(target = "encryptedPassword", source = "password")
     UserEntity editUserDtoToUser(EditUserDto editUserDto);

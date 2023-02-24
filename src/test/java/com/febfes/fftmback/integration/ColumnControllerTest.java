@@ -9,7 +9,6 @@ import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import com.google.gson.Gson;
@@ -48,23 +47,22 @@ class ColumnControllerTest extends BasicTestClass {
     private AuthenticationService authenticationService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private DtoBuilders dtoBuilders;
 
     private final Gson gson = new Gson();
 
     @BeforeEach
     void beforeEach() {
-        token = authenticationService.registerUser(
+        authenticationService.registerUser(
                 UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        ).token();
-        String createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
+        );
+        token = authenticationService.authenticateUser(
+                UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
+        ).accessToken();
 
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
-                createdUsername
+                USER_USERNAME
         );
         createdProjectId = projectEntity.getId();
     }

@@ -3,11 +3,13 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
-import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.service.*;
+import com.febfes.fftmback.dto.DashboardDto;
+import com.febfes.fftmback.service.AuthenticationService;
+import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.TaskService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -43,15 +45,15 @@ class DashboardControllerTests extends BasicTestClass {
     @Autowired
     private AuthenticationService authenticationService;
 
-    @Autowired
-    private UserService userService;
-
     @BeforeEach
     void beforeEach() {
-        token = authenticationService.registerUser(
+        authenticationService.registerUser(
                 UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        ).token();
-        createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
+        );
+        token = authenticationService.authenticateUser(
+                UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
+        ).accessToken();
+        createdUsername = USER_USERNAME;
     }
 
     @Test

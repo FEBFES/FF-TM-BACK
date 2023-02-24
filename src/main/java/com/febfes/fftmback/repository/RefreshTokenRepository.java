@@ -2,7 +2,6 @@ package com.febfes.fftmback.repository;
 
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -13,14 +12,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity
 
     Optional<RefreshTokenEntity> findByToken(String token);
 
-    @Modifying
-    @Query(value = "DELETE FROM refresh_token rt WHERE rt.user_id = :userId", nativeQuery = true)
-    void deleteByUserId(Long userId);
-
-    @Query("SELECT CASE " +
-            "WHEN COUNT(rt) > 0 then " +
-            "true else false " +
-            "end " +
-            "from RefreshTokenEntity rt where rt.userEntity.id = :userId")
-    boolean existsByUserId(Long userId);
+    @Query("SELECT rt from RefreshTokenEntity rt where rt.userEntity.id = :userId")
+    Optional<RefreshTokenEntity> findByUserId(Long userId);
 }

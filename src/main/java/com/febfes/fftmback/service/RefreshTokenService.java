@@ -1,17 +1,17 @@
 package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
-import com.febfes.fftmback.dto.auth.RefreshTokenDto;
+import com.febfes.fftmback.dto.auth.TokenDto;
 
 public interface RefreshTokenService {
 
     RefreshTokenEntity getByToken(String token);
 
+    RefreshTokenEntity getByUserId(Long userId);
+
+    RefreshTokenEntity updateRefreshToken(RefreshTokenEntity refreshToken);
+
     RefreshTokenEntity createRefreshToken(Long userId);
 
-    RefreshTokenEntity verifyExpiration(RefreshTokenEntity refreshToken);
-
-    void deleteByUserId(Long userId);
-
-    RefreshTokenDto refreshToken(String token);
+    TokenDto refreshToken(String token);
 }

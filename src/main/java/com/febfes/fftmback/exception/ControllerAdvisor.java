@@ -76,15 +76,15 @@ public class ControllerAdvisor {
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
-    @ExceptionHandler(RefreshTokenExpiredException.class)
+    @ExceptionHandler(TokenExpiredException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @Hidden
     public ApiErrorDto handleTokenRefreshException(
-            RefreshTokenExpiredException ex,
+            TokenExpiredException ex,
             HttpServletRequest httpRequest
     ) {
         log.error(LOG_MESSAGE, ex.getMessage(), Arrays.toString(ex.getStackTrace()));
-        return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, RefreshTokenExpiredException.class.getSimpleName(),
+        return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, TokenExpiredException.class.getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
