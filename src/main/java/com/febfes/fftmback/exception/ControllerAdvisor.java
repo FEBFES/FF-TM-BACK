@@ -88,19 +88,7 @@ public class ControllerAdvisor {
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
-    @ExceptionHandler(SaveFileException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @Hidden
-    public ApiErrorDto handleSaveFileException(
-            Exception ex,
-            HttpServletRequest httpRequest
-    ) {
-        log.error(LOG_MESSAGE, ex.getMessage(), Arrays.toString(ex.getStackTrace()));
-        return createResponseBodyForExceptions(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getSimpleName(),
-                ex.getMessage(), httpRequest.getRequestURI());
-    }
-
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({Exception.class, SaveFileException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @Hidden
     public ApiErrorDto handleGlobalException(

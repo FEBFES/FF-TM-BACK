@@ -41,9 +41,8 @@ public class UserController {
     }
 
     @Operation(summary = "Upload user pic")
-    @RequestMapping(
+    @PostMapping(
             path = "/{userId}/save-user-pic",
-            method = RequestMethod.POST,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.MULTIPART_FORM_DATA_VALUE
     )
@@ -55,9 +54,8 @@ public class UserController {
     }
 
     @Operation(summary = "Get user pic")
-    @RequestMapping(
+    @GetMapping(
             path = "/{userId}/get-user-pic",
-            method = RequestMethod.GET,
             produces = MediaType.IMAGE_JPEG_VALUE
     )
     public @ResponseBody byte[] getImageWithMediaType(@PathVariable Long userId) {
