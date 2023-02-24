@@ -33,10 +33,13 @@ class UserControllerTest extends BasicTestClass {
 
     @BeforeEach
     void beforeEach() {
-        token = authenticationService.registerUser(
+        authenticationService.registerUser(
                 UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        ).token();
-        createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
+        );
+        token = authenticationService.authenticateUser(
+                UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
+        ).accessToken();
+        createdUsername = USER_USERNAME;
     }
 
     @Test

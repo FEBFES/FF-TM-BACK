@@ -1,11 +1,7 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiCreate;
-import com.febfes.fftmback.annotation.ProtectedApi;
-import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.dto.auth.RefreshTokenDto;
-import com.febfes.fftmback.dto.auth.TokenDto;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
+import com.febfes.fftmback.dto.auth.*;
 import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.RefreshTokenService;
@@ -15,7 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,40 +28,29 @@ public class AuthenticationController {
     @Operation(summary = "Register new user")
     @ApiCreate(path = "register")
     @ApiResponse(responseCode = "409", description = "User already exists", content = @Content)
-    public TokenDto register(@RequestBody @Valid UserDetailsDto userDetailsDto) {
-        return authenticationService.registerUser(UserMapper.INSTANCE.userDetailsDtoToUser(userDetailsDto));
+    public void register(@RequestBody @Valid UserDetailsDto userDetailsDto) {
+        authenticationService.registerUser(UserMapper.INSTANCE.userDetailsDtoToUser(userDetailsDto));
     }
 
     @Operation(summary = "User authentication using username and password")
     @ApiCreate(path = "authenticate")
     @ApiResponse(responseCode = "404", description = "User not found by username", content = @Content)
-    public RefreshTokenDto authenticate(@RequestBody @Valid UserDetailsDto userDetailsDto) {
-        return authenticationService.authenticateUser(UserMapper.INSTANCE.userDetailsDtoToUser(userDetailsDto));
+    public TokenDto authenticate(@RequestBody @Valid AuthenticationDto authenticationDto) {
+        return authenticationService.authenticateUser(UserMapper.INSTANCE.authenticationDtoToUser(authenticationDto));
     }
 
-    @Operation(summary = "Get refresh token. You need to send an existent Refresh Token")
+    @Operation(summary = "Update refresh and access token. You need to send an existent Refresh Token")
     @PostMapping("refresh-token")
-    @ApiResponse(responseCode = "401", description = "Refresh token you sent has expired", content = @Content)
     @ApiResponse(responseCode = "404", description = "Token not found in db", content = @Content)
-    public RefreshTokenDto refreshToken(@RequestBody TokenDto tokenDto) {
-        String token = tokenDto.token();
+    public TokenDto refreshToken(@RequestBody RefreshTokenDto tokenDto) {
+        String token = tokenDto.refreshToken();
         return refreshTokenService.refreshToken(token);
-    }
-
-    @Operation(summary = "Logout user")
-    @PostMapping("logout")
-    @ProtectedApi
-    @ApiResponse(responseCode = "404", description = "Token not found in db by userId", content = @Content)
-    public void logoutUser() {
-        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = user.getId();
-        refreshTokenService.deleteByUserId(userId);
     }
 
     @Operation(summary = "Checking if the token has expired")
     @PostMapping("has-token-expired")
     @ApiResponse(responseCode = "401", description = "Access token you sent has expired", content = @Content)
-    public boolean hasTokenExpired(@RequestBody TokenDto tokenDto) {
-        return authenticationService.hasTokenExpired(tokenDto.token());
+    public void hasTokenExpired(@RequestBody AccessTokenDto accessTokenDto) {
+        authenticationService.checkAccessTokenExpiration(accessTokenDto.accessToken());
     }
 }

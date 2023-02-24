@@ -5,7 +5,10 @@ import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.service.*;
+import com.febfes.fftmback.service.AuthenticationService;
+import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -45,17 +48,17 @@ class TaskControllerTest extends BasicTestClass {
     private AuthenticationService authenticationService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private DtoBuilders dtoBuilders;
 
     @BeforeEach
     void beforeEach() {
-        token = authenticationService.registerUser(
+        authenticationService.registerUser(
                 UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        ).token();
-        createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
+        );
+        token = authenticationService.authenticateUser(
+                UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
+        ).accessToken();
+        createdUsername = USER_USERNAME;
 
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),

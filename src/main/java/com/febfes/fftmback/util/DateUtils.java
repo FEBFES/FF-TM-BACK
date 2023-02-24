@@ -26,4 +26,8 @@ public class DateUtils {
         return Date.from(dateToConvert.atZone(ZoneId.systemDefault())
                 .toInstant());
     }
+
+    public static boolean isDateBeforeCurrentDate(Date date) {
+        return date.before(DateUtils.getCurrentDate());
+    }
 }

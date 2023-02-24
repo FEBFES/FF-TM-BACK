@@ -7,15 +7,14 @@ import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.common.Role;
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.dto.auth.RefreshTokenDto;
 import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.exception.EntityAlreadyExistsException;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.TokenExpiredException;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.RefreshTokenService;
 import com.febfes.fftmback.util.DateUtils;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public TokenDto registerUser(UserEntity user) {
+    public void registerUser(UserEntity user) {
         if (userRepository.existsByEmailOrUsername(user.getEmail(), user.getUsername())) {
             throw new EntityAlreadyExistsException(UserEntity.class.getSimpleName());
         }
@@ -46,12 +45,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setRole(Role.MEMBER);
         userRepository.save(user);
         log.info("User saved: {}", user);
-        String jwtToken = jwtService.generateToken(user);
-        return new TokenDto(jwtToken);
     }
 
     @Override
-    public RefreshTokenDto authenticateUser(UserEntity user) {
+    public TokenDto authenticateUser(UserEntity user) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getUsername(),
@@ -64,20 +61,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         String jwtToken = jwtService.generateToken(receivedUser);
 
+        try {
+            RefreshTokenEntity existedRefreshToken = refreshTokenService.getByUserId(receivedUser.getId());
+            if (DateUtils.isDateBeforeCurrentDate(existedRefreshToken.getExpiryDate())) {
+                RefreshTokenEntity updatedRefreshToken = refreshTokenService.updateRefreshToken(existedRefreshToken);
+                log.info("User with id={} authenticated with updated refresh token", user.getId());
+                return new TokenDto(jwtToken, updatedRefreshToken.getToken());
+            }
+            log.info("User with id={} authenticated with existed non expired refresh token", user.getId());
+            return new TokenDto(jwtToken, existedRefreshToken.getToken());
+        } catch (EntityNotFoundException ignored) {
+            log.info("There is no refresh token in db for user with id={}", receivedUser.getId());
+        }
+
         RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(receivedUser.getId());
-        log.info("User authenticated");
-        return new RefreshTokenDto(jwtToken, refreshToken.getToken());
+        log.info("User with id={} authenticated", user.getId());
+        return new TokenDto(jwtToken, refreshToken.getToken());
     }
 
     @Override
-    public boolean hasTokenExpired(String token) {
+    public void checkAccessTokenExpiration(String token) {
         try {
             DecodedJWT decodedJWT = JWT.decode(token);
             Date expiresAt = decodedJWT.getExpiresAt();
-            return expiresAt.before(DateUtils.getCurrentDate());
+            if (DateUtils.isDateBeforeCurrentDate(expiresAt)) {
+                throw new TokenExpiredException(token);
+            }
         } catch (JWTDecodeException e) {
             log.error(e.getMessage());
-            throw new ExpiredJwtException(null, null, e.getMessage(), e.getCause());
+            throw e;
         }
     }
 }
