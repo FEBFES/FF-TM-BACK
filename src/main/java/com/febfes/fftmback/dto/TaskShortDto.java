@@ -9,7 +9,8 @@ public record TaskShortDto(
         Long columnId,
         Long projectId,
         Long ownerId,
-        Date createDate
-
+        Date createDate,
+        String priority,
+        String type
 ) {
 }

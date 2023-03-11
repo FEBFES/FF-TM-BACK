@@ -25,8 +25,11 @@ public record TaskDto(
         Long columnId,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-        Long ownerId
+        Long ownerId,
 
+        String priority,
+
+        String type
 ) {
 
 }

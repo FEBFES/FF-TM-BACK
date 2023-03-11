@@ -2,10 +2,12 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.TaskTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("v1/projects")
@@ -28,6 +31,7 @@ import java.util.List;
 public class ProjectController {
 
     private final @NonNull ProjectService projectService;
+    private final @NonNull TaskTypeService taskTypeService;
 
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
@@ -69,5 +73,16 @@ public class ProjectController {
     @ApiDelete(path = "{id}")
     public void deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
+    }
+
+    @Operation(summary = "Get task types for project")
+    @ApiGet(path = "{id}/task-types")
+    @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
+    public List<String> getTaskTypes(@PathVariable Long id) {
+        return taskTypeService
+                .getTaskTypesByProjectId(id)
+                .stream()
+                .map(TaskTypeEntity::getName)
+                .collect(Collectors.toList());
     }
 }
