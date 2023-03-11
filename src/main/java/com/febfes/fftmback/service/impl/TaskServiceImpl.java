@@ -7,8 +7,10 @@ import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.mapper.TaskMapper;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DateUtils;
 import com.febfes.fftmback.util.JsonUtils;
@@ -27,11 +29,11 @@ import static java.util.Objects.nonNull;
 @Slf4j
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
+    private static final String RECEIVED_TASKS_SIZE_LOG = "Received tasks size: {}";
 
     private final TaskRepository taskRepository;
     private final UserService userService;
-
-    private static final String RECEIVED_TASKS_SIZE_LOG = "Received tasks size: {}";
+    private final TaskTypeService taskTypeService;
 
     @Override
     public List<TaskEntity> getTasks(
@@ -78,6 +80,9 @@ public class TaskServiceImpl implements TaskService {
     ) {
         task.setCreateDate(DateUtils.getCurrentDate());
         task.setOwnerId(userService.getUserIdByUsername(username));
+        if (task.getTaskType() != null) {
+            fillTaskType(task, task.getTaskType().getName(), task.getProjectId());
+        }
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
         return savedTask;
@@ -96,6 +101,8 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(taskDto.description());
         task.setColumnId(columnId);
         task.setProjectId(projectId);
+        task.setPriority(TaskMapper.stringToPriority(taskDto.priority()));
+        fillTaskType(task, taskDto.type(), projectId);
         taskRepository.save(task);
         log.info("Updated task: {}", task);
         return task;
@@ -138,5 +145,16 @@ public class TaskServiceImpl implements TaskService {
             filters.addAll(additionalFilters);
         }
         return new FilterSpecification<>(filters);
+    }
+
+    private void fillTaskType(TaskEntity task, String typeName, Long projectId) {
+        if (typeName == null || projectId == null) {
+            task.setTaskType(null);
+            return;
+        }
+        taskTypeService
+                .getTaskTypeByNameAndProjectId(typeName, task.getProjectId())
+                .ifPresentOrElse(task::setTaskType, () -> task.setTaskType(null));
+
     }
 }

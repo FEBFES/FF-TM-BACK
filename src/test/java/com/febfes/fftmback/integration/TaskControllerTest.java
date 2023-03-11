@@ -5,10 +5,8 @@ import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.dto.constant.TaskPriority;
+import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -227,6 +225,26 @@ class TaskControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND);
     }
+
+    @Test
+    void createAndTaskWithType() {
+        String taskType = TaskTypeService.DEFAULT_TASK_TYPES.get(0);
+        TaskDto taskDto = dtoBuilders.createTaskDtoWithType(TASK_NAME, taskType);
+        createNewTask(taskDto)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("type", equalTo(taskType));
+    }
+
+    @Test
+    void createAndTaskWithPriority() {
+        TaskDto taskDto = dtoBuilders.createTaskDtoWithPriority(TASK_NAME, TaskPriority.LOW.name().toLowerCase());
+        createNewTask(taskDto)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("priority", equalTo(TaskPriority.LOW.name().toLowerCase()));
+    }
+
 
     private Response createNewTask(TaskDto taskDto) {
         return requestWithBearerToken()

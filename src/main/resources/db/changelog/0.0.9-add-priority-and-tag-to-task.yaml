@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: VladisStep
+      comment: "add priority column to task entity"
+      changes:
+        - addColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: priority
+                  type: int
+  - changeSet:
+      id: 2
+      author: VladisStep
+      comment: "add task type table"
+      changes:
+        - createTable:
+            tableName: "task_type"
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: project_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_project
+                    references: project(id)
+  - changeSet:
+      id: 3
+      author: VladisStep
+      comment: "add task type to task"
+      changes:
+        - addColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: task_type_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_task_type
+                    references: task_type(id)

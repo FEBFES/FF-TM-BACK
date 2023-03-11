@@ -6,6 +6,9 @@ public record TaskShortDto(
         String description,
         Long columnId,
         Long projectId,
-        Long ownerId
+        Long ownerId,
+        String priority,
+        String type
+
 ) {
 }

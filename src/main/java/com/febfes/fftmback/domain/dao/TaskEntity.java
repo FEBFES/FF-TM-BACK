@@ -1,9 +1,8 @@
 package com.febfes.fftmback.domain.dao;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.febfes.fftmback.dto.constant.TaskPriority;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -33,4 +32,11 @@ public class TaskEntity extends AppEntity {
 
     @Column(name = "owner_id")
     private Long ownerId;
+
+    @Column(name = "priority")
+    private TaskPriority priority;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_type_id", referencedColumnName = "id")
+    private TaskTypeEntity taskType;
 }

@@ -7,6 +7,7 @@ import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DateUtils;
 import jakarta.transaction.Transactional;
@@ -27,6 +28,8 @@ public class ProjectServiceImpl implements ProjectService {
     private final ColumnService columnService;
     private final UserService userService;
 
+    private final TaskTypeService taskTypeService;
+
     @Override
     public ProjectEntity createProject(
             ProjectEntity project,
@@ -36,7 +39,9 @@ public class ProjectServiceImpl implements ProjectService {
         project.setOwnerId(userService.getUserIdByUsername(username));
         ProjectEntity projectEntity = projectRepository.save(project);
         log.info("Saved project: {}", projectEntity);
-        columnService.createDefaultColumnsForProject(projectEntity.getId());
+        Long projectId = projectEntity.getId();
+        columnService.createDefaultColumnsForProject(projectId);
+        taskTypeService.createDefaultTaskTypesForProject(projectId);
         return projectEntity;
     }
 
@@ -68,6 +73,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void deleteProject(Long id) {
         if (projectRepository.existsById(id)) {
+            taskTypeService.deleteAllTypesByProjectId(id);
             projectRepository.deleteById(id);
             log.info("Project with id={} was deleted", id);
         } else {
