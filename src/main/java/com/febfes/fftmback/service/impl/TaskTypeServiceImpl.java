@@ -4,8 +4,8 @@ import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.repository.TaskTypeRepository;
 import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.util.DateUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,11 +13,13 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TaskTypeServiceImpl implements TaskTypeService {
 
+    public final List<String> DEFAULT_TASK_TYPES = List.of("bug", "feature", "research", "question");
 
-    @Autowired
-    private TaskTypeRepository taskTypeRepository;
+
+    private final TaskTypeRepository taskTypeRepository;
 
     @Override
     public void createDefaultTaskTypesForProject(Long projectId) {
@@ -30,8 +32,8 @@ public class TaskTypeServiceImpl implements TaskTypeService {
                         .projectId(projectId)
                         .build()
                 )
-                .forEach(taskTypeEntity -> taskTypeRepository.save(taskTypeEntity));
-        log.info("Created default columns with names: {}", DEFAULT_TASK_TYPES);
+                .forEach(taskTypeRepository::save);
+        log.info("Created default task types: {} for project with id={}", DEFAULT_TASK_TYPES, projectId);
     }
 
     @Override
@@ -47,6 +49,11 @@ public class TaskTypeServiceImpl implements TaskTypeService {
     @Override
     public void deleteAllTypesByProjectId(Long projectId) {
         taskTypeRepository.deleteAllByProjectId(projectId);
+    }
+
+    @Override
+    public TaskTypeEntity createTaskType(TaskTypeEntity taskType) {
+        return taskTypeRepository.save(taskType);
     }
 
 

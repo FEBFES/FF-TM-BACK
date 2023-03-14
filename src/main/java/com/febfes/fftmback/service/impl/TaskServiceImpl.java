@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Service
@@ -80,7 +81,7 @@ public class TaskServiceImpl implements TaskService {
     ) {
         task.setCreateDate(DateUtils.getCurrentDate());
         task.setOwnerId(userService.getUserIdByUsername(username));
-        if (task.getTaskType() != null) {
+        if (nonNull(task.getTaskType())) {
             fillTaskType(task, task.getTaskType().getName(), task.getProjectId());
         }
         TaskEntity savedTask = taskRepository.save(task);
@@ -148,7 +149,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void fillTaskType(TaskEntity task, String typeName, Long projectId) {
-        if (typeName == null || projectId == null) {
+        if (isNull(typeName) || isNull(projectId)) {
             task.setTaskType(null);
             return;
         }

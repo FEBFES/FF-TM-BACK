@@ -1,12 +1,10 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.TaskColumnEntity;
-import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.constant.TaskPriority;
+import com.febfes.fftmback.domain.dao.*;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.dto.constant.TaskPriority;
 import com.febfes.fftmback.service.*;
+import com.febfes.fftmback.util.DateUtils;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -27,6 +25,7 @@ import static org.hamcrest.Matchers.equalTo;
 class TaskControllerTest extends BasicTestClass {
 
     public static final String TASK_NAME = "Task name";
+    public static final String TASK_TYPE = "bugggg";
 
     private Long createdProjectId;
     private Long createdColumnId;
@@ -47,6 +46,9 @@ class TaskControllerTest extends BasicTestClass {
 
     @Autowired
     private DtoBuilders dtoBuilders;
+
+    @Autowired
+    private TaskTypeService taskTypeService;
 
     @BeforeEach
     void beforeEach() {
@@ -228,12 +230,18 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void createAndTaskWithType() {
-        String taskType = TaskTypeService.DEFAULT_TASK_TYPES.get(0);
-        TaskDto taskDto = dtoBuilders.createTaskDtoWithType(TASK_NAME, taskType);
+        taskTypeService.createTaskType(TaskTypeEntity
+                .builder()
+                .name(TASK_TYPE)
+                .projectId(createdProjectId)
+                .createDate(DateUtils.getCurrentDate())
+                .build()
+        );
+        TaskDto taskDto = dtoBuilders.createTaskDtoWithType(TASK_NAME, TASK_TYPE);
         createNewTask(taskDto)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .body("type", equalTo(taskType));
+                .body("type", equalTo(TASK_TYPE));
     }
 
     @Test
