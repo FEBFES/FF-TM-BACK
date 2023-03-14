@@ -1,14 +1,10 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.TaskColumnEntity;
-import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.constant.TaskPriority;
+import com.febfes.fftmback.domain.dao.*;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.service.*;
+import com.febfes.fftmback.util.DateUtils;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -29,6 +25,7 @@ import static org.hamcrest.Matchers.equalTo;
 class TaskControllerTest extends BasicTestClass {
 
     public static final String TASK_NAME = "Task name";
+    public static final String TASK_TYPE = "bugggg";
 
     private Long createdProjectId;
     private Long createdColumnId;
@@ -49,6 +46,9 @@ class TaskControllerTest extends BasicTestClass {
 
     @Autowired
     private DtoBuilders dtoBuilders;
+
+    @Autowired
+    private TaskTypeService taskTypeService;
 
     @BeforeEach
     void beforeEach() {
@@ -227,6 +227,32 @@ class TaskControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND);
     }
+
+    @Test
+    void createAndTaskWithType() {
+        taskTypeService.createTaskType(TaskTypeEntity
+                .builder()
+                .name(TASK_TYPE)
+                .projectId(createdProjectId)
+                .createDate(DateUtils.getCurrentDate())
+                .build()
+        );
+        TaskDto taskDto = dtoBuilders.createTaskDtoWithType(TASK_NAME, TASK_TYPE);
+        createNewTask(taskDto)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("type", equalTo(TASK_TYPE));
+    }
+
+    @Test
+    void createAndTaskWithPriority() {
+        TaskDto taskDto = dtoBuilders.createTaskDtoWithPriority(TASK_NAME, TaskPriority.LOW.name().toLowerCase());
+        createNewTask(taskDto)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("priority", equalTo(TaskPriority.LOW.name().toLowerCase()));
+    }
+
 
     private Response createNewTask(TaskDto taskDto) {
         return requestWithBearerToken()

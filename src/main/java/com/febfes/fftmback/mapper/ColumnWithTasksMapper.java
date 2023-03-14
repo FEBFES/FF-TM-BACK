@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = TaskShortMapper.class)
+@Mapper(uses = TaskMapper.class)
 public interface ColumnWithTasksMapper {
 
     ColumnWithTasksMapper INSTANCE = Mappers.getMapper(ColumnWithTasksMapper.class);

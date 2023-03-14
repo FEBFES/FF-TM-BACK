@@ -15,3 +15,5 @@ databaseChangeLog:
       file: /db/changelog/0.0.7-create-user-pic.yaml
   - include:
       file: /db/changelog/0.0.8-change-user-id-in-refresh-token.yaml
+  - include:
+      file: /db/changelog/0.0.9-add-priority-and-tag-to-task.yaml

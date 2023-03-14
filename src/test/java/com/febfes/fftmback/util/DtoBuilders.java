@@ -30,14 +30,18 @@ public class DtoBuilders {
     }
 
     public TaskDto createTaskDto() {
-        return new TaskDto(null, null, null, null, null, null, null);
+        return new TaskDto(null, null, null, null, null, null, null, null, null);
     }
 
     public TaskDto createTaskDto(String name) {
-        return new TaskDto(null, name, null, null, null, null, null);
+        return new TaskDto(null, name, null, null, null, null, null, null, null);
     }
 
-    public TaskDto createTaskDto(String name, String description) {
-        return new TaskDto(null, name, description, null, null, null, null);
+    public TaskDto createTaskDtoWithType(String name, String type) {
+        return new TaskDto(null, name, null, null, null, null, null, null, type);
+    }
+
+    public TaskDto createTaskDtoWithPriority(String name, String priority) {
+        return new TaskDto(null, name, null, null, null, null, null, priority, null);
     }
 }
