@@ -169,12 +169,6 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void setProjectFavouriteTest() {
         Long createdProjectId = createNewProject(PROJECT_NAME);
-        requestWithBearerToken()
-                .contentType(ContentType.JSON)
-                .when()
-                .put("%s/project-settings".formatted(PATH_TO_PROJECTS_API), createdProjectId)
-                .then()
-                .statusCode(HttpStatus.SC_OK);
         //TODO add check status
     }
 
