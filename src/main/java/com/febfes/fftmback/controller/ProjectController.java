@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.dto.ProjectSettingsDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
@@ -73,6 +74,12 @@ public class ProjectController {
     @ApiDelete(path = "{id}")
     public void deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
+    }
+
+    @Operation(summary = "Update project settings")
+    @ApiEdit(path = "/project-settings")
+    public void updateProjectSettings(@RequestBody ProjectSettingsDto settingsDto) {
+        projectService.setProjectFavouriteStatus(settingsDto);
     }
 
     @Operation(summary = "Get task types for project")

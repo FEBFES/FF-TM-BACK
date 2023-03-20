@@ -39,4 +39,7 @@ public class ProjectEntity extends AppEntity {
     @Column(name = "owner_id")
     private Long ownerId;
 
+    @Transient
+    private Boolean isFavourite;
+
 }

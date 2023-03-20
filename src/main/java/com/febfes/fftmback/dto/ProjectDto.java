@@ -19,6 +19,8 @@ public record ProjectDto(
         Date createDate,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-        Long ownerId
+        Long ownerId,
+
+        Boolean isFavourite
 ) {
 }

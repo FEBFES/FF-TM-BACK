@@ -2,6 +2,7 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
+import com.febfes.fftmback.dto.ProjectSettingsDto;
 
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface ProjectService {
     void deleteProject(Long id);
 
     DashboardDto getDashboard(Long id, String taskFilter);
+
+    void setProjectFavouriteStatus(ProjectSettingsDto projectSettings);
 }
