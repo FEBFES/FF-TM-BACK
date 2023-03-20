@@ -107,9 +107,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditOfProjectTest() {
-        ProjectDto createProjectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
-        Response createResponse = createNewProject(createProjectDto);
-        Long createdProjectId = createResponse.jsonPath().getLong("id");
+        Long createdProjectId = createNewProject(PROJECT_NAME);
 
         String newProjectName = PROJECT_NAME + "edit";
         ProjectDto editProjectDto = dtoBuilders.createProjectDto(newProjectName);
@@ -146,9 +144,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfProjectTest() {
-        ProjectDto createProjectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
-        Response createResponse = createNewProject(createProjectDto);
-        Long createdProjectId = createResponse.jsonPath().getLong("id");
+        Long createdProjectId = createNewProject(PROJECT_NAME);
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -168,6 +164,18 @@ class ProjectControllerTest extends BasicTestClass {
                 .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), wrongProjectId1)
                 .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test
+    void setProjectFavouriteTest() {
+        Long createdProjectId = createNewProject(PROJECT_NAME);
+        //TODO add check status
+    }
+
+    private Long createNewProject(String projectName) {
+        ProjectDto createProjectDto = dtoBuilders.createProjectDto(projectName);
+        Response createResponse = createNewProject(createProjectDto);
+        return createResponse.jsonPath().getLong("id");
     }
 
     private Response createNewProject(ProjectDto projectDto) {

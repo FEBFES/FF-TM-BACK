@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 @Profile("test")
 public class DtoBuilders {
     public ProjectDto createProjectDto(String name) {
-        return new ProjectDto(null, name, null, null, null);
+        return new ProjectDto(null, name, null, null, null, null);
     }
 
     public ProjectDto createProjectDto(String name, String description) {
-        return new ProjectDto(null, name, description, null, null);
+        return new ProjectDto(null, name, description, null, null, null);
     }
 
     public ColumnDto createColumnDto() {
