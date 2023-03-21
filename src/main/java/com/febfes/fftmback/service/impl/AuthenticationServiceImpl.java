@@ -40,7 +40,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (userRepository.existsByEmailOrUsername(user.getEmail(), user.getUsername())) {
             throw new EntityAlreadyExistsException(UserEntity.class.getSimpleName());
         }
-        user.setCreateDate(DateUtils.getCurrentDate());
         user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.MEMBER);
         userRepository.save(user);

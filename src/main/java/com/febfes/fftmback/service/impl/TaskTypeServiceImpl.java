@@ -3,7 +3,6 @@ package com.febfes.fftmback.service.impl;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.repository.TaskTypeRepository;
 import com.febfes.fftmback.service.TaskTypeService;
-import com.febfes.fftmback.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ public class TaskTypeServiceImpl implements TaskTypeService {
                 .map(typeName -> TaskTypeEntity
                         .builder()
                         .name(typeName)
-                        .createDate(DateUtils.getCurrentDate())
                         .projectId(projectId)
                         .build()
                 )

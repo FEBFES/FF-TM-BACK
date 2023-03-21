@@ -10,7 +10,6 @@ import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.DateUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +37,6 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectEntity project,
             String username
     ) {
-        project.setCreateDate(DateUtils.getCurrentDate());
         project.setOwnerId(userService.getUserIdByUsername(username));
         ProjectEntity projectEntity = projectRepository.save(project);
         log.info("Saved project: {}", projectEntity);

@@ -7,7 +7,6 @@ import com.febfes.fftmback.exception.SaveFileException;
 import com.febfes.fftmback.repository.UserPicRepository;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -67,7 +66,6 @@ public class UserServiceImpl implements UserService {
         UserPicEntity userPic = userPicRepository.findUserPicEntityByUserId(userId)
                 .orElseGet(() -> UserPicEntity.builder().userId(userId).build());
         try {
-            userPic.setCreateDate(DateUtils.getCurrentDate());
             userPic.setPic(pic.getBytes());
             userPicRepository.save(userPic);
         } catch (IOException e) {
