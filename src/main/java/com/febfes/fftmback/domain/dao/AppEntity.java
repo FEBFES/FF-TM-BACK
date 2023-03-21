@@ -3,6 +3,7 @@ package com.febfes.fftmback.domain.dao;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 
@@ -19,6 +20,7 @@ public abstract class AppEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "create_date", nullable = false)
+    @Column(name = "create_date")
+    @CreationTimestamp
     private Date createDate;
 }

@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: VladisStep
+      comment: ""
+      changes:
+        - dropNotNullConstraint:
+            tableName: project
+            columnName: create_date
+        - dropNotNullConstraint:
+            tableName: refresh_token
+            columnName: create_date
+        - dropNotNullConstraint:
+            tableName: task
+            columnName: create_date
+        - dropNotNullConstraint:
+            tableName: task_column
+            columnName: create_date
+        - dropNotNullConstraint:
+            tableName: task_type
+            columnName: create_date
+        - dropNotNullConstraint:
+            tableName: user_entity
+            columnName: create_date
+        - dropNotNullConstraint:
+            tableName: user_pic
+            columnName: create_date
+  - changeSet:
+      id: 2
+      author: VladisStep
+      comment: "add default create date to tables"
+      changes:
+        - addDefaultValue:
+            tableName: project
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+        - addDefaultValue:
+            tableName: refresh_token
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+        - addDefaultValue:
+            tableName: task
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+        - addDefaultValue:
+            tableName: task_column
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+        - addDefaultValue:
+            tableName: task_type
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+        - addDefaultValue:
+            tableName: user_entity
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+        - addDefaultValue:
+            tableName: user_pic
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+
+
+

@@ -4,7 +4,6 @@ import com.febfes.fftmback.domain.constant.TaskPriority;
 import com.febfes.fftmback.domain.dao.*;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.service.*;
-import com.febfes.fftmback.util.DateUtils;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -234,7 +233,6 @@ class TaskControllerTest extends BasicTestClass {
                 .builder()
                 .name(TASK_TYPE)
                 .projectId(createdProjectId)
-                .createDate(DateUtils.getCurrentDate())
                 .build()
         );
         TaskDto taskDto = dtoBuilders.createTaskDtoWithType(TASK_NAME, TASK_TYPE);

@@ -12,7 +12,6 @@ import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.DateUtils;
 import com.febfes.fftmback.util.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +78,6 @@ public class TaskServiceImpl implements TaskService {
             TaskEntity task,
             String username
     ) {
-        task.setCreateDate(DateUtils.getCurrentDate());
         task.setOwnerId(userService.getUserIdByUsername(username));
         if (nonNull(task.getTaskType())) {
             fillTaskType(task, task.getTaskType().getName(), task.getProjectId());

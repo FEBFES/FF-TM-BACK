@@ -60,7 +60,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshTokenEntity createRefreshToken(Long userId) {
         RefreshTokenEntity refreshToken = refreshTokenRepository.save(
                 RefreshTokenEntity.builder()
-                        .createDate(DateUtils.getCurrentDate())
                         .userEntity(userService.getUserById(userId))
                         .expiryDate(DateUtils.getCurrentDatePlusSeconds(jwtRefreshExpirationDateInSeconds))
                         .token(UUID.randomUUID().toString())

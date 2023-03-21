@@ -19,3 +19,5 @@ databaseChangeLog:
       file: /db/changelog/0.0.9-add-priority-and-tag-to-task.yaml
   - include:
       file: /db/changelog/0.0.10-add-project-favourite-status.yaml
+  - include:
+      file: /db/changelog/0.0.11-auto-fill-create-date.yaml
