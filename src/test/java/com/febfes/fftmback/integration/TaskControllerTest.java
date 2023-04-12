@@ -1,6 +1,6 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.constant.TaskPriority;
+import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.dao.*;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.service.*;

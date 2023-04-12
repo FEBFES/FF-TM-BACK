@@ -2,9 +2,11 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -14,6 +16,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static io.restassured.RestAssured.given;
@@ -26,6 +30,7 @@ class ProjectControllerTest extends BasicTestClass {
     public static final String PROJECT_DESCRIPTION = "Project description";
 
     private String createdUsername;
+    private Long createdUserId;
     private String token;
 
     @Autowired
@@ -33,6 +38,9 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Autowired
     private AuthenticationService authenticationService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private DtoBuilders dtoBuilders;
@@ -46,6 +54,7 @@ class ProjectControllerTest extends BasicTestClass {
                 UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).accessToken();
         createdUsername = USER_USERNAME;
+        createdUserId = userService.getUserIdByUsername(createdUsername);
     }
 
     @Test
@@ -156,20 +165,62 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void failedDeleteOfProjectTest() {
-        String wrongProjectId1 = "54731584";
+        String wrongProjectId = "54731584";
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
-                .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), wrongProjectId1)
+                .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), wrongProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
     @Test
-    void setProjectFavouriteTest() {
-        Long createdProjectId = createNewProject(PROJECT_NAME);
-        //TODO add check status
+    void successfulSetProjectFavouriteTest() {
+        Long createdProjectId = createNewProject(PROJECT_NAME + "favourite_test");
+        List<PatchDto> patchDtoList = List.of(new PatchDto("update", "isFavourite", Boolean.TRUE));
+
+        requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .body(patchDtoList)
+                .when()
+                .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+        ProjectEntity updatedProject = projectService.getProject(createdProjectId, createdUserId);
+        Assertions.assertThat(updatedProject.getIsFavourite())
+                .isTrue();
+    }
+
+    @Test
+    void failedSetProjectFavouriteTest() {
+        Long createdProjectId = createNewProject(PROJECT_NAME + "favourite_test");
+        List<PatchDto> patchDtoList = List.of(new PatchDto("update", "isFavourite!", Boolean.TRUE));
+
+        requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .body(patchDtoList)
+                .when()
+                .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
+                .then()
+                .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void successfulUpdateNameTest() {
+        Long createdProjectId = createNewProject(PROJECT_NAME + "name");
+        List<PatchDto> patchDtoList = List.of(new PatchDto("update", "name", PROJECT_NAME));
+
+        requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .body(patchDtoList)
+                .when()
+                .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+        ProjectEntity updatedProject = projectService.getProject(createdProjectId, createdUserId);
+        Assertions.assertThat(updatedProject.getName())
+                .isEqualTo(PROJECT_NAME);
     }
 
     private Long createNewProject(String projectName) {

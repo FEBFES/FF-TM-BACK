@@ -2,7 +2,7 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.dto.ProjectSettingsDto;
+import com.febfes.fftmback.dto.PatchDto;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public interface ProjectService {
 
     List<ProjectEntity> getProjectsByOwnerId(Long ownerId);
 
-    ProjectEntity getProject(Long id);
+    ProjectEntity getProject(Long id, Long ownerId);
 
     void editProject(Long id, ProjectEntity project);
 
@@ -19,5 +19,5 @@ public interface ProjectService {
 
     DashboardDto getDashboard(Long id, String taskFilter);
 
-    void setProjectFavouriteStatus(ProjectSettingsDto projectSettings);
+    void editProjectPartially(Long id, Long ownerId, List<PatchDto> patchDtoList);
 }

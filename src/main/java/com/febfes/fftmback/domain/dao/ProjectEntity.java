@@ -41,5 +41,4 @@ public class ProjectEntity extends AppEntity {
 
     @Transient
     private Boolean isFavourite;
-
 }

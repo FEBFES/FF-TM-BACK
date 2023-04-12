@@ -4,8 +4,8 @@ import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.dto.ProjectSettingsDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
@@ -58,7 +58,9 @@ public class ProjectController {
     @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public ProjectDto getProject(@PathVariable Long id) {
-        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProject(id));
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = user.getId();
+        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProject(id, userId));
     }
 
     @Operation(summary = "Edit project by its id")
@@ -76,15 +78,19 @@ public class ProjectController {
         projectService.deleteProject(id);
     }
 
-    @Operation(summary = "Update project settings")
-    @ApiEdit(path = "/project-settings")
-    public void updateProjectSettings(@RequestBody ProjectSettingsDto settingsDto) {
-        projectService.setProjectFavouriteStatus(settingsDto);
+    @Operation(summary = "Edit project partially")
+    @ApiPatch(path = "{id}")
+    public void editProjectPartially(
+            @PathVariable Long id,
+            @RequestBody List<PatchDto> patchDtoList
+    ) {
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = user.getId();
+        projectService.editProjectPartially(id, userId, patchDtoList);
     }
 
     @Operation(summary = "Get task types for project")
     @ApiGet(path = "{id}/task-types")
-    @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public List<String> getTaskTypes(@PathVariable Long id) {
         return taskTypeService
                 .getTaskTypesByProjectId(id)
