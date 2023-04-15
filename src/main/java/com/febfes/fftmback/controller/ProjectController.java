@@ -59,8 +59,7 @@ public class ProjectController {
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public ProjectDto getProject(@PathVariable Long id) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = user.getId();
-        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProject(id, userId));
+        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProjectByOwnerId(id, user.getId()));
     }
 
     @Operation(summary = "Edit project by its id")
@@ -85,8 +84,7 @@ public class ProjectController {
             @RequestBody List<PatchDto> patchDtoList
     ) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = user.getId();
-        projectService.editProjectPartially(id, userId, patchDtoList);
+        projectService.editProjectPartially(id, user.getId(), patchDtoList);
     }
 
     @Operation(summary = "Get task types for project")

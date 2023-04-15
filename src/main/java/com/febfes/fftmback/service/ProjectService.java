@@ -11,7 +11,9 @@ public interface ProjectService {
 
     List<ProjectEntity> getProjectsByOwnerId(Long ownerId);
 
-    ProjectEntity getProject(Long id, Long ownerId);
+    ProjectEntity getProject(Long id);
+
+    ProjectEntity getProjectByOwnerId(Long id, Long ownerId);
 
     void editProject(Long id, ProjectEntity project);
 

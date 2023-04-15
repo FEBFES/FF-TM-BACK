@@ -62,11 +62,19 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectEntity getProject(Long id, Long ownerId) {
+    public ProjectEntity getProject(Long id) {
+        ProjectEntity projectEntity = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
+        log.info("Received project {} by id={}", projectEntity, id);
+        return projectEntity;
+    }
+
+    @Override
+    public ProjectEntity getProjectByOwnerId(Long id, Long ownerId) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
         projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, ownerId));
-        log.info("Received project {} by id={}", projectEntity, id);
+        log.info("Received project {} by id={} and ownerId={}", projectEntity, id, ownerId);
         return projectEntity;
     }
 
@@ -109,11 +117,10 @@ public class ProjectServiceImpl implements ProjectService {
             List<PatchDto> patchDtoList
     ) {
         log.info("Project with id={} partial update: {}", id, patchDtoList);
-        ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
+        ProjectEntity projectEntity = getProject(id);
         patchDtoList.forEach(patchDto -> {
             if (PatchOperation.getByCode(patchDto.op()).equals(PatchOperation.UPDATE)) {
-                updateProjectFields(id, ownerId, patchDto, projectEntity);
+                updateProjectField(id, ownerId, patchDto, projectEntity);
             }
         });
         projectRepository.save(projectEntity);
@@ -134,7 +141,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.findAllFavouriteProjectIdsForUser(userId);
     }
 
-    private void updateProjectFields(
+    private void updateProjectField(
             Long id,
             Long ownerId,
             PatchDto patchDto,

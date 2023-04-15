@@ -187,7 +187,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProject(createdProjectId, createdUserId);
+        ProjectEntity updatedProject = projectService.getProjectByOwnerId(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.getIsFavourite())
                 .isTrue();
     }
@@ -203,7 +203,10 @@ class ProjectControllerTest extends BasicTestClass {
                 .when()
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
-                .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                .statusCode(HttpStatus.SC_OK);
+        ProjectEntity updatedProject = projectService.getProjectByOwnerId(createdProjectId, createdUserId);
+        Assertions.assertThat(updatedProject.getIsFavourite())
+                .isFalse();
     }
 
     @Test
@@ -218,7 +221,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProject(createdProjectId, createdUserId);
+        ProjectEntity updatedProject = projectService.getProject(createdProjectId);
         Assertions.assertThat(updatedProject.getName())
                 .isEqualTo(PROJECT_NAME);
     }
