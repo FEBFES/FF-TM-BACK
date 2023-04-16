@@ -11,6 +11,9 @@ import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.util.patch.ProjectPatchFieldProcessor;
+import com.febfes.fftmback.util.patch.ProjectPatchIsFavouriteProcessor;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +34,14 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final ColumnService columnService;
     private final UserService userService;
-
     private final TaskTypeService taskTypeService;
+
+    private ProjectPatchFieldProcessor patchIsFavouriteProcessor;
+
+    @PostConstruct
+    private void postConstruct() {
+        patchIsFavouriteProcessor = new ProjectPatchIsFavouriteProcessor(this, null);
+    }
 
     @Override
     public ProjectEntity createProject(
@@ -119,21 +128,24 @@ public class ProjectServiceImpl implements ProjectService {
         log.info("Project with id={} partial update: {}", id, patchDtoList);
         ProjectEntity projectEntity = getProject(id);
         patchDtoList.forEach(patchDto -> {
+            patchIsFavouriteProcessor.patchField(id, ownerId, patchDto);
             if (PatchOperation.getByCode(patchDto.op()).equals(PatchOperation.UPDATE)) {
-                updateProjectField(id, ownerId, patchDto, projectEntity);
+                updateProjectField(patchDto, projectEntity);
             }
         });
         projectRepository.save(projectEntity);
         log.info("Project updated partially: {}", projectEntity);
     }
 
-    private void addProjectToFavourite(Long projectId, Long userId) {
+    @Override
+    public void addProjectToFavourite(Long projectId, Long userId) {
         if (!projectRepository.isProjectFavourite(projectId, userId)) {
             projectRepository.addProjectToFavourite(projectId, userId);
         }
     }
 
-    private void removeProjectFromFavourite(Long projectId, Long userId) {
+    @Override
+    public void removeProjectFromFavourite(Long projectId, Long userId) {
         projectRepository.removeProjectFromFavourite(projectId, userId);
     }
 
@@ -142,21 +154,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private void updateProjectField(
-            Long id,
-            Long ownerId,
             PatchDto patchDto,
             ProjectEntity projectEntity
     ) {
-        if (patchDto.key().equals("isFavourite")) {
-            Boolean isFavourite = (Boolean) patchDto.value();
-            if (isFavourite) {
-                addProjectToFavourite(id, ownerId);
-            } else {
-                removeProjectFromFavourite(id, ownerId);
-            }
-            log.info("Project field \"isFavourite\" updated. New value: {}", isFavourite);
-            return;
-        }
         try {
             Field field = projectEntity.getClass().getDeclaredField(patchDto.key());
             field.setAccessible(true);

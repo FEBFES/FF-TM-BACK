@@ -22,4 +22,8 @@ public interface ProjectService {
     DashboardDto getDashboard(Long id, String taskFilter);
 
     void editProjectPartially(Long id, Long ownerId, List<PatchDto> patchDtoList);
+
+    void addProjectToFavourite(Long projectId, Long userId);
+
+    void removeProjectFromFavourite(Long projectId, Long userId);
 }
