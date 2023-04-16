@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +22,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ControllerAdvisor {
 
-    private static final String LOG_MESSAGE = "Message: {}.\nStack trace: {}";
-
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @Hidden
@@ -32,7 +29,7 @@ public class ControllerAdvisor {
             EntityNotFoundException ex,
             HttpServletRequest httpRequest
     ) {
-        log.error(LOG_MESSAGE, ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+        ex.printStackTrace();
         return createResponseBodyForExceptions(HttpStatus.NOT_FOUND, EntityNotFoundException.class.getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
@@ -44,7 +41,7 @@ public class ControllerAdvisor {
             EntityAlreadyExistsException ex,
             HttpServletRequest httpRequest
     ) {
-        log.error(LOG_MESSAGE, ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+        ex.printStackTrace();
         return createResponseBodyForExceptions(HttpStatus.CONFLICT, EntityAlreadyExistsException.class.getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
@@ -59,7 +56,7 @@ public class ControllerAdvisor {
         List<String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList());
-        log.error(LOG_MESSAGE, errors, Arrays.toString(ex.getStackTrace()));
+        ex.printStackTrace();
         return createResponseBodyForExceptions(HttpStatus.UNPROCESSABLE_ENTITY, MethodArgumentNotValidException.class.getSimpleName(),
                 errors.toString(), httpRequest.getRequestURI());
     }
@@ -71,7 +68,7 @@ public class ControllerAdvisor {
             ExpiredJwtException ex,
             HttpServletRequest httpRequest
     ) {
-        log.error(LOG_MESSAGE, ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+        ex.printStackTrace();
         return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, ExpiredJwtException.class.getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
@@ -83,7 +80,7 @@ public class ControllerAdvisor {
             TokenExpiredException ex,
             HttpServletRequest httpRequest
     ) {
-        log.error(LOG_MESSAGE, ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+        ex.printStackTrace();
         return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, TokenExpiredException.class.getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
@@ -95,7 +92,7 @@ public class ControllerAdvisor {
             Exception ex,
             HttpServletRequest httpRequest
     ) {
-        log.error(LOG_MESSAGE, ex.getMessage(), Arrays.toString(ex.getStackTrace()));
+        ex.printStackTrace();
         return createResponseBodyForExceptions(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }

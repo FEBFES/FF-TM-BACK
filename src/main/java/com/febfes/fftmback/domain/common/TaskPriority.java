@@ -1,4 +1,4 @@
-package com.febfes.fftmback.domain.constant;
+package com.febfes.fftmback.domain.common;
 
 public enum TaskPriority {
 

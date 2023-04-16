@@ -1,8 +1,9 @@
 package com.febfes.fftmback.service.impl;
 
+import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.dto.ProjectSettingsDto;
+import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
@@ -10,13 +11,17 @@ import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.util.patch.ProjectPatchFieldProcessor;
+import com.febfes.fftmback.util.patch.ProjectPatchIsFavouriteProcessor;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,8 +34,14 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final ColumnService columnService;
     private final UserService userService;
-
     private final TaskTypeService taskTypeService;
+
+    private ProjectPatchFieldProcessor patchIsFavouriteProcessor;
+
+    @PostConstruct
+    private void postConstruct() {
+        patchIsFavouriteProcessor = new ProjectPatchIsFavouriteProcessor(this, null);
+    }
 
     @Override
     public ProjectEntity createProject(
@@ -68,6 +79,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public ProjectEntity getProjectByOwnerId(Long id, Long ownerId) {
+        ProjectEntity projectEntity = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
+        projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, ownerId));
+        log.info("Received project {} by id={} and ownerId={}", projectEntity, id, ownerId);
+        return projectEntity;
+    }
+
+    @Override
     public void editProject(Long id, ProjectEntity project) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
@@ -100,33 +120,51 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void setProjectFavouriteStatus(ProjectSettingsDto projectSettings) {
-        Boolean isFavourite = projectSettings.isFavourite();
-        Long projectId = projectSettings.projectId();
-        Long userId = projectSettings.userId();
-        if (Objects.isNull(isFavourite) || Objects.isNull(projectId) || Objects.isNull(userId)) {
-            return;
-        }
-        if (isFavourite) {
-            addProjectToFavourite(projectId, userId);
-        } else {
-            removeProjectFromFavourite(projectId, userId);
-        }
-
+    public void editProjectPartially(
+            Long id,
+            Long ownerId,
+            List<PatchDto> patchDtoList
+    ) {
+        log.info("Project with id={} partial update: {}", id, patchDtoList);
+        ProjectEntity projectEntity = getProject(id);
+        patchDtoList.forEach(patchDto -> {
+            patchIsFavouriteProcessor.patchField(id, ownerId, patchDto);
+            if (PatchOperation.getByCode(patchDto.op()).equals(PatchOperation.UPDATE)) {
+                updateProjectField(patchDto, projectEntity);
+            }
+        });
+        projectRepository.save(projectEntity);
+        log.info("Project updated partially: {}", projectEntity);
     }
 
-    private void addProjectToFavourite(Long projectId, Long userId) {
+    @Override
+    public void addProjectToFavourite(Long projectId, Long userId) {
         if (!projectRepository.isProjectFavourite(projectId, userId)) {
             projectRepository.addProjectToFavourite(projectId, userId);
         }
     }
 
-    private void removeProjectFromFavourite(Long projectId, Long userId) {
+    @Override
+    public void removeProjectFromFavourite(Long projectId, Long userId) {
         projectRepository.removeProjectFromFavourite(projectId, userId);
     }
 
     private Set<Long> getFavouriteProjectsForUser(Long userId) {
         return projectRepository.findAllFavouriteProjectIdsForUser(userId);
+    }
+
+    private void updateProjectField(
+            PatchDto patchDto,
+            ProjectEntity projectEntity
+    ) {
+        try {
+            Field field = projectEntity.getClass().getDeclaredField(patchDto.key());
+            field.setAccessible(true);
+            ReflectionUtils.setField(field, projectEntity, patchDto.value());
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+            log.info("Can't find field \"{}\" in Project entity", patchDto.key());
+        }
     }
 
 }
