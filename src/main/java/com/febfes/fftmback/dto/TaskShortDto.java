@@ -1,5 +1,7 @@
 package com.febfes.fftmback.dto;
 
+import com.febfes.fftmback.domain.common.TaskPriority;
+
 import java.util.Date;
 
 public record TaskShortDto(
@@ -10,7 +12,8 @@ public record TaskShortDto(
         Long projectId,
         Long ownerId,
         Date createDate,
-        String priority,
-        String type
+        TaskPriority priority,
+        String type,
+        String ownerUserPic
 ) {
 }

@@ -1,5 +1,6 @@
 package com.febfes.fftmback.dto;
 
+import com.febfes.fftmback.domain.common.TaskPriority;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
@@ -27,7 +28,7 @@ public record TaskDto(
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Long ownerId,
 
-        String priority,
+        TaskPriority priority,
 
         String type
 ) {

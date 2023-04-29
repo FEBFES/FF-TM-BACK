@@ -9,13 +9,17 @@ import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -26,6 +30,11 @@ public class UserServiceImpl implements UserService {
 
     private final UserPicRepository userPicRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${user-pic.folder}")
+    private String userPicFolder;
+
+    private static final String USER_PIC_URN = "/users/%d/user-pic";
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -65,8 +74,12 @@ public class UserServiceImpl implements UserService {
     public void saveUserPic(Long userId, MultipartFile pic) {
         UserPicEntity userPic = userPicRepository.findUserPicEntityByUserId(userId)
                 .orElseGet(() -> UserPicEntity.builder().userId(userId).build());
+        String filePath = userPicFolder +
+                (Objects.requireNonNull(pic.getOriginalFilename()).isEmpty() ? pic.getName() : pic.getOriginalFilename());
+        userPic.setFilePath(filePath);
+        userPic.setFileUrn(String.format(USER_PIC_URN, userId));
         try {
-            userPic.setPic(pic.getBytes());
+            pic.transferTo(new File(filePath));
             userPicRepository.save(userPic);
         } catch (IOException e) {
             throw new SaveFileException(pic.getName());
@@ -77,5 +90,12 @@ public class UserServiceImpl implements UserService {
     public UserPicEntity getUserPic(Long userId) {
         return userPicRepository.findUserPicEntityByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(UserPicEntity.class.getSimpleName(), userId));
+    }
+
+    @Override
+    public byte[] getUserPicContent(Long userId) throws IOException {
+        UserPicEntity userPicEntity = getUserPic(userId);
+        String filePath = userPicEntity.getFilePath();
+        return Files.readAllBytes(new File(filePath).toPath());
     }
 }

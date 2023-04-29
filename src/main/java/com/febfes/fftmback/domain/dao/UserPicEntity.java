@@ -22,7 +22,10 @@ public class UserPicEntity extends AppEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "pic")
-    private byte[] pic;
+    @Column(name = "file_path")
+    private String filePath;
+
+    @Column(name = "file_urn")
+    private String fileUrn;
 
 }

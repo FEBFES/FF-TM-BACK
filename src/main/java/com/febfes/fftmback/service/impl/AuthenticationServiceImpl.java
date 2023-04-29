@@ -64,10 +64,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             RefreshTokenEntity existedRefreshToken = refreshTokenService.getByUserId(receivedUser.getId());
             if (DateUtils.isDateBeforeCurrentDate(existedRefreshToken.getExpiryDate())) {
                 RefreshTokenEntity updatedRefreshToken = refreshTokenService.updateRefreshToken(existedRefreshToken);
-                log.info("User with id={} authenticated with updated refresh token", user.getId());
+                log.info("User with id={} authenticated with updated refresh token", receivedUser.getId());
                 return new TokenDto(jwtToken, updatedRefreshToken.getToken());
             }
-            log.info("User with id={} authenticated with existed non expired refresh token", user.getId());
+            log.info("User with id={} authenticated with existed non expired refresh token", receivedUser.getId());
             return new TokenDto(jwtToken, existedRefreshToken.getToken());
         } catch (EntityNotFoundException ignored) {
             log.info("There is no refresh token in db for user with id={}", receivedUser.getId());

@@ -248,7 +248,7 @@ class TaskControllerTest extends BasicTestClass {
         createNewTask(taskDto)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .body("priority", equalTo(TaskPriority.LOW.name().toLowerCase()));
+                .body("priority", equalTo(TaskPriority.LOW.name()));
     }
 
 

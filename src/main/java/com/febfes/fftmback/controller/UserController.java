@@ -17,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("v1/users")
 @RequiredArgsConstructor
@@ -61,7 +63,7 @@ public class UserController {
             produces = MediaType.IMAGE_JPEG_VALUE
     )
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content)
-    public byte[] getImageWithMediaType(@PathVariable Long userId) {
-        return userService.getUserPic(userId).getPic();
+    public byte[] getImageWithMediaType(@PathVariable Long userId) throws IOException {
+        return userService.getUserPicContent(userId);
     }
 }

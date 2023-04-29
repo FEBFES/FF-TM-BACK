@@ -5,6 +5,8 @@ import com.febfes.fftmback.domain.dao.UserPicEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 public interface UserService extends UserDetailsService {
 
     Long getUserIdByUsername(String username);
@@ -16,4 +18,6 @@ public interface UserService extends UserDetailsService {
     void saveUserPic(Long userId, MultipartFile pic);
 
     UserPicEntity getUserPic(Long userId);
+
+    byte[] getUserPicContent(Long userId) throws IOException;
 }
