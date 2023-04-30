@@ -7,7 +7,6 @@ import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.mapper.TaskMapper;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
@@ -100,7 +99,7 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(taskDto.description());
         task.setColumnId(columnId);
         task.setProjectId(projectId);
-        task.setPriority(TaskMapper.stringToPriority(taskDto.priority()));
+        task.setPriority(taskDto.priority());
         fillTaskType(task, taskDto.type(), projectId);
         taskRepository.save(task);
         log.info("Updated task: {}", task);

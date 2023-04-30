@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1"
+      author: IvanShish
+      comment: "Change pic column in user_pic"
+      changes:
+        - dropColumn:
+            tableName: user_pic
+            columns:
+              - column:
+                  name: pic
+        - addColumn:
+            tableName: user_pic
+            columns:
+              - column:
+                  name: file_path
+                  type: text
+  - changeSet:
+      id: "2"
+      author: IvanShish
+      comment: "Add column in user_pic"
+      changes:
+        - addColumn:
+            tableName: user_pic
+            columns:
+              - column:
+                  name: file_urn
+                  type: text

@@ -39,4 +39,8 @@ public class TaskEntity extends AppEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_type_id", referencedColumnName = "id")
     private TaskTypeEntity taskType;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner_id", referencedColumnName = "user_id", insertable=false, updatable=false)
+    private UserPicEntity ownerUserPic;
 }

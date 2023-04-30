@@ -1,5 +1,6 @@
 package com.febfes.fftmback.util;
 
+import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.TaskDto;
@@ -42,6 +43,6 @@ public class DtoBuilders {
     }
 
     public TaskDto createTaskDtoWithPriority(String name, String priority) {
-        return new TaskDto(null, name, null, null, null, null, null, priority, null);
+        return new TaskDto(null, name, null, null, null, null, null, TaskPriority.valueOf(priority.toUpperCase()), null);
     }
 }
