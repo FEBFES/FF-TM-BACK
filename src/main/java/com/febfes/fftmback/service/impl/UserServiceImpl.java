@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
     public void saveUserPic(Long userId, MultipartFile pic) {
         UserPicEntity userPic = userPicRepository.findUserPicEntityByUserId(userId)
                 .orElseGet(() -> UserPicEntity.builder().userId(userId).build());
-        String filePath = userPicFolder + userId;
+        String filePath = "%s%d.jpg".formatted(userPicFolder, userId);
         userPic.setFilePath(filePath);
         userPic.setFileUrn(String.format(USER_PIC_URN, userId));
         try {
