@@ -9,8 +9,11 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import java.io.File;
 
@@ -28,11 +31,21 @@ class UserControllerTest extends BasicTestClass {
     private String createdUsername;
     private String token;
 
+    @TempDir
+    static File tempDir;
+
     @Autowired
     private UserService userService;
 
     @Autowired
     private AuthenticationService authenticationService;
+
+    @DynamicPropertySource
+    static void registerPgProperties(DynamicPropertyRegistry registry) {
+        registry.add("user-pic.folder",
+                () -> String.format("%s\\", tempDir.getPath())
+        );
+    }
 
     @BeforeEach
     void beforeEach() {
@@ -85,7 +98,7 @@ class UserControllerTest extends BasicTestClass {
     @Test
     void successfulGetUserPic() {
         Long userId = userService.getUserIdByUsername(createdUsername);
-        userService.saveUserPic(userId, new MockMultipartFile("image", new byte[]{1}));
+        userService.saveUserPic(userId, new MockMultipartFile("image.jpg", new byte[]{1}));
         requestWithBearerToken()
                 .when()
                 .get("%s/{userId}/user-pic".formatted(PATH_TO_USERS_API), userId)
