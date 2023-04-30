@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -74,8 +73,7 @@ public class UserServiceImpl implements UserService {
     public void saveUserPic(Long userId, MultipartFile pic) {
         UserPicEntity userPic = userPicRepository.findUserPicEntityByUserId(userId)
                 .orElseGet(() -> UserPicEntity.builder().userId(userId).build());
-        String filePath = userPicFolder +
-                (Objects.requireNonNull(pic.getOriginalFilename()).isEmpty() ? pic.getName() : pic.getOriginalFilename());
+        String filePath = userPicFolder + userId;
         userPic.setFilePath(filePath);
         userPic.setFileUrn(String.format(USER_PIC_URN, userId));
         try {
