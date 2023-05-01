@@ -79,6 +79,7 @@ public class UserServiceImpl implements UserService {
         try {
             pic.transferTo(new File(filePath));
             userPicRepository.save(userPic);
+            log.info("User pic for user with id={} saved", userId);
         } catch (IOException e) {
             throw new SaveFileException(pic.getName());
         }

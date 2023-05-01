@@ -14,6 +14,7 @@ public record TaskShortDto(
         Date createDate,
         TaskPriority priority,
         String type,
-        String ownerUserPic
+        String ownerUserPic,
+        Long filesCounter
 ) {
 }

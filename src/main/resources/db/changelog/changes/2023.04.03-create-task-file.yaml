@@ -1,0 +1,81 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1"
+      author: IvanShish
+      comment: "Create task file table"
+      changes:
+        - createTable:
+            tableName: task_file
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: task_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_path
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_urn
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+        - addDefaultValue:
+            tableName: task_file
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+        - addForeignKeyConstraint:
+            constraintName: fk_task_id
+            baseTableName: task_file
+            baseColumnNames: task_id
+            referencedTableName: task
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_user_id
+            baseTableName: task_file
+            baseColumnNames: user_id
+            referencedTableName: user_entity
+            referencedColumnNames: id
+            onDelete: "NO ACTION"
+  - changeSet:
+      id: "2"
+      author: IvanShish
+      comment: "Add files counter column"
+      changes:
+        - addColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: files_counter
+                  type: bigint
+                  defaultValue: "0"

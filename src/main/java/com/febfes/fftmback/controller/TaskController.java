@@ -2,24 +2,27 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
 import com.febfes.fftmback.dto.parameter.TaskParameters;
 import com.febfes.fftmback.mapper.TaskMapper;
 import com.febfes.fftmback.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +37,6 @@ public class TaskController {
 
     @Operation(summary = "Get tasks with pagination")
     @ApiGet(path = "{projectId}/columns/{columnId}/tasks")
-    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use ColumnParameters
     public List<TaskDto> getTasks(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
@@ -57,7 +59,6 @@ public class TaskController {
 
     @Operation(summary = "Create new task")
     @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
-    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use ColumnParameters
     public TaskDto createTask(
             @ParameterObject ColumnParameters pathVars,
             @RequestBody @Valid TaskDto taskDto
@@ -72,7 +73,6 @@ public class TaskController {
 
     @Operation(summary = "Edit task by its id")
     @ApiEdit(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
-    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use TaskParameters
     public TaskDto updateTask(
             @ParameterObject TaskParameters pathVars,
             @RequestBody TaskDto taskDto
@@ -84,8 +84,31 @@ public class TaskController {
 
     @Operation(summary = "Delete task by its id")
     @ApiDelete(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
-    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use TaskParameters
     public void deleteTask(@ParameterObject TaskParameters pathVars) {
         taskService.deleteTask(pathVars.taskId());
+    }
+
+    @Operation(summary = "Upload task files")
+    @PostMapping(
+            path = "{projectId}/columns/{columnId}/tasks/{taskId}/files",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public void saveTaskFiles(
+            @ParameterObject TaskParameters pathVars,
+            @RequestParam("files") MultipartFile[] files
+    ) {
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        taskService.saveFileTasks(pathVars, user.getId(), files);
+    }
+
+    @Operation(summary = "Get task file")
+    @GetMapping(
+            path = "{projectId}/columns/{columnId}/tasks/{taskId}/files/{fileId}",
+            produces = MediaType.IMAGE_JPEG_VALUE
+    )
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content)
+    public byte[] getTaskFile(@ParameterObject TaskParameters pathVars, @PathVariable String fileId) throws IOException {
+        return taskService.getTaskFileContent(pathVars, fileId);
     }
 }

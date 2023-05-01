@@ -5,8 +5,12 @@ import com.febfes.fftmback.domain.common.query.FilterRequest;
 import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.TaskFileEntity;
 import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.dto.parameter.TaskParameters;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.SaveFileException;
+import com.febfes.fftmback.repository.TaskFileRepository;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
@@ -14,12 +18,20 @@ import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -29,10 +41,15 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
     private static final String RECEIVED_TASKS_SIZE_LOG = "Received tasks size: {}";
+    private static final String TASK_FILE_URN = "/%d/columns/%d/tasks/%d/files/%s";
 
     private final TaskRepository taskRepository;
     private final UserService userService;
     private final TaskTypeService taskTypeService;
+    private final TaskFileRepository taskFileRepository;
+
+    @Value("${files.folder}")
+    private String filesFolder;
 
     @Override
     public List<TaskEntity> getTasks(
@@ -110,10 +127,52 @@ public class TaskServiceImpl implements TaskService {
     public void deleteTask(Long id) {
         if (taskRepository.existsById(id)) {
             taskRepository.deleteById(id);
-            log.info("Task with id={} was deleted", id);
+            log.info("Task with id={} deleted", id);
         } else {
             throw new EntityNotFoundException(TaskEntity.class.getSimpleName(), id);
         }
+    }
+
+    @Override
+    @Async
+    public void saveFileTasks(TaskParameters pathVars, Long userId, MultipartFile[] files) {
+        Arrays.stream(files).forEach(file -> {
+            String uuid = UUID.randomUUID().toString();
+            String filePath = "%s%s.jpg".formatted(filesFolder, uuid);
+            TaskFileEntity taskFile = TaskFileEntity.builder()
+                    .userId(userId)
+                    .taskId(pathVars.taskId())
+                    .name(file.getOriginalFilename())
+                    .type(file.getContentType())
+                    .filePath(filePath)
+                    .fileUrn(String.format(TASK_FILE_URN, pathVars.projectId(), pathVars.columnId(), pathVars.taskId(), uuid))
+                    .build();
+            try {
+                file.transferTo(new File(filePath));
+                taskFileRepository.save(taskFile);
+                log.info("Task file for task with id={} saved by user with id={}", pathVars.taskId(), userId);
+            } catch (IOException e) {
+                throw new SaveFileException(file.getName());
+            }
+        });
+//        TaskEntity task = getTaskById(id);
+//        task.setFilesCounter(task.getFilesCounter() + files.length);
+//        taskRepository.save(task);
+    }
+
+    @Override
+    public TaskFileEntity getTaskFile(TaskParameters pathVars, String fileId) {
+        String fileUrn = String.format(TASK_FILE_URN, pathVars.projectId(), pathVars.columnId(), pathVars.taskId(), fileId);
+        return taskFileRepository.findByFileUrn(fileUrn)
+                .orElseThrow(() -> new EntityNotFoundException(TaskFileEntity.class.getSimpleName(),
+                        "fileUrn", fileUrn));
+    }
+
+    @Override
+    public byte[] getTaskFileContent(TaskParameters pathVars, String fileId) throws IOException {
+        TaskFileEntity taskFile = getTaskFile(pathVars, fileId);
+        String filePath = taskFile.getFilePath();
+        return Files.readAllBytes(new File(filePath).toPath());
     }
 
     private FilterSpecification<TaskEntity> makeTasksFilter(String filter) {

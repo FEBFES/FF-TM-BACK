@@ -46,7 +46,7 @@ public class UserController {
 
     @Operation(summary = "Upload user pic")
     @PostMapping(
-            path = "/{userId}/user-pic",
+            path = "{userId}/user-pic",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.MULTIPART_FORM_DATA_VALUE
     )
@@ -59,7 +59,7 @@ public class UserController {
 
     @Operation(summary = "Get user pic")
     @GetMapping(
-            path = "/{userId}/user-pic",
+            path = "{userId}/user-pic",
             produces = MediaType.IMAGE_JPEG_VALUE
     )
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content)
