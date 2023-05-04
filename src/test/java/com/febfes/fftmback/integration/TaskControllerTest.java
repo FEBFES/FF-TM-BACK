@@ -250,10 +250,10 @@ class TaskControllerTest extends BasicTestClass {
         saveTaskFile(taskParameters);
 
         TaskEntity updatedTask = taskService.getTaskById(task.getId());
-        Assertions.assertEquals(updatedTask.getFilesCounter(), 1);
+        Assertions.assertEquals(1, updatedTask.getFilesCounter());
 
         List<TaskFileEntity> taskFiles = taskService.getTaskFiles(taskParameters.taskId());
-        Assertions.assertEquals(taskFiles.size(), 1);
+        Assertions.assertEquals(1, taskFiles.size());
     }
 
     @Test
@@ -263,7 +263,7 @@ class TaskControllerTest extends BasicTestClass {
 
         saveTaskFile(taskParameters);
         List<TaskFileEntity> taskFiles = taskService.getTaskFiles(taskParameters.taskId());
-        Assertions.assertEquals(taskFiles.size(), 1);
+        Assertions.assertEquals(1, taskFiles.size());
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -274,7 +274,7 @@ class TaskControllerTest extends BasicTestClass {
                 .statusCode(HttpStatus.SC_OK);
 
         List<TaskFileEntity> newTaskFiles = taskService.getTaskFiles(taskParameters.taskId());
-        Assertions.assertEquals(newTaskFiles.size(), 0);
+        Assertions.assertEquals(0, newTaskFiles.size());
     }
 
 
