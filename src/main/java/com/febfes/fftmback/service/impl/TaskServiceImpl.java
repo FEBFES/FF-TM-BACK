@@ -7,14 +7,18 @@ import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskFileEntity;
 import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.dto.TaskFileDto;
 import com.febfes.fftmback.dto.parameter.TaskParameters;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.SaveFileException;
+import com.febfes.fftmback.mapper.TaskFileMapper;
+import com.febfes.fftmback.mapper.TaskMapper;
 import com.febfes.fftmback.repository.TaskFileRepository;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.util.FileUtils;
 import com.febfes.fftmback.util.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -41,7 +47,6 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
     private static final String RECEIVED_TASKS_SIZE_LOG = "Received tasks size: {}";
-    private static final String TASK_FILE_URN = "/%d/columns/%d/tasks/%d/files/%s";
 
     private final TaskRepository taskRepository;
     private final UserService userService;
@@ -98,6 +103,9 @@ public class TaskServiceImpl implements TaskService {
         if (nonNull(task.getTaskType())) {
             fillTaskType(task, task.getTaskType().getName(), task.getProjectId());
         }
+        /* TODO: хз почему, но это поле filesCounter по дефолту в данном случае не заполняется 0,
+            хотя в миграции прописал defaultValue 0. Что может быть не так?*/
+        task.setFilesCounter(0L);
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
         return savedTask;
@@ -136,33 +144,43 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Async
     public void saveFileTasks(TaskParameters pathVars, Long userId, MultipartFile[] files) {
+        AtomicReference<Long> filesCounter = new AtomicReference<>(0L);
         Arrays.stream(files).forEach(file -> {
             String uuid = UUID.randomUUID().toString();
-            String filePath = "%s%s.jpg".formatted(filesFolder, uuid);
+            String filePath = "%s%s.%s".formatted(filesFolder, uuid, FileUtils.getExtension(file.getOriginalFilename()));
             TaskFileEntity taskFile = TaskFileEntity.builder()
                     .userId(userId)
                     .taskId(pathVars.taskId())
                     .name(file.getOriginalFilename())
                     .type(file.getContentType())
                     .filePath(filePath)
-                    .fileUrn(String.format(TASK_FILE_URN, pathVars.projectId(), pathVars.columnId(), pathVars.taskId(), uuid))
+                    .fileUrn(String.format(FileUtils.TASK_FILE_URN, pathVars.projectId(), pathVars.columnId(),
+                            pathVars.taskId(), uuid))
                     .build();
             try {
                 file.transferTo(new File(filePath));
                 taskFileRepository.save(taskFile);
                 log.info("Task file for task with id={} saved by user with id={}", pathVars.taskId(), userId);
+                filesCounter.getAndSet(filesCounter.get() + 1);
             } catch (IOException e) {
                 throw new SaveFileException(file.getName());
             }
         });
-//        TaskEntity task = getTaskById(id);
-//        task.setFilesCounter(task.getFilesCounter() + files.length);
-//        taskRepository.save(task);
+        /*TODO: Как это грамотнее всего сделать? Или и такой вариант норм? Я про counter файлов*/
+        TaskEntity task = getTaskById(pathVars.taskId());
+        task.setFilesCounter(task.getFilesCounter() + filesCounter.get());
+        taskRepository.save(task);
+    }
+
+    @Override
+    public List<TaskFileEntity> getTaskFiles(Long taskId) {
+        return taskFileRepository.getByTaskId(taskId);
     }
 
     @Override
     public TaskFileEntity getTaskFile(TaskParameters pathVars, String fileId) {
-        String fileUrn = String.format(TASK_FILE_URN, pathVars.projectId(), pathVars.columnId(), pathVars.taskId(), fileId);
+        String fileUrn = String.format(FileUtils.TASK_FILE_URN, pathVars.projectId(), pathVars.columnId(),
+                pathVars.taskId(), fileId);
         return taskFileRepository.findByFileUrn(fileUrn)
                 .orElseThrow(() -> new EntityNotFoundException(TaskFileEntity.class.getSimpleName(),
                         "fileUrn", fileUrn));
@@ -173,6 +191,29 @@ public class TaskServiceImpl implements TaskService {
         TaskFileEntity taskFile = getTaskFile(pathVars, fileId);
         String filePath = taskFile.getFilePath();
         return Files.readAllBytes(new File(filePath).toPath());
+    }
+
+    @Override
+    public List<TaskDto> updateTasksWithFiles(List<TaskEntity> tasks) {
+        List<TaskDto> tasksDto = new ArrayList<>();
+        tasks.forEach(task -> tasksDto.add(updateTaskWithFiles(task)));
+        return tasksDto;
+    }
+
+    @Override
+    public TaskDto updateTaskWithFiles(TaskEntity task) {
+        List<TaskFileDto> taskFiles = getTaskFiles(task.getId()).stream()
+                .map(TaskFileMapper.INSTANCE::taskFileToDto)
+                .collect(Collectors.toList());
+        return TaskMapper.INSTANCE.taskToTaskDto(task, taskFiles);
+    }
+
+    @Override
+    public void deleteTaskFile(Long taskId, Long taskFileId) {
+        taskFileRepository.deleteById(taskFileId);
+        TaskEntity task = getTaskById(taskId);
+        task.setFilesCounter(task.getFilesCounter() - 1);
+        taskRepository.save(task);
     }
 
     private FilterSpecification<TaskEntity> makeTasksFilter(String filter) {

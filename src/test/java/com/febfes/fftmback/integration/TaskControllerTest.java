@@ -3,6 +3,7 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.dao.*;
 import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.dto.parameter.TaskParameters;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -12,7 +13,13 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+
+import java.io.File;
+import java.util.List;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static com.febfes.fftmback.integration.ColumnControllerTest.COLUMN_NAME;
@@ -31,6 +38,9 @@ class TaskControllerTest extends BasicTestClass {
     private String createdUsername;
     private String token;
 
+    @TempDir
+    static File tempDir;
+
     @Autowired
     private TaskService taskService;
 
@@ -48,6 +58,13 @@ class TaskControllerTest extends BasicTestClass {
 
     @Autowired
     private TaskTypeService taskTypeService;
+
+    @DynamicPropertySource
+    static void registerPgProperties(DynamicPropertyRegistry registry) {
+        registry.add("files.folder",
+                () -> String.format("%s\\", tempDir.getPath())
+        );
+    }
 
     @BeforeEach
     void beforeEach() {
@@ -76,25 +93,8 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulGetTasksTest() {
-        taskService.createTask(
-                TaskEntity
-                        .builder()
-                        .projectId(createdProjectId)
-                        .columnId(createdColumnId)
-                        .name(TASK_NAME + "1")
-                        .build(),
-                createdUsername
-        );
-
-        taskService.createTask(
-                TaskEntity
-                        .builder()
-                        .projectId(createdProjectId)
-                        .columnId(createdColumnId)
-                        .name(TASK_NAME + "2")
-                        .build(),
-                createdUsername
-        );
+        createNewTask(TASK_NAME + "1");
+        createNewTask(TASK_NAME + "2");
 
         Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -111,25 +111,8 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulGetTasksWithFilterTest() {
-        taskService.createTask(
-                TaskEntity
-                        .builder()
-                        .projectId(createdProjectId)
-                        .columnId(createdColumnId)
-                        .name(TASK_NAME + "1")
-                        .build(),
-                createdUsername
-        );
-
-        taskService.createTask(
-                TaskEntity
-                        .builder()
-                        .projectId(createdProjectId)
-                        .columnId(createdColumnId)
-                        .name(TASK_NAME + "2")
-                        .build(),
-                createdUsername
-        );
+        createNewTask(TASK_NAME + "1");
+        createNewTask(TASK_NAME + "2");
 
         Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -228,7 +211,7 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     @Test
-    void createAndTaskWithType() {
+    void createTaskWithType() {
         taskTypeService.createTaskType(TaskTypeEntity
                 .builder()
                 .name(TASK_TYPE)
@@ -251,6 +234,49 @@ class TaskControllerTest extends BasicTestClass {
                 .body("priority", equalTo(TaskPriority.LOW.name()));
     }
 
+    @Test
+    void saveTaskFileTest() {
+        TaskEntity task = createNewTask(TASK_NAME);
+        TaskParameters taskParameters = new TaskParameters(createdProjectId, createdColumnId, task.getId());
+
+        saveTaskFile(taskParameters);
+    }
+
+    @Test
+    void getTaskFilesTest() {
+        TaskEntity task = createNewTask(TASK_NAME);
+        TaskParameters taskParameters = new TaskParameters(createdProjectId, createdColumnId, task.getId());
+
+        saveTaskFile(taskParameters);
+
+        TaskEntity updatedTask = taskService.getTaskById(task.getId());
+        Assertions.assertEquals(updatedTask.getFilesCounter(), 1);
+
+        List<TaskFileEntity> taskFiles = taskService.getTaskFiles(taskParameters.taskId());
+        Assertions.assertEquals(taskFiles.size(), 1);
+    }
+
+    @Test
+    void deleteTaskFileTest() {
+        TaskEntity task = createNewTask(TASK_NAME);
+        TaskParameters taskParameters = new TaskParameters(createdProjectId, createdColumnId, task.getId());
+
+        saveTaskFile(taskParameters);
+        List<TaskFileEntity> taskFiles = taskService.getTaskFiles(taskParameters.taskId());
+        Assertions.assertEquals(taskFiles.size(), 1);
+
+        requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .when()
+                .delete("%s/{projectId}/columns/{columnId}/tasks/{taskId}/files/{taskFileId}".formatted(PATH_TO_PROJECTS_API),
+                        createdProjectId, createdColumnId, taskParameters.taskId(), taskFiles.get(0).getId())
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+        List<TaskFileEntity> newTaskFiles = taskService.getTaskFiles(taskParameters.taskId());
+        Assertions.assertEquals(newTaskFiles.size(), 0);
+    }
+
 
     private Response createNewTask(TaskDto taskDto) {
         return requestWithBearerToken()
@@ -261,7 +287,32 @@ class TaskControllerTest extends BasicTestClass {
                         createdProjectId, createdColumnId);
     }
 
+    private TaskEntity createNewTask(String taskName) {
+        return taskService.createTask(
+                TaskEntity
+                        .builder()
+                        .projectId(createdProjectId)
+                        .columnId(createdColumnId)
+                        .name(taskName)
+                        .build(),
+                createdUsername
+        );
+    }
+
     private RequestSpecification requestWithBearerToken() {
         return given().header("Authorization", "Bearer " + token);
+    }
+
+    private void saveTaskFile(TaskParameters taskParameters) {
+        File taskFile = new File("src/test/resources/task-file.txt");
+
+        requestWithBearerToken()
+                .multiPart("files", taskFile)
+                .contentType("multipart/form-data")
+                .when()
+                .post("%s/{projectId}/columns/{columnId}/tasks/{taskId}/files".formatted(PATH_TO_PROJECTS_API),
+                        taskParameters.projectId(), taskParameters.columnId(), taskParameters.taskId())
+                .then()
+                .statusCode(HttpStatus.SC_OK);
     }
 }

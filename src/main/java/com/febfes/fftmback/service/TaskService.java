@@ -25,9 +25,18 @@ public interface TaskService {
 
     void deleteTask(Long id);
 
+    /*TODO: мб создать отдельный сервис для task files? И в него запихнуть следующие 7 методов*/
     void saveFileTasks(TaskParameters pathVars, Long userId, MultipartFile[] files);
+
+    List<TaskFileEntity> getTaskFiles(Long taskId);
 
     TaskFileEntity getTaskFile(TaskParameters pathVars, String fileId);
 
     byte[] getTaskFileContent(TaskParameters pathVars, String fileId) throws IOException;
+
+    List<TaskDto> updateTasksWithFiles(List<TaskEntity> tasks);
+
+    TaskDto updateTaskWithFiles(TaskEntity task);
+
+    void deleteTaskFile(Long taskId, Long taskFileId);
 }

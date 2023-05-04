@@ -78,4 +78,4 @@ databaseChangeLog:
               - column:
                   name: files_counter
                   type: bigint
-                  defaultValue: "0"
+                  defaultValueNumeric: "0"

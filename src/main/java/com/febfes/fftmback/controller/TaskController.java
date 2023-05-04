@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("v1/projects")
@@ -45,16 +44,14 @@ public class TaskController {
     ) {
 
         List<TaskEntity> tasks = taskService.getTasks(page, limit, pathVars.columnId(), filter);
-        return tasks.stream()
-                .map(TaskMapper.INSTANCE::taskToTaskDto)
-                .collect(Collectors.toList());
+        return taskService.updateTasksWithFiles(tasks);
     }
 
     @Operation(summary = "Get task by its id")
     @ApiGetOne(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
     public TaskDto getTaskById(@ParameterObject TaskParameters pathVars) {
         TaskEntity task = taskService.getTaskById(pathVars.taskId());
-        return TaskMapper.INSTANCE.taskToTaskDto(task);
+        return taskService.updateTaskWithFiles(task);
     }
 
     @Operation(summary = "Create new task")
@@ -110,5 +107,11 @@ public class TaskController {
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content)
     public byte[] getTaskFile(@ParameterObject TaskParameters pathVars, @PathVariable String fileId) throws IOException {
         return taskService.getTaskFileContent(pathVars, fileId);
+    }
+
+    @Operation(summary = "Delete task file by its id")
+    @ApiDelete(path = "{projectId}/columns/{columnId}/tasks/{taskId}/files/{taskFileId}")
+    public void deleteTaskFile(@ParameterObject TaskParameters pathVars, @PathVariable Long taskFileId) {
+        taskService.deleteTaskFile(pathVars.taskId(), taskFileId);
     }
 }

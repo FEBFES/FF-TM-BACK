@@ -5,7 +5,6 @@ import com.febfes.fftmback.domain.common.TaskPriority;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Formula;
 
 
 @Entity
@@ -45,7 +44,7 @@ public class TaskEntity extends AppEntity {
     @JoinColumn(name = "owner_id", referencedColumnName = "user_id", insertable=false, updatable=false)
     private UserPicEntity ownerUserPic;
 
+    @Basic
     @Column(name = "files_counter")
-    @Formula(value="(SELECT count(*) FROM task_file tf WHERE tf.task_id = this_.id)")
     private Long filesCounter;
 }

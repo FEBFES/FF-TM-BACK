@@ -7,6 +7,7 @@ import com.febfes.fftmback.exception.SaveFileException;
 import com.febfes.fftmback.repository.UserPicRepository;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,8 +33,6 @@ public class UserServiceImpl implements UserService {
 
     @Value("${user-pic.folder}")
     private String userPicFolder;
-
-    private static final String USER_PIC_URN = "/users/%d/user-pic";
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -75,7 +74,7 @@ public class UserServiceImpl implements UserService {
                 .orElseGet(() -> UserPicEntity.builder().userId(userId).build());
         String filePath = "%s%d.jpg".formatted(userPicFolder, userId);
         userPic.setFilePath(filePath);
-        userPic.setFileUrn(String.format(USER_PIC_URN, userId));
+        userPic.setFileUrn(String.format(FileUtils.USER_PIC_URN, userId));
         try {
             pic.transferTo(new File(filePath));
             userPicRepository.save(userPic);
