@@ -41,6 +41,9 @@ public class UserEntity extends AppEntity implements UserDetails {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "display_name")
+    private String displayName;
+
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
