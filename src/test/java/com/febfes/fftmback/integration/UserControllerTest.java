@@ -26,6 +26,7 @@ class UserControllerTest extends BasicTestClass {
     public static final String PATH_TO_USERS_API = "/api/v1/users";
     private static final String FIRST_NAME = "first";
     private static final String LAST_NAME = "last";
+    private static final String DISPLAY_NAME = "display";
     private static final String PASSWORD = "123";
 
     private String createdUsername;
@@ -73,7 +74,7 @@ class UserControllerTest extends BasicTestClass {
     @Test
     void successfulUpdateUserTest() {
         Long userId = userService.getUserIdByUsername(createdUsername);
-        EditUserDto editUserDto = new EditUserDto(FIRST_NAME, LAST_NAME, PASSWORD);
+        EditUserDto editUserDto = new EditUserDto(FIRST_NAME, LAST_NAME, DISPLAY_NAME, PASSWORD);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editUserDto)
