@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: VladisStep
+      comment: "Add new field to user"
+      changes:
+        - addColumn:
+            tableName: user_entity
+            columns:
+              - column:
+                  name: display_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false

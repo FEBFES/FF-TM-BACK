@@ -63,6 +63,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getSimpleName(), id));
         userToUpdate.setFirstName(user.getFirstName());
         userToUpdate.setLastName(user.getLastName());
+        userToUpdate.setDisplayName(user.getDisplayName());
         userToUpdate.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(userToUpdate);
         log.info("Updated user: {}", userToUpdate);

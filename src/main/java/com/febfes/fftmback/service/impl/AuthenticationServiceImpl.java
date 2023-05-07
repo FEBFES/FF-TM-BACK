@@ -17,6 +17,7 @@ import com.febfes.fftmback.service.RefreshTokenService;
 import com.febfes.fftmback.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.RandomStringGenerator;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
+    private final RandomStringGenerator generator = new RandomStringGenerator
+            .Builder()
+            .selectFrom('0', '9')
+            .build();
 
     @Override
     public void registerUser(UserEntity user) {
@@ -42,8 +47,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.MEMBER);
+        user.setDisplayName(generateDisplayUserName());
         userRepository.save(user);
         log.info("User saved: {}", user);
+    }
+
+    private String generateDisplayUserName() {
+        return "user" + generator.generate(6); // generate a 6-character username
     }
 
     @Override
