@@ -16,7 +16,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class TaskColumnEntity extends BaseEntity {
 
-    public static final String NAME = "Task column";
+    public static final String ENTITY_NAME = "Task column";
 
     @Column(name = "name")
     private String name;

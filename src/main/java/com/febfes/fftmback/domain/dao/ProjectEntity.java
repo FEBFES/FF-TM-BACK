@@ -18,7 +18,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProjectEntity extends BaseEntity {
 
-    public static final String NAME = "Project";
+    public static final String ENTITY_NAME = "Project";
 
     @Column(name = "name")
     private String name;

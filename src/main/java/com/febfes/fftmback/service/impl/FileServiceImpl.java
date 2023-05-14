@@ -35,7 +35,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileEntity getFile(String fileUrn) {
         return repository.findByFileUrn(fileUrn)
-                .orElseThrow(() -> new EntityNotFoundException(FileEntity.NAME, "file urn", fileUrn));
+                .orElseThrow(() -> new EntityNotFoundException(FileEntity.ENTITY_NAME, "file urn", fileUrn));
     }
 
     @Override
@@ -46,9 +46,10 @@ public class FileServiceImpl implements FileService {
     @Override
     public byte[] getFileContent(String idForUrn, EntityType entityType) throws IOException {
         String fileUrn = "";
-        switch (entityType) {
-            case USER_PIC -> fileUrn = String.format(FileUtils.USER_PIC_URN, Long.parseLong(idForUrn));
-            case TASK -> fileUrn = String.format(FileUtils.TASK_FILE_URN, idForUrn);
+        if (entityType.equals(EntityType.USER_PIC)) {
+            fileUrn = String.format(FileUtils.USER_PIC_URN, Long.parseLong(idForUrn));
+        } else if (entityType.equals(EntityType.TASK)) {
+            fileUrn = String.format(FileUtils.TASK_FILE_URN, idForUrn);
         }
         FileEntity fileEntity = getFile(fileUrn);
         String filePath = fileEntity.getFilePath();
@@ -70,14 +71,13 @@ public class FileServiceImpl implements FileService {
                 .name(file.getOriginalFilename())
                 .entityType(entityType.name())
                 .contentType(file.getContentType());
-        switch (entityType) {
-            case USER_PIC -> fileBuilder
-                    .fileUrn(String.format(FileUtils.USER_PIC_URN, userId))
+        if (entityType.equals(EntityType.USER_PIC)) {
+            fileBuilder.fileUrn(String.format(FileUtils.USER_PIC_URN, userId))
                     .filePath(
                             "%s%d.%s".formatted(userPicFolder, userId, FileUtils.getExtension(file.getOriginalFilename()))
                     );
-            case TASK -> fileBuilder
-                    .fileUrn(String.format(FileUtils.TASK_FILE_URN, uuid))
+        } else if (entityType.equals(EntityType.TASK)) {
+            fileBuilder.fileUrn(String.format(FileUtils.TASK_FILE_URN, uuid))
                     .filePath(
                             "%s%s.%s".formatted(filesFolder, uuid, FileUtils.getExtension(file.getOriginalFilename()))
                     );

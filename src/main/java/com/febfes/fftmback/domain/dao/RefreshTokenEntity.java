@@ -17,7 +17,8 @@ import java.util.Date;
 @ToString(callSuper = true)
 public class RefreshTokenEntity extends BaseEntity {
 
-    public static final String NAME = "Refresh token";
+    public static final String ENTITY_NAME = "Refresh token";
+
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ToString.Exclude

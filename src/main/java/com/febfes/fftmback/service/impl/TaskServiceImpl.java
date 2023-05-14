@@ -63,7 +63,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskView getTaskById(Long id) {
         TaskView task = taskViewRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.NAME, id));
+                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
         log.info(RECEIVED_TASKS_SIZE_LOG, task);
         return task;
     }
@@ -90,7 +90,7 @@ public class TaskServiceImpl implements TaskService {
             TaskDto taskDto
     ) {
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.NAME, id));
+                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
         task.setName(taskDto.name());
         task.setDescription(taskDto.description());
         task.setColumnId(columnId);
@@ -108,7 +108,7 @@ public class TaskServiceImpl implements TaskService {
             taskRepository.deleteById(id);
             log.info("Task with id={} deleted", id);
         } else {
-            throw new EntityNotFoundException(TaskEntity.NAME, id);
+            throw new EntityNotFoundException(TaskEntity.ENTITY_NAME, id);
         }
     }
 

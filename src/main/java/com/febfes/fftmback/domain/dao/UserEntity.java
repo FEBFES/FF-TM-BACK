@@ -23,7 +23,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class UserEntity extends BaseEntity implements UserDetails {
 
-    public static final String NAME = "User";
+    public static final String ENTITY_NAME = "User";
 
     @Serial
     private static final long serialVersionUID = 7365026142938847634L;

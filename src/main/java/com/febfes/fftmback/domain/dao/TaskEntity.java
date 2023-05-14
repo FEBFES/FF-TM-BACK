@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 public class TaskEntity extends BaseEntity {
 
-    public static final String NAME = "Task";
+    public static final String ENTITY_NAME = "Task";
 
     @Column(name = "name", nullable = false)
     private String name;

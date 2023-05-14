@@ -40,7 +40,7 @@ public class ColumnServiceImpl implements ColumnService {
     @Override
     public void editColumn(TaskColumnEntity column) {
         TaskColumnEntity oldColumn = columnRepository.findById(column.getId())
-                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.NAME, column.getId()));
+                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.ENTITY_NAME, column.getId()));
         oldColumn.setName(column.getName());
         if (!Objects.equals(oldColumn.getChildTaskColumnId(), column.getChildTaskColumnId())) {
             columnRepository.updateChildColumn(
@@ -63,7 +63,7 @@ public class ColumnServiceImpl implements ColumnService {
     @Override
     public void deleteColumn(Long id) {
         TaskColumnEntity columnEntity = columnRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.NAME, id));
+                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.ENTITY_NAME, id));
         columnRepository.updateChildColumn(
                 columnEntity.getChildTaskColumnId(),
                 columnEntity.getId(),

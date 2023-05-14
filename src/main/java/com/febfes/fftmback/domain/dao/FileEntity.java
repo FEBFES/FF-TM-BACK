@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "file_entity")
 public class FileEntity extends BaseEntity {
 
-    public static final String NAME = "File";
+    public static final String ENTITY_NAME = "File";
 
     @Column(name = "user_id")
     private Long userId;

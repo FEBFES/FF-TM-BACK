@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.NAME, "username", username));
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, "username", username));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity getUserById(Long id) {
         UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.NAME, id));
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id));
         log.info("Received user {} by id={}", userEntity, id);
         return userEntity;
     }
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
             Long id
     ) {
         UserEntity userToUpdate = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.NAME, id));
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id));
         userToUpdate.setFirstName(user.getFirstName());
         userToUpdate.setLastName(user.getLastName());
         userToUpdate.setDisplayName(user.getDisplayName());
