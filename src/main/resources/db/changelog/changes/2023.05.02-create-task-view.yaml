@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1"
+      author: IvanShish
+      comment: "Create task view"
+      changes:
+        - createView:
+            catalogName: ff-tm
+            path: "/view/v_task.sql"
+            relativeToChangelogFile: true
+            replaceIfExists: true
+            schemaName: public
+            viewName: v_task
+        - sql:
+            dbms: 'postgresql'
+            sql: CREATE CAST (varchar AS priority) WITH INOUT AS IMPLICIT;

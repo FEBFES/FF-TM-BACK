@@ -10,5 +10,6 @@ databaseChangeLog:
               - column:
                   name: display_name
                   type: varchar(50)
+                  defaultValue: "defaultDisplayName"
                   constraints:
                     nullable: false

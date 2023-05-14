@@ -1,11 +1,7 @@
 package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.domain.dao.UserPicEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 public interface UserService extends UserDetailsService {
 
@@ -14,10 +10,4 @@ public interface UserService extends UserDetailsService {
     UserEntity getUserById(Long id);
 
     void updateUser(UserEntity user, Long id);
-
-    void saveUserPic(Long userId, MultipartFile pic);
-
-    UserPicEntity getUserPic(Long userId);
-
-    byte[] getUserPicContent(Long userId) throws IOException;
 }

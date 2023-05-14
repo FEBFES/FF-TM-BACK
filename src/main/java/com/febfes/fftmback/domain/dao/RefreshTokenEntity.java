@@ -15,8 +15,9 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class RefreshTokenEntity extends AppEntity {
+public class RefreshTokenEntity extends BaseEntity {
 
+    public static final String NAME = "Refresh token";
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ToString.Exclude

@@ -16,7 +16,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "task_type")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TaskTypeEntity extends AppEntity {
+public class TaskTypeEntity extends BaseEntity {
+
+    public static final String NAME = "Task type";
 
     @Column(name = "name", nullable = false)
     private String name;

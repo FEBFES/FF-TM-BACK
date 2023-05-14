@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 @Profile("test")
 public class DatabaseCleanup implements InitializingBean {
 
+    public final static String VIEW_PREFIX = "v_";
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -25,7 +27,12 @@ public class DatabaseCleanup implements InitializingBean {
         entityManager.flush();
 
         for (final String tableName : tableNames) {
-            entityManager.createNativeQuery("TRUNCATE TABLE " + tableName + " RESTART IDENTITY CASCADE").executeUpdate();
+            if (!tableName.startsWith(VIEW_PREFIX)) {
+                entityManager.createNativeQuery("TRUNCATE TABLE " + tableName + " RESTART IDENTITY CASCADE").executeUpdate();
+            } else {
+                entityManager.createNativeQuery("TRUNCATE TABLE " + tableName.substring(VIEW_PREFIX.length())
+                        + " RESTART IDENTITY CASCADE").executeUpdate();
+            }
         }
     }
 

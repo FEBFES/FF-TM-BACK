@@ -3,7 +3,6 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.dao.*;
 import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.dto.parameter.TaskParameters;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -58,6 +57,9 @@ class TaskControllerTest extends BasicTestClass {
 
     @Autowired
     private TaskTypeService taskTypeService;
+
+    @Autowired
+    private FileService fileService;
 
     @DynamicPropertySource
     static void registerPgProperties(DynamicPropertyRegistry registry) {
@@ -237,43 +239,37 @@ class TaskControllerTest extends BasicTestClass {
     @Test
     void saveTaskFileTest() {
         TaskEntity task = createNewTask(TASK_NAME);
-        TaskParameters taskParameters = new TaskParameters(createdProjectId, createdColumnId, task.getId());
-
-        saveTaskFile(taskParameters);
+        saveTaskFile(task.getId());
     }
 
     @Test
     void getTaskFilesTest() {
         TaskEntity task = createNewTask(TASK_NAME);
-        TaskParameters taskParameters = new TaskParameters(createdProjectId, createdColumnId, task.getId());
+        saveTaskFile(task.getId());
 
-        saveTaskFile(taskParameters);
-
-        TaskEntity updatedTask = taskService.getTaskById(task.getId());
+        TaskView updatedTask = taskService.getTaskById(task.getId());
         Assertions.assertEquals(1, updatedTask.getFilesCounter());
 
-        List<TaskFileEntity> taskFiles = taskService.getTaskFiles(taskParameters.taskId());
+        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId());
         Assertions.assertEquals(1, taskFiles.size());
     }
 
     @Test
     void deleteTaskFileTest() {
         TaskEntity task = createNewTask(TASK_NAME);
-        TaskParameters taskParameters = new TaskParameters(createdProjectId, createdColumnId, task.getId());
 
-        saveTaskFile(taskParameters);
-        List<TaskFileEntity> taskFiles = taskService.getTaskFiles(taskParameters.taskId());
+        saveTaskFile(task.getId());
+        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId());
         Assertions.assertEquals(1, taskFiles.size());
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
-                .delete("%s/{projectId}/columns/{columnId}/tasks/{taskId}/files/{taskFileId}".formatted(PATH_TO_PROJECTS_API),
-                        createdProjectId, createdColumnId, taskParameters.taskId(), taskFiles.get(0).getId())
+                .delete("/api/v1/files/{fileId}", taskFiles.get(0).getId())
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        List<TaskFileEntity> newTaskFiles = taskService.getTaskFiles(taskParameters.taskId());
+        List<FileEntity> newTaskFiles = fileService.getFilesByEntityId(task.getId());
         Assertions.assertEquals(0, newTaskFiles.size());
     }
 
@@ -303,15 +299,14 @@ class TaskControllerTest extends BasicTestClass {
         return given().header("Authorization", "Bearer " + token);
     }
 
-    private void saveTaskFile(TaskParameters taskParameters) {
+    private void saveTaskFile(Long taskId) {
         File taskFile = new File("src/test/resources/task-file.txt");
 
         requestWithBearerToken()
                 .multiPart("files", taskFile)
                 .contentType("multipart/form-data")
                 .when()
-                .post("%s/{projectId}/columns/{columnId}/tasks/{taskId}/files".formatted(PATH_TO_PROJECTS_API),
-                        taskParameters.projectId(), taskParameters.columnId(), taskParameters.taskId())
+                .post("/api/v1/files/task/{taskId}", taskId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }

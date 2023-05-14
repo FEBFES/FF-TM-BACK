@@ -73,7 +73,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectEntity getProject(Long id) {
         ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
+                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.NAME, id));
         log.info("Received project {} by id={}", projectEntity, id);
         return projectEntity;
     }
@@ -81,7 +81,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectEntity getProjectByOwnerId(Long id, Long ownerId) {
         ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
+                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.NAME, id));
         projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, ownerId));
         log.info("Received project {} by id={} and ownerId={}", projectEntity, id, ownerId);
         return projectEntity;
@@ -90,7 +90,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void editProject(Long id, ProjectEntity project) {
         ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id));
+                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.NAME, id));
         projectEntity.setName(project.getName());
         projectEntity.setDescription(project.getDescription());
         projectRepository.save(projectEntity);
@@ -104,15 +104,14 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.deleteById(id);
             log.info("Project with id={} was deleted", id);
         } else {
-            throw new EntityNotFoundException(ProjectEntity.class.getSimpleName(), id);
+            throw new EntityNotFoundException(ProjectEntity.NAME, id);
         }
     }
 
     @Override
     public DashboardDto getDashboard(Long id, String taskFilter) {
         return new DashboardDto(
-                columnService
-                        .getColumnListWithOrder(id, taskFilter)
+                columnService.getColumnListWithOrder(id, taskFilter)
                         .stream()
                         .map(ColumnWithTasksMapper.INSTANCE::columnToColumnWithTasksDto)
                         .collect(Collectors.toList())

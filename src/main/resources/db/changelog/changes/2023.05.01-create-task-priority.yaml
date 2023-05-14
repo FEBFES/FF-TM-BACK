@@ -2,20 +2,19 @@ databaseChangeLog:
   - changeSet:
       id: "1"
       author: IvanShish
-      comment: "Create task priority table"
+      comment: "Create task priority enum"
       changes:
-        - createTable:
-            tableName: task_priority
+        - sql:
+            dbms: 'postgresql'
+            sql: CREATE TYPE priority AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'URGENT');
+        - dropColumn:
+            tableName: task
             columns:
               - column:
-                  name: id
-                  type: bigint
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  name: priority
+        - addColumn:
+            tableName: task
+            columns:
               - column:
-                  name: name
-                  type: varchar(100)
-                  constraints:
-                    nullable: false
+                  name: priority
+                  type: priority

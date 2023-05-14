@@ -1,8 +1,10 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.service.AuthenticationService;
+import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.UserService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 
@@ -40,6 +43,9 @@ class UserControllerTest extends BasicTestClass {
 
     @Autowired
     private AuthenticationService authenticationService;
+
+    @Autowired
+    private FileService fileService;
 
     @DynamicPropertySource
     static void registerPgProperties(DynamicPropertyRegistry registry) {
@@ -91,7 +97,7 @@ class UserControllerTest extends BasicTestClass {
         requestWithBearerToken()
                 .multiPart("image", imageFile, "multipart/form-data")
                 .when()
-                .post("%s/{userId}/user-pic".formatted(PATH_TO_USERS_API), userId)
+                .post("/api/v1/files/user-pic/{userId}", userId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }
@@ -99,10 +105,11 @@ class UserControllerTest extends BasicTestClass {
     @Test
     void successfulGetUserPic() {
         Long userId = userService.getUserIdByUsername(createdUsername);
-        userService.saveUserPic(userId, new MockMultipartFile("image.jpg", new byte[]{1}));
+        MultipartFile file = new MockMultipartFile("image.jpg", "image", "jpg", new byte[]{1});
+        fileService.saveFile(userId, userId, EntityType.USER_PIC, file);
         requestWithBearerToken()
                 .when()
-                .get("%s/{userId}/user-pic".formatted(PATH_TO_USERS_API), userId)
+                .get("/api/v1/files/user-pic/{userId}", userId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }

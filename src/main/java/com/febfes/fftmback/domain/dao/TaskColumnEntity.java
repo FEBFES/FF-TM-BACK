@@ -14,8 +14,9 @@ import java.util.List;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class TaskColumnEntity extends AppEntity {
+public class TaskColumnEntity extends BaseEntity {
 
+    public static final String NAME = "Task column";
 
     @Column(name = "name")
     private String name;
@@ -30,9 +31,8 @@ public class TaskColumnEntity extends AppEntity {
     private Long childTaskColumnId;
 
     @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "column_id")
+    @JoinColumn(name = "\"columnId\"")
     @ToString.Exclude
-    private List<TaskEntity> taskEntityList;
-    //TODO problem when project was deleted
+    private List<TaskView> taskList;
 
 }

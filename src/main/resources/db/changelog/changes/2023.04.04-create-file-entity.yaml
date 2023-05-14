@@ -2,10 +2,10 @@ databaseChangeLog:
   - changeSet:
       id: "1"
       author: IvanShish
-      comment: "Create task file table"
+      comment: "Create files table"
       changes:
         - createTable:
-            tableName: task_file
+            tableName: file_entity
             columns:
               - column:
                   name: id
@@ -25,17 +25,20 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: task_id
+                  name: entity_id
                   type: bigint
-                  constraints:
-                    nullable: false
               - column:
                   name: name
                   type: varchar(100)
                   constraints:
                     nullable: false
               - column:
-                  name: type
+                  name: entity_type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content_type
                   type: varchar(50)
                   constraints:
                     nullable: false
@@ -50,19 +53,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - addDefaultValue:
-            tableName: task_file
+            tableName: file_entity
             columnName: create_date
             defaultValueComputed: CURRENT_TIMESTAMP
         - addForeignKeyConstraint:
-            constraintName: fk_task_id
-            baseTableName: task_file
-            baseColumnNames: task_id
-            referencedTableName: task
-            referencedColumnNames: id
-            onDelete: CASCADE
-        - addForeignKeyConstraint:
             constraintName: fk_user_id
-            baseTableName: task_file
+            baseTableName: file_entity
             baseColumnNames: user_id
             referencedTableName: user_entity
             referencedColumnNames: id
@@ -70,12 +66,10 @@ databaseChangeLog:
   - changeSet:
       id: "2"
       author: IvanShish
-      comment: "Add files counter column"
+      comment: "Drop user pic table"
       changes:
-        - addColumn:
-            tableName: task
-            columns:
-              - column:
-                  name: files_counter
-                  type: bigint
-                  defaultValueNumeric: "0"
+        - dropTable:
+            cascadeConstraints: true
+            catalogName: ff-tm
+            schemaName: public
+            tableName: user_pic
