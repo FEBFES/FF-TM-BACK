@@ -2,15 +2,13 @@ package com.febfes.fftmback.repository;
 
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface ColumnRepository extends JpaRepository<TaskColumnEntity, Long> {
-    List<TaskColumnEntity> findAllByProjectId(Long projectId);
+public interface ColumnRepository extends JpaRepository<TaskColumnEntity, Long>, JpaSpecificationExecutor<TaskColumnEntity> {
 
     /**
      * Change id of a child column from oldChildId to newChildId

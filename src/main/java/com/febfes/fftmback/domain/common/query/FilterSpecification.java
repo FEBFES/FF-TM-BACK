@@ -48,7 +48,7 @@ public record FilterSpecification<T>(
         return predicate;
     }
 
-    private void setFieldTypeToFilter(FilterRequest filter) {
+    public static void setFieldTypeToFilter(FilterRequest filter) {
         boolean fieldTypeSet = filter.getOperator().possibleClasses.stream()
                 .anyMatch(possibleClass -> {
                     if (possibleClass.equals(Date.class) && isValueADate(filter)) {
@@ -78,7 +78,7 @@ public record FilterSpecification<T>(
         }
     }
 
-    private boolean canParseToDate(Object value) {
+    private static boolean canParseToDate(Object value) {
         try {
             LocalDateTime.parse((String) value, FORMATTER);
             return true;
@@ -87,7 +87,7 @@ public record FilterSpecification<T>(
         return false;
     }
 
-    private boolean isValueADate(FilterRequest filter) {
+    private static boolean isValueADate(FilterRequest filter) {
         if (canParseToDate(filter.getValue())) {
             if (nonNull(filter.getValueTo())) {
                 if (canParseToDate(filter.getValueTo())) {
@@ -101,17 +101,17 @@ public record FilterSpecification<T>(
         return false;
     }
 
-    private boolean isValueBelongsToClass(Object value, Class<?> clazz) {
+    private static boolean isValueBelongsToClass(Object value, Class<?> clazz) {
         return nonNull(value) && (value.getClass().isInstance(clazz)
                 || clazz.isAssignableFrom(value.getClass()));
     }
 
-    private boolean isValueNotBelongsToClass(Object value, Class<?> clazz) {
+    private static boolean isValueNotBelongsToClass(Object value, Class<?> clazz) {
         return nonNull(value) && !(value.getClass().isInstance(clazz)
                 || clazz.isAssignableFrom(value.getClass()));
     }
 
-    private boolean doAllValuesBelongToClass(List<Object> values, Class<?> clazz) {
+    private static boolean doAllValuesBelongToClass(List<Object> values, Class<?> clazz) {
         if (isNull(values)) {
             return false;
         }
