@@ -11,7 +11,7 @@ public interface FileService {
 
     FileEntity getFile(String fileUrn);
 
-    List<FileEntity> getFilesByEntityId(Long entityId);
+    List<FileEntity> getFilesByEntityId(Long entityId, EntityType entityType);
 
     byte[] getFileContent(String idForUrn, EntityType entityType) throws IOException;
 

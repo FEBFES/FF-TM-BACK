@@ -1,6 +1,8 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
+import com.febfes.fftmback.domain.common.EntityType;
+import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.TaskDto;
@@ -55,7 +57,8 @@ public class TaskController {
     @ApiGetOne(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
     public TaskDto getTaskById(@ParameterObject TaskParameters pathVars) {
         TaskView task = taskService.getTaskById(pathVars.taskId());
-        return TaskMapper.INSTANCE.taskViewToTaskDto(task, fileService.getFilesByEntityId(pathVars.taskId()));
+        List<FileEntity> files = fileService.getFilesByEntityId(pathVars.taskId(), EntityType.TASK);
+        return TaskMapper.INSTANCE.taskViewToTaskDto(task, files);
     }
 
     @Operation(summary = "Create new task")

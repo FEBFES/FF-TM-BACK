@@ -1,5 +1,6 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.dao.*;
 import com.febfes.fftmback.dto.TaskDto;
@@ -250,7 +251,7 @@ class TaskControllerTest extends BasicTestClass {
         TaskView updatedTask = taskService.getTaskById(task.getId());
         Assertions.assertEquals(1, updatedTask.getFilesCounter());
 
-        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId());
+        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
         Assertions.assertEquals(1, taskFiles.size());
     }
 
@@ -259,7 +260,7 @@ class TaskControllerTest extends BasicTestClass {
         TaskEntity task = createNewTask(TASK_NAME);
 
         saveTaskFile(task.getId());
-        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId());
+        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
         Assertions.assertEquals(1, taskFiles.size());
 
         requestWithBearerToken()
@@ -269,7 +270,7 @@ class TaskControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        List<FileEntity> newTaskFiles = fileService.getFilesByEntityId(task.getId());
+        List<FileEntity> newTaskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
         Assertions.assertEquals(0, newTaskFiles.size());
     }
 

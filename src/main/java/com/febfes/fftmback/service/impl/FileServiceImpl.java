@@ -39,16 +39,16 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<FileEntity> getFilesByEntityId(Long entityId) {
-        return repository.findAllByEntityId(entityId);
+    public List<FileEntity> getFilesByEntityId(Long entityId, EntityType entityType) {
+        return repository.findAllByEntityIdAndEntityType(entityId, entityType.name());
     }
 
     @Override
     public byte[] getFileContent(String idForUrn, EntityType entityType) throws IOException {
         String fileUrn = "";
-        if (entityType.equals(EntityType.USER_PIC)) {
+        if (EntityType.USER_PIC.equals(entityType)) {
             fileUrn = String.format(FileUtils.USER_PIC_URN, Long.parseLong(idForUrn));
-        } else if (entityType.equals(EntityType.TASK)) {
+        } else if (EntityType.TASK.equals(entityType)) {
             fileUrn = String.format(FileUtils.TASK_FILE_URN, idForUrn);
         }
         FileEntity fileEntity = getFile(fileUrn);
@@ -71,12 +71,12 @@ public class FileServiceImpl implements FileService {
                 .name(file.getOriginalFilename())
                 .entityType(entityType.name())
                 .contentType(file.getContentType());
-        if (entityType.equals(EntityType.USER_PIC)) {
+        if (EntityType.USER_PIC.equals(entityType)) {
             fileBuilder.fileUrn(String.format(FileUtils.USER_PIC_URN, userId))
                     .filePath(
                             "%s%d.%s".formatted(userPicFolder, userId, FileUtils.getExtension(file.getOriginalFilename()))
                     );
-        } else if (entityType.equals(EntityType.TASK)) {
+        } else if (EntityType.TASK.equals(entityType)) {
             fileBuilder.fileUrn(String.format(FileUtils.TASK_FILE_URN, uuid))
                     .filePath(
                             "%s%s.%s".formatted(filesFolder, uuid, FileUtils.getExtension(file.getOriginalFilename()))
