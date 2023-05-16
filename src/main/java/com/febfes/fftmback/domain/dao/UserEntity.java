@@ -21,7 +21,9 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class UserEntity extends AppEntity implements UserDetails {
+public class UserEntity extends BaseEntity implements UserDetails {
+
+    public static final String ENTITY_NAME = "User";
 
     @Serial
     private static final long serialVersionUID = 7365026142938847634L;

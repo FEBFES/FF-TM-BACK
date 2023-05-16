@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1"
+      author: IvanShish
+      comment: "Create files table"
+      changes:
+        - createTable:
+            tableName: file_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_id
+                  type: bigint
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content_type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_path
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_urn
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+        - addDefaultValue:
+            tableName: file_entity
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+        - addForeignKeyConstraint:
+            constraintName: fk_user_id
+            baseTableName: file_entity
+            baseColumnNames: user_id
+            referencedTableName: user_entity
+            referencedColumnNames: id
+            onDelete: "NO ACTION"
+  - changeSet:
+      id: "2"
+      author: IvanShish
+      comment: "Drop user pic table"
+      changes:
+        - dropTable:
+            cascadeConstraints: true
+            catalogName: ff-tm
+            schemaName: public
+            tableName: user_pic

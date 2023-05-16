@@ -103,6 +103,15 @@ class DashboardControllerTests extends BasicTestClass {
                 createdUsername
         );
 
+        ProjectEntity projectEntity2 = projectService.createProject(
+                ProjectEntity.builder().name(PROJECT_NAME + "2").build(),
+                createdUsername
+        );
+        taskService.createTask(
+                TaskEntity.builder().projectId(projectEntity2.getId()).columnId(5L).name(TASK_NAME).build(),
+                createdUsername
+        );
+
         Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .params("taskFilter", "[{\"property\":\"name\",\"operator\":\"EQUAL\",\"value\":\"%s\"}]".formatted(TASK_NAME))

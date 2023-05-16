@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface ColumnRepository extends JpaRepository<TaskColumnEntity, Long> {
+
     List<TaskColumnEntity> findAllByProjectId(Long projectId);
 
     /**

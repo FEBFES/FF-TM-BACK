@@ -8,16 +8,13 @@ import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("v1/users")
@@ -42,28 +39,5 @@ public class UserController {
             @RequestBody EditUserDto editUserDto
     ) {
         userService.updateUser(UserMapper.INSTANCE.editUserDtoToUser(editUserDto), id);
-    }
-
-    @Operation(summary = "Upload user pic")
-    @PostMapping(
-            path = "/{userId}/user-pic",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public void saveUserPic(
-            @PathVariable Long userId,
-            @RequestParam("image") MultipartFile userPic
-    ) {
-        userService.saveUserPic(userId, userPic);
-    }
-
-    @Operation(summary = "Get user pic")
-    @GetMapping(
-            path = "/{userId}/user-pic",
-            produces = MediaType.IMAGE_JPEG_VALUE
-    )
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content)
-    public byte[] getImageWithMediaType(@PathVariable Long userId) throws IOException {
-        return userService.getUserPicContent(userId);
     }
 }

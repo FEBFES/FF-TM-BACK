@@ -40,7 +40,7 @@ public class ColumnServiceImpl implements ColumnService {
     @Override
     public void editColumn(TaskColumnEntity column) {
         TaskColumnEntity oldColumn = columnRepository.findById(column.getId())
-                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), column.getId()));
+                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.ENTITY_NAME, column.getId()));
         oldColumn.setName(column.getName());
         if (!Objects.equals(oldColumn.getChildTaskColumnId(), column.getChildTaskColumnId())) {
             columnRepository.updateChildColumn(
@@ -63,7 +63,7 @@ public class ColumnServiceImpl implements ColumnService {
     @Override
     public void deleteColumn(Long id) {
         TaskColumnEntity columnEntity = columnRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.class.getSimpleName(), id));
+                .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.ENTITY_NAME, id));
         columnRepository.updateChildColumn(
                 columnEntity.getChildTaskColumnId(),
                 columnEntity.getId(),
@@ -89,9 +89,7 @@ public class ColumnServiceImpl implements ColumnService {
         Map<Long, TaskColumnEntity> childIdToColumnEntity = columnRepository
                 .findAllByProjectId(projectId)
                 .stream()
-                /* TODO: as I understand it, there will be an extra request to the database. Gotta do something about it
-                 */
-                .peek(column -> column.setTaskEntityList(taskService.getTasks(column.getId(), taskFilter)))
+                .peek(column -> column.setTaskList(taskService.getTasks(column.getId(), taskFilter)))
                 .collect(Collectors.toMap(TaskColumnEntity::getChildTaskColumnId, Function.identity()));
         List<TaskColumnEntity> result = new ArrayList<>();
         Long currentColumnId = null;

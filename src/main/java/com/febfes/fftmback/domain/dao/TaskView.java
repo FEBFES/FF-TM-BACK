@@ -1,14 +1,12 @@
 package com.febfes.fftmback.domain.dao;
 
-
 import com.febfes.fftmback.domain.common.TaskPriority;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-
 @Entity
-@Table(name = "task")
+@Table(name = "v_task")
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,30 +14,35 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class TaskEntity extends BaseEntity {
+public class TaskView extends BaseView {
 
-    public static final String ENTITY_NAME = "Task";
-
-    @Column(name = "name", nullable = false)
+    @Column(name = "\"name\"")
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "\"description\"")
     private String description;
 
-    @Column(name = "project_id")
+    @Column(name = "\"projectId\"")
     private Long projectId;
 
-    @Column(name = "column_id")
+    @Column(name = "\"columnId\"")
     private Long columnId;
 
-    @Column(name = "owner_id")
+    @Column(name = "\"ownerId\"")
     private Long ownerId;
 
-    @Column(name = "priority")
+    @Column(name = "\"priority\"", columnDefinition = "priority")
     @Enumerated(EnumType.STRING)
     private TaskPriority priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_type_id", referencedColumnName = "id")
+    @JoinColumn(name = "\"taskTypeId\"", referencedColumnName = "id")
     private TaskTypeEntity taskType;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "\"ownerUserPicId\"", referencedColumnName = "user_id")
+    private FileEntity ownerUserPic;
+
+    @Column(name = "\"filesCounter\"")
+    private Long filesCounter;
 }

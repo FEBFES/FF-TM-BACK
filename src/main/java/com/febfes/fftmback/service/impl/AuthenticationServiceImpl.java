@@ -43,7 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void registerUser(UserEntity user) {
         if (userRepository.existsByEmailOrUsername(user.getEmail(), user.getUsername())) {
-            throw new EntityAlreadyExistsException(UserEntity.class.getSimpleName());
+            throw new EntityAlreadyExistsException(UserEntity.ENTITY_NAME);
         }
         user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.MEMBER);
@@ -65,8 +65,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 )
         );
         UserEntity receivedUser = userRepository.findByUsername(user.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getSimpleName(),
-                        "username", user.getUsername()));
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, "username", user.getUsername()));
 
         String jwtToken = jwtService.generateToken(receivedUser);
 

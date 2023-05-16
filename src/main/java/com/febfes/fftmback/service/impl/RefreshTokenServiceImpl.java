@@ -32,8 +32,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshTokenEntity getByToken(String token) {
         RefreshTokenEntity refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new EntityNotFoundException(RefreshTokenEntity.class.getSimpleName(),
-                        "token", token));
+                .orElseThrow(() -> new EntityNotFoundException(RefreshTokenEntity.ENTITY_NAME, "token", token));
         log.info("Received refresh token {} by token={}", refreshToken, token);
         return refreshToken;
     }
@@ -41,8 +40,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshTokenEntity getByUserId(Long userId) {
         RefreshTokenEntity refreshToken = refreshTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException(RefreshTokenEntity.class.getSimpleName(),
-                        "userId", userId.toString()));
+                .orElseThrow(() -> new EntityNotFoundException(RefreshTokenEntity.ENTITY_NAME, "userId", userId.toString()));
         log.info("Received refresh token {} by user id={}", refreshToken, userId);
         return refreshToken;
     }

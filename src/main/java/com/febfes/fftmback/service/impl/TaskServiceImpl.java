@@ -5,9 +5,11 @@ import com.febfes.fftmback.domain.common.query.FilterRequest;
 import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.TaskRepository;
+import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
@@ -31,43 +33,37 @@ public class TaskServiceImpl implements TaskService {
     private static final String RECEIVED_TASKS_SIZE_LOG = "Received tasks size: {}";
 
     private final TaskRepository taskRepository;
+    private final TaskViewRepository taskViewRepository;
     private final UserService userService;
     private final TaskTypeService taskTypeService;
 
     @Override
-    public List<TaskEntity> getTasks(
+    public List<TaskView> getTasks(
             int page,
             int limit,
             Long columnId,
             String filter
     ) {
         Pageable pageableRequest = PageRequest.of(page, limit);
-        List<TaskEntity> tasks = taskRepository.findAll(makeTasksFilter(columnId, filter), pageableRequest).getContent();
+        List<TaskView> tasks = taskViewRepository.findAll(makeTasksFilter(columnId, filter), pageableRequest).getContent();
         log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
         return tasks;
     }
 
     @Override
-    public List<TaskEntity> getTasks(
+    public List<TaskView> getTasks(
             Long columnId,
             String filter
     ) {
-        List<TaskEntity> tasks = taskRepository.findAll(makeTasksFilter(columnId, filter));
+        List<TaskView> tasks = taskViewRepository.findAll(makeTasksFilter(columnId, filter));
         log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
         return tasks;
     }
 
     @Override
-    public List<TaskEntity> getTasks(String filter) {
-        List<TaskEntity> tasks = taskRepository.findAll(makeTasksFilter(filter));
-        log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
-        return tasks;
-    }
-
-    @Override
-    public TaskEntity getTaskById(Long id) {
-        TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
+    public TaskView getTaskById(Long id) {
+        TaskView task = taskViewRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
         log.info(RECEIVED_TASKS_SIZE_LOG, task);
         return task;
     }
@@ -94,7 +90,7 @@ public class TaskServiceImpl implements TaskService {
             TaskDto taskDto
     ) {
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.class.getSimpleName(), id));
+                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
         task.setName(taskDto.name());
         task.setDescription(taskDto.description());
         task.setColumnId(columnId);
@@ -110,13 +106,14 @@ public class TaskServiceImpl implements TaskService {
     public void deleteTask(Long id) {
         if (taskRepository.existsById(id)) {
             taskRepository.deleteById(id);
-            log.info("Task with id={} was deleted", id);
+            log.info("Task with id={} deleted", id);
         } else {
-            throw new EntityNotFoundException(TaskEntity.class.getSimpleName(), id);
+            throw new EntityNotFoundException(TaskEntity.ENTITY_NAME, id);
         }
     }
 
-    private FilterSpecification<TaskEntity> makeTasksFilter(String filter) {
+    @Override
+    public FilterSpecification<TaskView> makeTasksFilter(String filter) {
         if (nonNull(filter)) {
             log.info("Receiving tasks with a filter: {}", filter);
             List<FilterRequest> filters = JsonUtils.convertStringToObject(filter, new TypeReference<>() {
@@ -126,7 +123,7 @@ public class TaskServiceImpl implements TaskService {
         return new FilterSpecification<>(new ArrayList<>());
     }
 
-    private FilterSpecification<TaskEntity> makeTasksFilter(
+    private FilterSpecification<TaskView> makeTasksFilter(
             Long columnId,
             String filter
     ) {
