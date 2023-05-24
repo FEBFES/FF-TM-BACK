@@ -65,6 +65,7 @@ public class FileServiceImpl implements FileService {
             MultipartFile file
     ) {
         String uuid = UUID.randomUUID().toString();
+        // TODO: need some optimization (because we find in repository if it exists and only then we save)
         FileEntity.FileEntityBuilder fileBuilder = FileEntity.builder()
                 .userId(userId)
                 .entityId(entityId)
@@ -85,7 +86,10 @@ public class FileServiceImpl implements FileService {
         try {
             FileEntity fileEntity = fileBuilder.build();
             file.transferTo(new File(fileEntity.getFilePath()));
-            repository.save(fileEntity);
+            // TODO: i'm talking about this (look upper)
+            if (!EntityType.USER_PIC.equals(entityType) || !repository.existsByEntityIdAndEntityType(entityId, entityType.name())) {
+                repository.save(fileEntity);
+            }
         } catch (IOException e) {
             throw new SaveFileException(file.getName());
         }
