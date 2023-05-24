@@ -40,7 +40,7 @@ public class TaskView extends BaseView {
     private TaskTypeEntity taskType;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "\"ownerUserPicId\"", referencedColumnName = "user_id")
+    @JoinColumn(name = "\"ownerUserPicId\"", referencedColumnName = "id")
     private FileEntity ownerUserPic;
 
     @Column(name = "\"filesCounter\"")
