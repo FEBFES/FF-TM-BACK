@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.common.query.FilterRequest;
 import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -147,9 +149,19 @@ public class TaskServiceImpl implements TaskService {
             task.setTaskType(null);
             return;
         }
-        taskTypeService
-                .getTaskTypeByNameAndProjectId(typeName, task.getProjectId())
-                .ifPresentOrElse(task::setTaskType, () -> task.setTaskType(null));
+        Optional<TaskTypeEntity> taskTypeEntity = taskTypeService
+                .getTaskTypeByNameAndProjectId(typeName, task.getProjectId());
+        if (taskTypeEntity.isPresent()) {
+            task.setTaskType(taskTypeEntity.get());
+        } else {
+            TaskTypeEntity newTaskType = taskTypeService.createTaskType(
+                    TaskTypeEntity.builder()
+                            .name(typeName)
+                            .projectId(projectId)
+                            .build()
+            );
+            task.setTaskType(newTaskType);
+        }
 
     }
 }
