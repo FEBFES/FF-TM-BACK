@@ -64,14 +64,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskView getTaskById(Long id) {
-        TaskView task = taskViewRepository.findById(id)
+        return taskViewRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
-        log.info(RECEIVED_TASKS_SIZE_LOG, task);
-        return task;
     }
 
     @Override
-    public TaskEntity createTask(
+    public TaskView createTask(
             TaskEntity task,
             String username
     ) {
@@ -81,11 +79,11 @@ public class TaskServiceImpl implements TaskService {
         }
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
-        return savedTask;
+        return getTaskById(savedTask.getId());
     }
 
     @Override
-    public TaskEntity updateTask(
+    public TaskView updateTask(
             Long id,
             Long projectId,
             Long columnId,
@@ -101,7 +99,7 @@ public class TaskServiceImpl implements TaskService {
         fillTaskType(task, taskDto.type(), projectId);
         taskRepository.save(task);
         log.info("Updated task: {}", task);
-        return task;
+        return getTaskById(id);
     }
 
     @Override
