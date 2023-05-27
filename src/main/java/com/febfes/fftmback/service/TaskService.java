@@ -15,9 +15,9 @@ public interface TaskService {
 
     TaskView getTaskById(Long id);
 
-    TaskEntity createTask(TaskEntity task, String username);
+    TaskView createTask(TaskEntity task, String username);
 
-    TaskEntity updateTask(Long id, Long projectId, Long columnId, TaskDto taskDto);
+    TaskView updateTask(Long id, Long projectId, Long columnId, TaskDto taskDto);
 
     void deleteTask(Long id);
 

@@ -7,7 +7,6 @@ import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.service.RefreshTokenService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
-import com.google.gson.Gson;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
@@ -25,8 +24,6 @@ public class AuthenticationControllerTest extends BasicTestClass {
 
     @Autowired
     RefreshTokenService refreshTokenService;
-
-    private final Gson gson = new Gson();
 
     @Test
     void successfulRegisterTest() {
@@ -75,10 +72,12 @@ public class AuthenticationControllerTest extends BasicTestClass {
                 .body(userDetailsDto)
                 .when()
                 .post("%s/authenticate".formatted(PATH_TO_AUTH_API));
-        response.then()
-                .statusCode(HttpStatus.SC_OK);
+        TokenDto refreshTokenDto = response.then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(TokenDto.class);
 
-        TokenDto refreshTokenDto = gson.fromJson(response.print(), TokenDto.class);
         RefreshTokenEntity refreshToken = refreshTokenService.getByToken(refreshTokenDto.refreshToken());
         Assertions.assertNotNull(refreshToken);
     }
@@ -129,8 +128,10 @@ public class AuthenticationControllerTest extends BasicTestClass {
                 .body(userDetailsDto)
                 .when()
                 .post("%s/authenticate".formatted(PATH_TO_AUTH_API));
-        response.then()
-                .statusCode(HttpStatus.SC_OK);
-        return gson.fromJson(response.print(), TokenDto.class);
+        return response.then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(TokenDto.class);
     }
 }

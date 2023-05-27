@@ -239,13 +239,13 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void saveTaskFileTest() {
-        TaskEntity task = createNewTask(TASK_NAME);
+        TaskView task = createNewTask(TASK_NAME);
         saveTaskFile(task.getId());
     }
 
     @Test
     void getTaskFilesTest() {
-        TaskEntity task = createNewTask(TASK_NAME);
+        TaskView task = createNewTask(TASK_NAME);
         saveTaskFile(task.getId());
 
         TaskView updatedTask = taskService.getTaskById(task.getId());
@@ -257,7 +257,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void deleteTaskFileTest() {
-        TaskEntity task = createNewTask(TASK_NAME);
+        TaskView task = createNewTask(TASK_NAME);
 
         saveTaskFile(task.getId());
         List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
@@ -284,7 +284,7 @@ class TaskControllerTest extends BasicTestClass {
                         createdProjectId, createdColumnId);
     }
 
-    private TaskEntity createNewTask(String taskName) {
+    private TaskView createNewTask(String taskName) {
         return taskService.createTask(
                 TaskEntity
                         .builder()

@@ -3,7 +3,6 @@ package com.febfes.fftmback.controller;
 import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
-import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.TaskShortDto;
@@ -63,27 +62,26 @@ public class TaskController {
 
     @Operation(summary = "Create new task")
     @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
-    public TaskDto createTask(
+    public TaskShortDto createTask(
             @ParameterObject ColumnParameters pathVars,
             @RequestBody @Valid TaskDto taskDto
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        TaskEntity task = taskService.createTask(
+        TaskView task = taskService.createTask(
                 TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), taskDto),
                 authentication.getName()
         );
-        return TaskMapper.INSTANCE.taskToTaskDto(task);
+        return TaskMapper.INSTANCE.taskViewToTaskShortDto(task);
     }
 
     @Operation(summary = "Edit task by its id")
     @ApiEdit(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
-    public TaskDto updateTask(
+    public TaskShortDto updateTask(
             @ParameterObject TaskParameters pathVars,
             @RequestBody TaskDto taskDto
     ) {
-
-        TaskEntity task = taskService.updateTask(pathVars.taskId(), pathVars.projectId(), pathVars.columnId(), taskDto);
-        return TaskMapper.INSTANCE.taskToTaskDto(task);
+        TaskView task = taskService.updateTask(pathVars.taskId(), pathVars.projectId(), pathVars.columnId(), taskDto);
+        return TaskMapper.INSTANCE.taskViewToTaskShortDto(task);
     }
 
     @Operation(summary = "Delete task by its id")
