@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+import static java.util.Objects.isNull;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -47,7 +49,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.MEMBER);
-        user.setDisplayName(generateDisplayUserName());
+        user.setDisplayName(isNull(user.getDisplayName()) ? generateDisplayUserName() : user.getDisplayName());
         userRepository.save(user);
         log.info("User saved: {}", user);
     }
