@@ -11,7 +11,6 @@ import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
-import com.google.gson.Gson;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -48,8 +47,6 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Autowired
     private DtoBuilders dtoBuilders;
-
-    private final Gson gson = new Gson();
 
     @BeforeEach
     void beforeEach() {
@@ -228,14 +225,14 @@ class ColumnControllerTest extends BasicTestClass {
     }
 
     private DashboardDto getDashboard() {
-        return gson.fromJson(
-                requestWithBearerToken()
-                        .contentType(ContentType.JSON)
-                        .when()
-                        .get("/api/v1/projects/{id}/dashboard", createdProjectId)
-                        .print(),
-                DashboardDto.class
-        );
+        return requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/api/v1/projects/{id}/dashboard", createdProjectId)
+                .then()
+                .extract()
+                .response()
+                .as(DashboardDto.class);
     }
 
     private RequestSpecification requestWithBearerToken() {
