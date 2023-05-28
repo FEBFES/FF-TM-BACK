@@ -43,4 +43,8 @@ public class ProjectEntity extends BaseEntity {
 
     @Transient
     private Boolean isFavourite;
+
+    @ManyToMany
+    @ToString.Exclude
+    private List<UserEntity> members;
 }

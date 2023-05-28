@@ -60,6 +60,11 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @ToString.Exclude
     private List<ProjectEntity> projectEntityList;
 
+    @ManyToMany
+    @JoinTable(name = "user_project")
+    @ToString.Exclude
+    private List<ProjectEntity> projects;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

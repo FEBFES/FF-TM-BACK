@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1"
+      author: IvanShish
+      comment: "Create table for user-project relationship"
+      changes:
+        - createTable:
+            tableName: user_project
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: project_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_project_id
+            baseTableName: user_project
+            baseColumnNames: project_id
+            referencedTableName: project
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_user_id
+            baseTableName: user_project
+            baseColumnNames: user_id
+            referencedTableName: user_entity
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addDefaultValue:
+            tableName: user_project
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
