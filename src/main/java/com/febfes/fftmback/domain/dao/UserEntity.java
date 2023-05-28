@@ -1,5 +1,6 @@
 package com.febfes.fftmback.domain.dao;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.febfes.fftmback.domain.common.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "user_entity")
@@ -61,9 +64,12 @@ public class UserEntity extends BaseEntity implements UserDetails {
     private List<ProjectEntity> projectEntityList;
 
     @ManyToMany
-    @JoinTable(name = "user_project")
+    @JoinTable(name = "user_project",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "project_id")})
+    @JsonIgnoreProperties(value = "members")
     @ToString.Exclude
-    private List<ProjectEntity> projects;
+    private Set<ProjectEntity> projects = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

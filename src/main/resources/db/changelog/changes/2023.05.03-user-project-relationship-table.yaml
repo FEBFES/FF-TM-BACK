@@ -8,18 +8,6 @@ databaseChangeLog:
             tableName: user_project
             columns:
               - column:
-                  name: id
-                  type: bigint
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: create_date
-                  type: timestamp
-                  constraints:
-                    nullable: false
-              - column:
                   name: user_id
                   type: bigint
                   constraints:
@@ -43,7 +31,3 @@ databaseChangeLog:
             referencedTableName: user_entity
             referencedColumnNames: id
             onDelete: CASCADE
-        - addDefaultValue:
-            tableName: user_project
-            columnName: create_date
-            defaultValueComputed: CURRENT_TIMESTAMP
