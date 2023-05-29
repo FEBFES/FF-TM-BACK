@@ -8,15 +8,18 @@ import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DtoBuilders;
+import com.febfes.fftmback.util.HibernateUtil;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.assertj.core.api.Assertions;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,6 +32,8 @@ class ProjectControllerTest extends BasicTestClass {
     public static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
     public static final String PROJECT_NAME = "Project name";
     public static final String PROJECT_DESCRIPTION = "Project description";
+
+    private static SessionFactory sessionFactory;
 
     private String createdUsername;
     private Long createdUserId;
@@ -45,6 +50,11 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Autowired
     private DtoBuilders dtoBuilders;
+
+    @BeforeAll
+    public static void init() {
+        sessionFactory = HibernateUtil.getSessionFactory();
+    }
 
     @BeforeEach
     void beforeEach() {
@@ -228,7 +238,6 @@ class ProjectControllerTest extends BasicTestClass {
     }
 
     @Test
-    @Transactional
     void successfulAddNewMembersTest() {
         authenticationService.registerUser(
                 UserEntity.builder().email(USER_EMAIL + "1").username(USER_USERNAME + "1").encryptedPassword(USER_PASSWORD).build()
@@ -249,12 +258,18 @@ class ProjectControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+
         ProjectEntity updatedProject = projectService.getProject(createdProjectId);
         Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(2);
         UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
         Assertions.assertThat(secondAddedMember.getProjects().size()).isEqualTo(1);
         UserEntity thirdAddedMember = userService.getUserById(thirdCreatedUserId);
         Assertions.assertThat(thirdAddedMember.getProjects().size()).isEqualTo(1);
+
+        session.getTransaction().commit();
+        session.close();
     }
 
     @Test
