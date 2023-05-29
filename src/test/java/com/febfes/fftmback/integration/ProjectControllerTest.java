@@ -8,18 +8,18 @@ import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DtoBuilders;
-import com.febfes.fftmback.util.HibernateUtil;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import lombok.NonNull;
 import org.assertj.core.api.Assertions;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
@@ -32,8 +32,6 @@ class ProjectControllerTest extends BasicTestClass {
     public static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
     public static final String PROJECT_NAME = "Project name";
     public static final String PROJECT_DESCRIPTION = "Project description";
-
-    private static SessionFactory sessionFactory;
 
     private String createdUsername;
     private Long createdUserId;
@@ -51,10 +49,8 @@ class ProjectControllerTest extends BasicTestClass {
     @Autowired
     private DtoBuilders dtoBuilders;
 
-    @BeforeAll
-    public static void init() {
-        sessionFactory = HibernateUtil.getSessionFactory();
-    }
+    @Autowired
+    private TransactionTemplate txTemplate;
 
     @BeforeEach
     void beforeEach() {
@@ -258,37 +254,44 @@ class ProjectControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+        // it's to avoid org.hibernate.LazyInitializationException
+        txTemplate.execute(new TransactionCallbackWithoutResult() {
 
-        ProjectEntity updatedProject = projectService.getProject(createdProjectId);
-        Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(2);
-        UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
-        Assertions.assertThat(secondAddedMember.getProjects().size()).isEqualTo(1);
-        UserEntity thirdAddedMember = userService.getUserById(thirdCreatedUserId);
-        Assertions.assertThat(thirdAddedMember.getProjects().size()).isEqualTo(1);
-
-        session.getTransaction().commit();
-        session.close();
+            @Override
+            protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
+                ProjectEntity updatedProject = projectService.getProject(createdProjectId);
+                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(2);
+                UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
+                Assertions.assertThat(secondAddedMember.getProjects().size()).isEqualTo(1);
+                UserEntity thirdAddedMember = userService.getUserById(thirdCreatedUserId);
+                Assertions.assertThat(thirdAddedMember.getProjects().size()).isEqualTo(1);
+            }
+        });
     }
 
     @Test
     void successfulRemoveMemberTest() {
         successfulAddNewMembersTest();
         Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
-        UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
-        ProjectEntity project = projectService.getProjectsByOwnerId(createdUserId).get(0);
+        Long createdProjectId = projectService.getProjectsByOwnerId(createdUserId).get(0).getId();
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
-                .delete("%s/{id}/members/{memberId}".formatted(PATH_TO_PROJECTS_API), project.getId(), secondAddedMember)
+                .delete("%s/{id}/members/{memberId}".formatted(PATH_TO_PROJECTS_API), createdProjectId, secondCreatedUserId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        ProjectEntity updatedProject = projectService.getProject(project.getId());
-        Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(1);
-        UserEntity updatedSecondAddedMember = userService.getUserById(createdUserId);
-        Assertions.assertThat(updatedSecondAddedMember.getProjects().size()).isEqualTo(0);
+        // it's to avoid org.hibernate.LazyInitializationException
+        txTemplate.execute(new TransactionCallbackWithoutResult() {
+
+            @Override
+            protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
+                ProjectEntity updatedProject = projectService.getProject(createdProjectId);
+                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(1);
+                UserEntity updatedSecondAddedMember = userService.getUserById(secondCreatedUserId);
+                Assertions.assertThat(updatedSecondAddedMember.getProjects().size()).isEqualTo(0);
+            }
+        });
     }
 
     private Long createNewProject(String projectName) {
