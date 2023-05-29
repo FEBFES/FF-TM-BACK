@@ -1,6 +1,5 @@
 package com.febfes.fftmback.domain.dao;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.febfes.fftmback.domain.common.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -63,11 +62,14 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @ToString.Exclude
     private List<ProjectEntity> projectEntityList;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            })
     @JoinTable(name = "user_project",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "project_id")})
-    @JsonIgnoreProperties(value = "members")
     @ToString.Exclude
     private Set<ProjectEntity> projects = new HashSet<>();
 

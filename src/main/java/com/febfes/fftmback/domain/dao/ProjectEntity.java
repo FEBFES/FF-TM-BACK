@@ -48,7 +48,11 @@ public class ProjectEntity extends BaseEntity {
     @Transient
     private Boolean isFavourite;
 
-    @ManyToMany(mappedBy = "projects")
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            }, mappedBy = "projects")
     @JsonIgnoreProperties(value = "projects")
     @ToString.Exclude
     private Set<UserEntity> members = new HashSet<>();

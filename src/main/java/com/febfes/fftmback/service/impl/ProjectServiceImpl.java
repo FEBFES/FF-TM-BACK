@@ -2,9 +2,11 @@ package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.ColumnService;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -146,6 +149,34 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void removeProjectFromFavourite(Long projectId, Long userId) {
         projectRepository.removeProjectFromFavourite(projectId, userId);
+    }
+
+    @Override
+    public void addNewMembers(Long projectId, List<Long> memberIds, Long ownerId) {
+        ProjectEntity project = getProject(projectId);
+        if (!Objects.equals(project.getOwnerId(), ownerId)) {
+            throw new ProjectOwnerException(project.getOwnerId());
+        }
+        if (memberIds.contains(ownerId)) {
+            throw new ProjectOwnerException();
+        }
+        memberIds.forEach(memberId -> {
+            UserEntity member = userService.getUserById(memberId);
+            project.addMember(member);
+        });
+        projectRepository.save(project);
+        log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
+    }
+
+    @Override
+    public void removeMember(Long projectId, Long memberId, Long ownerId) {
+        ProjectEntity project = getProject(projectId);
+        if (!Objects.equals(project.getOwnerId(), ownerId)) {
+            throw new ProjectOwnerException(project.getOwnerId());
+        }
+        project.removeMember(memberId);
+        projectRepository.save(project);
+        log.info("Removed member with id={} from project with id={}", memberId, projectId);
     }
 
     private Set<Long> getFavouriteProjectsForUser(Long userId) {

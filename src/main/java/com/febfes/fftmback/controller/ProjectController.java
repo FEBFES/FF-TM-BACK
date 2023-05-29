@@ -10,16 +10,15 @@ import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -95,5 +94,23 @@ public class ProjectController {
                 .stream()
                 .map(TaskTypeEntity::getName)
                 .collect(Collectors.toList());
+    }
+
+    @Operation(summary = "Add new members to the project")
+    @PostMapping(path = "{id}/members")
+    @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
+    public void addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        projectService.addNewMembers(id, memberIds, user.getId());
+    }
+
+    @Operation(summary = "Delete member from project")
+    @DeleteMapping(path = "{id}/members/{memberId}")
+    @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
+    public void addNewMembers(@PathVariable Long id, @PathVariable Long memberId) {
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        projectService.removeMember(id, memberId, user.getId());
     }
 }

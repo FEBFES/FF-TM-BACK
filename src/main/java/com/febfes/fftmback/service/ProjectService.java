@@ -26,4 +26,8 @@ public interface ProjectService {
     void addProjectToFavourite(Long projectId, Long userId);
 
     void removeProjectFromFavourite(Long projectId, Long userId);
+
+    void addNewMembers(Long projectId, List<Long> memberIds, Long ownerId);
+
+    void removeMember(Long projectId, Long memberId, Long ownerId);
 }

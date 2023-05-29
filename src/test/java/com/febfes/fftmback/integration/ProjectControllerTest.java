@@ -16,6 +16,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -224,6 +225,55 @@ class ProjectControllerTest extends BasicTestClass {
         ProjectEntity updatedProject = projectService.getProject(createdProjectId);
         Assertions.assertThat(updatedProject.getName())
                 .isEqualTo(PROJECT_NAME);
+    }
+
+    @Test
+    @Transactional
+    void successfulAddNewMembersTest() {
+        authenticationService.registerUser(
+                UserEntity.builder().email(USER_EMAIL + "1").username(USER_USERNAME + "1").encryptedPassword(USER_PASSWORD).build()
+        );
+        authenticationService.registerUser(
+                UserEntity.builder().email(USER_EMAIL + "2").username(USER_USERNAME + "2").encryptedPassword(USER_PASSWORD).build()
+        );
+        Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
+        Long thirdCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "2");
+        Long createdProjectId = createNewProject(PROJECT_NAME + "new_members_test");
+        List<Long> memberIds = List.of(secondCreatedUserId, thirdCreatedUserId);
+
+        requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .body(memberIds)
+                .when()
+                .post("%s/{id}/members".formatted(PATH_TO_PROJECTS_API), createdProjectId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+        ProjectEntity updatedProject = projectService.getProject(createdProjectId);
+        Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(2);
+        UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
+        Assertions.assertThat(secondAddedMember.getProjects().size()).isEqualTo(1);
+        UserEntity thirdAddedMember = userService.getUserById(thirdCreatedUserId);
+        Assertions.assertThat(thirdAddedMember.getProjects().size()).isEqualTo(1);
+    }
+
+    @Test
+    void successfulRemoveMemberTest() {
+        successfulAddNewMembersTest();
+        Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
+        UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
+        ProjectEntity project = projectService.getProjectsByOwnerId(createdUserId).get(0);
+        requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .when()
+                .delete("%s/{id}/members/{memberId}".formatted(PATH_TO_PROJECTS_API), project.getId(), secondAddedMember)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+        ProjectEntity updatedProject = projectService.getProject(project.getId());
+        Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(1);
+        UserEntity updatedSecondAddedMember = userService.getUserById(createdUserId);
+        Assertions.assertThat(updatedSecondAddedMember.getProjects().size()).isEqualTo(0);
     }
 
     private Long createNewProject(String projectName) {
