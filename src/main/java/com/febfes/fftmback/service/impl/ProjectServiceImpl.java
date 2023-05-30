@@ -23,6 +23,7 @@ import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -61,16 +62,19 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectEntity> getProjectsByOwnerId(Long ownerId) {
-        Set<Long> favouriteProjects = getFavouriteProjectsForUser(ownerId);
+    public List<ProjectEntity> getProjectsForUser(Long userId) {
+        UserEntity user = userService.getUserById(userId);
+        Set<Long> favouriteProjects = getFavouriteProjectsForUser(userId);
         // TODO Возможно обработку является ли проект избранным стоит вынести в запрос
-        List<ProjectEntity> projectEntityList = projectRepository
-                .findAllByOwnerId(ownerId)
+        List<ProjectEntity> ownedProjects = projectRepository
+                .findAllByOwnerId(userId)
                 .stream()
                 .peek(project -> project.setIsFavourite(favouriteProjects.contains(project.getId())))
                 .toList();
-        log.info("Received {} projects for owner with id={}", projectEntityList.size(), ownerId);
-        return projectEntityList;
+        List<ProjectEntity> userProjects = new ArrayList<>(ownedProjects);
+        userProjects.addAll(user.getProjects());
+        log.info("Received {} projects for user with id={}", userProjects.size(), userId);
+        return userProjects;
     }
 
     @Override
@@ -82,11 +86,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectEntity getProjectByOwnerId(Long id, Long ownerId) {
+    public ProjectEntity getProjectForUser(Long id, Long userId) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
-        projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, ownerId));
-        log.info("Received project {} by id={} and ownerId={}", projectEntity, id, ownerId);
+        projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, userId));
+        log.info("Received project {} by id={} and userId={}", projectEntity, id, userId);
         return projectEntity;
     }
 

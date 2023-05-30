@@ -194,7 +194,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProjectByOwnerId(createdProjectId, createdUserId);
+        ProjectEntity updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.getIsFavourite())
                 .isTrue();
     }
@@ -211,7 +211,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProjectByOwnerId(createdProjectId, createdUserId);
+        ProjectEntity updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.getIsFavourite())
                 .isFalse();
     }
@@ -235,14 +235,8 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulAddNewMembersTest() {
-        authenticationService.registerUser(
-                UserEntity.builder().email(USER_EMAIL + "1").username(USER_USERNAME + "1").encryptedPassword(USER_PASSWORD).build()
-        );
-        authenticationService.registerUser(
-                UserEntity.builder().email(USER_EMAIL + "2").username(USER_USERNAME + "2").encryptedPassword(USER_PASSWORD).build()
-        );
-        Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
-        Long thirdCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "2");
+        Long secondCreatedUserId = createNewUser(USER_EMAIL + "1", USER_USERNAME + "1");
+        Long thirdCreatedUserId = createNewUser(USER_EMAIL + "2", USER_USERNAME + "2");
         Long createdProjectId = createNewProject(PROJECT_NAME + "new_members_test");
         List<Long> memberIds = List.of(secondCreatedUserId, thirdCreatedUserId);
 
@@ -273,7 +267,7 @@ class ProjectControllerTest extends BasicTestClass {
     void successfulRemoveMemberTest() {
         successfulAddNewMembersTest();
         Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
-        Long createdProjectId = projectService.getProjectsByOwnerId(createdUserId).get(0).getId();
+        Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).getId();
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
@@ -289,15 +283,48 @@ class ProjectControllerTest extends BasicTestClass {
                 ProjectEntity updatedProject = projectService.getProject(createdProjectId);
                 Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(1);
                 UserEntity updatedSecondAddedMember = userService.getUserById(secondCreatedUserId);
-                Assertions.assertThat(updatedSecondAddedMember.getProjects().size()).isEqualTo(0);
+                Assertions.assertThat(updatedSecondAddedMember.getProjects().size()).isZero();
             }
         });
+    }
+
+    @Test
+    void successfulGetUserProjectsTest() {
+        successfulAddNewMembersTest();
+        Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
+        projectService.createProject(
+                ProjectEntity.builder().name(PROJECT_NAME + "1").build(),
+                userService.getUserById(secondCreatedUserId).getUsername()
+        );
+
+        String tokenForSecondUser = authenticationService.authenticateUser(
+                UserEntity.builder().username(USER_USERNAME + "1").encryptedPassword(USER_PASSWORD).build()
+        ).accessToken();
+        Response response = given().header("Authorization", "Bearer " + tokenForSecondUser)
+                .contentType(ContentType.JSON)
+                .when()
+                .get(PATH_TO_PROJECTS_API);
+        response.then()
+                .statusCode(HttpStatus.SC_OK);
+
+        int size = response
+                .jsonPath()
+                .getInt("data.size()");
+        Assertions.assertThat(size)
+                .isEqualTo(2);
     }
 
     private Long createNewProject(String projectName) {
         ProjectDto createProjectDto = dtoBuilders.createProjectDto(projectName);
         Response createResponse = createNewProject(createProjectDto);
         return createResponse.jsonPath().getLong("id");
+    }
+
+    private Long createNewUser(String email, String username) {
+        authenticationService.registerUser(
+                UserEntity.builder().email(email).username(username).encryptedPassword(USER_PASSWORD).build()
+        );
+        return userService.getUserIdByUsername(username);
     }
 
     private Response createNewProject(ProjectDto projectDto) {

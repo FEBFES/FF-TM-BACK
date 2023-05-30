@@ -38,7 +38,7 @@ public class ProjectController {
     public List<ProjectDto> getProjectsForUser() {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = user.getId();
-        return projectService.getProjectsByOwnerId(userId).stream()
+        return projectService.getProjectsForUser(userId).stream()
                 .map(ProjectMapper.INSTANCE::projectToProjectDto)
                 .toList();
     }
@@ -58,7 +58,7 @@ public class ProjectController {
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public ProjectDto getProject(@PathVariable Long id) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProjectByOwnerId(id, user.getId()));
+        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProjectForUser(id, user.getId()));
     }
 
     @Operation(summary = "Edit project by its id")

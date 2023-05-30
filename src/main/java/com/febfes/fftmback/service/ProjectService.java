@@ -9,11 +9,11 @@ import java.util.List;
 public interface ProjectService {
     ProjectEntity createProject(ProjectEntity project, String username);
 
-    List<ProjectEntity> getProjectsByOwnerId(Long ownerId);
+    List<ProjectEntity> getProjectsForUser(Long userId);
 
     ProjectEntity getProject(Long id);
 
-    ProjectEntity getProjectByOwnerId(Long id, Long ownerId);
+    ProjectEntity getProjectForUser(Long id, Long userId);
 
     void editProject(Long id, ProjectEntity project);
 
