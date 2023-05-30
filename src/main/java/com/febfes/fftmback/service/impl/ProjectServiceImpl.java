@@ -156,7 +156,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void addNewMembers(Long projectId, List<Long> memberIds, Long ownerId) {
+    public List<UserEntity> addNewMembers(Long projectId, List<Long> memberIds, Long ownerId) {
         ProjectEntity project = getProject(projectId);
         if (!Objects.equals(project.getOwnerId(), ownerId)) {
             throw new ProjectOwnerException(project.getOwnerId());
@@ -164,16 +164,19 @@ public class ProjectServiceImpl implements ProjectService {
         if (memberIds.contains(ownerId)) {
             throw new ProjectOwnerException();
         }
+        List<UserEntity> addedMembers = new ArrayList<>();
         memberIds.forEach(memberId -> {
             UserEntity member = userService.getUserById(memberId);
             project.addMember(member);
+            addedMembers.add(member);
         });
         projectRepository.save(project);
         log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
+        return addedMembers;
     }
 
     @Override
-    public void removeMember(Long projectId, Long memberId, Long ownerId) {
+    public UserEntity removeMember(Long projectId, Long memberId, Long ownerId) {
         ProjectEntity project = getProject(projectId);
         if (!Objects.equals(project.getOwnerId(), ownerId)) {
             throw new ProjectOwnerException(project.getOwnerId());
@@ -181,6 +184,7 @@ public class ProjectServiceImpl implements ProjectService {
         project.removeMember(memberId);
         projectRepository.save(project);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
+        return userService.getUserById(memberId);
     }
 
     private Set<Long> getFavouriteProjectsForUser(Long userId) {

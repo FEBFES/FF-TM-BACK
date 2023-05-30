@@ -41,9 +41,7 @@ public class UserController {
 
     @Operation(summary = "Get users with filter")
     @ApiGet()
-    public List<UserDto> getTasks(
-            @RequestParam(value = "filter") @FilterParam String filter
-    ) {
+    public List<UserDto> getUsersWithFilter(@RequestParam(value = "filter") @FilterParam String filter) {
         return userService.getUsersByFilter(filter).stream()
                 .map(UserMapper.INSTANCE::userToUserDto)
                 .collect(Collectors.toList());

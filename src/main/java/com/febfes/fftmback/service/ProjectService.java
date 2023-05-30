@@ -1,6 +1,7 @@
 package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.PatchDto;
 
@@ -27,7 +28,7 @@ public interface ProjectService {
 
     void removeProjectFromFavourite(Long projectId, Long userId);
 
-    void addNewMembers(Long projectId, List<Long> memberIds, Long ownerId);
+    List<UserEntity> addNewMembers(Long projectId, List<Long> memberIds, Long ownerId);
 
-    void removeMember(Long projectId, Long memberId, Long ownerId);
+    UserEntity removeMember(Long projectId, Long memberId, Long ownerId);
 }
