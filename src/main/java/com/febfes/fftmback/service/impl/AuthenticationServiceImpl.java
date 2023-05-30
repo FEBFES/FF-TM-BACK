@@ -7,7 +7,7 @@ import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.common.Role;
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.dto.auth.TokenDto;
+import com.febfes.fftmback.dto.auth.GetAuthDto;
 import com.febfes.fftmback.exception.EntityAlreadyExistsException;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.TokenExpiredException;
@@ -35,6 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
+
     private final RandomStringGenerator generator = new RandomStringGenerator
             .Builder()
             .selectFrom('0', '9')
@@ -57,7 +58,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public TokenDto authenticateUser(UserEntity user) {
+    public GetAuthDto authenticateUser(UserEntity user) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getUsername(),
@@ -66,25 +67,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
         UserEntity receivedUser = userRepository.findByUsername(user.getUsername())
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, "username", user.getUsername()));
+        Long userId = receivedUser.getId();
 
         String jwtToken = jwtService.generateToken(receivedUser);
 
+        GetAuthDto.GetAuthDtoBuilder getAuthDto = GetAuthDto.builder()
+                .accessToken(jwtToken)
+                .userId(userId);
         try {
-            RefreshTokenEntity existedRefreshToken = refreshTokenService.getByUserId(receivedUser.getId());
+            RefreshTokenEntity existedRefreshToken = refreshTokenService.getByUserId(userId);
             if (DateUtils.isDateBeforeCurrentDate(existedRefreshToken.getExpiryDate())) {
                 RefreshTokenEntity updatedRefreshToken = refreshTokenService.updateRefreshToken(existedRefreshToken);
-                log.info("User with id={} authenticated with updated refresh token", receivedUser.getId());
-                return new TokenDto(jwtToken, updatedRefreshToken.getToken());
+                log.info("User with id={} authenticated with updated refresh token", userId);
+                return getAuthDto.refreshToken(updatedRefreshToken.getToken()).build();
             }
-            log.info("User with id={} authenticated with existed non expired refresh token", receivedUser.getId());
-            return new TokenDto(jwtToken, existedRefreshToken.getToken());
+            log.info("User with id={} authenticated with existed non expired refresh token", userId);
+            return getAuthDto.refreshToken(existedRefreshToken.getToken()).build();
         } catch (EntityNotFoundException ignored) {
-            log.info("There is no refresh token in db for user with id={}", receivedUser.getId());
+            log.info("There is no refresh token in db for user with id={}", userId);
         }
 
-        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(receivedUser.getId());
-        log.info("User with id={} authenticated", user.getId());
-        return new TokenDto(jwtToken, refreshToken.getToken());
+        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(userId);
+        log.info("User with id={} authenticated", userId);
+        return getAuthDto.refreshToken(refreshToken.getToken()).build();
     }
 
     @Override

@@ -2,8 +2,8 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.dto.auth.AccessTokenDto;
+import com.febfes.fftmback.dto.auth.GetAuthDto;
 import com.febfes.fftmback.dto.auth.RefreshTokenDto;
-import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import com.febfes.fftmback.service.RefreshTokenService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -72,20 +72,20 @@ public class AuthenticationControllerTest extends BasicTestClass {
                 .body(userDetailsDto)
                 .when()
                 .post("%s/authenticate".formatted(PATH_TO_AUTH_API));
-        TokenDto refreshTokenDto = response.then()
+        GetAuthDto authDto = response.then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
                 .response()
-                .as(TokenDto.class);
+                .as(GetAuthDto.class);
 
-        RefreshTokenEntity refreshToken = refreshTokenService.getByToken(refreshTokenDto.refreshToken());
+        RefreshTokenEntity refreshToken = refreshTokenService.getByToken(authDto.refreshToken());
         Assertions.assertNotNull(refreshToken);
     }
 
     @Test
     void successfulRefreshTokenTest() {
-        TokenDto refreshTokenDto = getRefreshTokenDto();
-        RefreshTokenDto tokenDto = new RefreshTokenDto(refreshTokenDto.refreshToken());
+        GetAuthDto authDto = getRefreshTokenDto();
+        RefreshTokenDto tokenDto = new RefreshTokenDto(authDto.refreshToken());
         given()
                 .contentType(ContentType.JSON)
                 .body(tokenDto)
@@ -97,8 +97,8 @@ public class AuthenticationControllerTest extends BasicTestClass {
 
     @Test
     void successfulCheckTokenExpirationTest() {
-        TokenDto refreshTokenDto = getRefreshTokenDto();
-        AccessTokenDto accessTokenDto = new AccessTokenDto(refreshTokenDto.accessToken());
+        GetAuthDto authDto = getRefreshTokenDto();
+        AccessTokenDto accessTokenDto = new AccessTokenDto(authDto.accessToken());
         given()
                 .contentType(ContentType.JSON)
                 .body(accessTokenDto)
@@ -116,7 +116,7 @@ public class AuthenticationControllerTest extends BasicTestClass {
                 .post("%s/register".formatted(PATH_TO_AUTH_API));
     }
 
-    private TokenDto getRefreshTokenDto() {
+    private GetAuthDto getRefreshTokenDto() {
         UserDetailsDto userDetailsDto = new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD);
 
         registerUser(userDetailsDto)
@@ -132,6 +132,6 @@ public class AuthenticationControllerTest extends BasicTestClass {
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
                 .response()
-                .as(TokenDto.class);
+                .as(GetAuthDto.class);
     }
 }
