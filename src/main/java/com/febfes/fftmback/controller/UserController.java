@@ -29,7 +29,7 @@ public class UserController {
     @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public UserDto getUser(@PathVariable Long id) {
-        return UserMapper.INSTANCE.userToUserDto(userService.getUserById(id));
+        return UserMapper.INSTANCE.userViewToUserDto(userService.getUserViewById(id));
     }
 
     @Operation(summary = "Edit user by its id")

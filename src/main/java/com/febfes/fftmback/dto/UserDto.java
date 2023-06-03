@@ -15,6 +15,8 @@ public record UserDto(
 
         String lastName,
 
-        String displayName
+        String displayName,
+
+        String userPic
 ) {
 }
