@@ -4,6 +4,7 @@ import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
+import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.TaskShortDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
@@ -64,7 +65,7 @@ public class TaskController {
     @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
     public TaskShortDto createTask(
             @ParameterObject ColumnParameters pathVars,
-            @RequestBody @Valid TaskDto taskDto
+            @RequestBody @Valid EditTaskDto taskDto
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         TaskView task = taskService.createTask(
@@ -78,9 +79,9 @@ public class TaskController {
     @ApiEdit(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
     public TaskShortDto updateTask(
             @ParameterObject TaskParameters pathVars,
-            @RequestBody TaskDto taskDto
+            @RequestBody EditTaskDto editTaskDto
     ) {
-        TaskView task = taskService.updateTask(pathVars.taskId(), pathVars.projectId(), pathVars.columnId(), taskDto);
+        TaskView task = taskService.updateTask(pathVars.taskId(), pathVars.projectId(), pathVars.columnId(), editTaskDto);
         return TaskMapper.INSTANCE.taskViewToTaskShortDto(task);
     }
 

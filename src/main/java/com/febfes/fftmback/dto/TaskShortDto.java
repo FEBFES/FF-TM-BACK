@@ -10,11 +10,11 @@ public record TaskShortDto(
         String description,
         Long columnId,
         Long projectId,
-        Long ownerId,
         Date createDate,
         TaskPriority priority,
         String type,
-        String ownerUserPic,
-        Long filesCounter
+        Long filesCounter,
+        UserDto owner,
+        UserDto assignee
 ) {
 }

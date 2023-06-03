@@ -35,6 +35,9 @@ public class TaskEntity extends BaseEntity {
     @Column(name = "owner_id")
     private Long ownerId;
 
+    @Column(name = "assignee_id")
+    private Long assigneeId;
+
     @Column(name = "priority")
     @Enumerated(EnumType.STRING)
     private TaskPriority priority;

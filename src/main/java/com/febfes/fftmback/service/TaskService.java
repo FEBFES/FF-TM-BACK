@@ -3,7 +3,7 @@ package com.febfes.fftmback.service;
 import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
-import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.dto.EditTaskDto;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface TaskService {
 
     TaskView createTask(TaskEntity task, String username);
 
-    TaskView updateTask(Long id, Long projectId, Long columnId, TaskDto taskDto);
+    TaskView updateTask(Long id, Long projectId, Long columnId, EditTaskDto editTaskDto);
 
     void deleteTask(Long id);
 
