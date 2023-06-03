@@ -17,6 +17,7 @@ public record UserDto(
 
         String displayName,
 
+        @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         String userPic
 ) {
 }
