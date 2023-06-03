@@ -48,23 +48,14 @@ Swagger is available at: http://localhost:8090/api/swagger-ui/index.html#/
 
 ### Adding new migrations
 
-1. Create new .yaml file in [changelog](src%2Fmain%2Fresources%2Fdb%2Fchangelog).
-   File name {version of migration} - {short description}
+Create new .yaml file in [changelog](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fchanges)
 
-For example: last migration has num 0.1.2 and our migrations add new table Person
--> 0.1.3-addPersonTable.yaml
+#### New migrations naming 
 
-2. Add created file in the end
-   of [db.changelog-master.yaml](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fdb.changelog-master.yaml)
+The migration name is generated like this: `<year>.<month>.<sequence_number>-<short_description>.yaml`
 
-```
-databaseChangeLog:
-    ...
-    - include:
-        file: /db/changelog/0.1.2-someAction.yaml
-    - include:
-        file: /db/changelog/0.1.3-addPersonTable.yaml
-```
+Example: 2023.03.01-create-task-table.yaml. Year and month of creation are 2023 and 3 (March). Sequence number is 1, because it's the first migration in march. Short description: created new table for tasks.
+
 
 ### Rollback migrations
 

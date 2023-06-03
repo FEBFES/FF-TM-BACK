@@ -95,7 +95,7 @@ class UserControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulLoadUserPic() {
+    void successfulLoadUserPicTest() {
         Long userId = userService.getUserIdByUsername(createdUsername);
         File imageFile = new File("src/test/resources/image.jpg");
         requestWithBearerToken()
@@ -107,7 +107,7 @@ class UserControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulGetUserPic() {
+    void successfulGetUserPicTest() {
         Long userId = userService.getUserIdByUsername(createdUsername);
         MultipartFile file = new MockMultipartFile("image.jpg", "image", "jpg", new byte[]{1});
         fileService.saveFile(userId, userId, EntityType.USER_PIC, file);
@@ -143,6 +143,22 @@ class UserControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
+    @Test
+    void successfulGetUserPicFromUserInfoTest() {
+        successfulLoadUserPicTest();
+        Long userId = userService.getUserIdByUsername(createdUsername);
+        UserDto userDto = requestWithBearerToken()
+                .when()
+                .get("%s/{id}".formatted(PATH_TO_USERS_API), userId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(UserDto.class);
+        Assertions.assertNotNull(userDto.userPic());
+        Assertions.assertEquals("/files/user-pic/%d".formatted(userId), userDto.userPic());
+    }
+
 
     private RequestSpecification requestWithBearerToken() {
         return given().header("Authorization", "Bearer " + token);

@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.febfes.fftmback.domain.common.query.FilterRequest;
 import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.UserRepository;
+import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.JsonUtils;
 import lombok.NonNull;
@@ -24,6 +26,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserViewRepository userViewRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -43,6 +46,14 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id));
         log.info("Received user {} by id={}", userEntity, id);
         return userEntity;
+    }
+
+    @Override
+    public UserView getUserViewById(Long id) {
+        UserView user = userViewRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id));
+        log.info("Received user {} by id={}", user, id);
+        return user;
     }
 
     @Override
