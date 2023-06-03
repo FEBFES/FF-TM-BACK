@@ -3,12 +3,14 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
+import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.UserService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -91,7 +93,7 @@ class UserControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulLoadUserPic() {
+    void successfulLoadUserPicTest() {
         Long userId = userService.getUserIdByUsername(createdUsername);
         File imageFile = new File("src/test/resources/image.jpg");
         requestWithBearerToken()
@@ -103,7 +105,7 @@ class UserControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulGetUserPic() {
+    void successfulGetUserPicTest() {
         Long userId = userService.getUserIdByUsername(createdUsername);
         MultipartFile file = new MockMultipartFile("image.jpg", "image", "jpg", new byte[]{1});
         fileService.saveFile(userId, userId, EntityType.USER_PIC, file);
@@ -112,6 +114,22 @@ class UserControllerTest extends BasicTestClass {
                 .get("/api/v1/files/user-pic/{userId}", userId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
+    }
+
+    @Test
+    void successfulGetUserPicFromUserInfoTest() {
+        successfulLoadUserPicTest();
+        Long userId = userService.getUserIdByUsername(createdUsername);
+        UserDto userDto = requestWithBearerToken()
+                .when()
+                .get("%s/{id}".formatted(PATH_TO_USERS_API), userId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(UserDto.class);
+        Assertions.assertNotNull(userDto.userPic());
+        Assertions.assertEquals("/files/user-pic/%d".formatted(userId), userDto.userPic());
     }
 
 
