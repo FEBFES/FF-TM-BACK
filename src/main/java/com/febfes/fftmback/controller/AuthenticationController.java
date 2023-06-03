@@ -35,7 +35,7 @@ public class AuthenticationController {
     @Operation(summary = "User authentication using username and password")
     @ApiCreate(path = "authenticate")
     @ApiResponse(responseCode = "404", description = "User not found by username", content = @Content)
-    public TokenDto authenticate(@RequestBody @Valid AuthenticationDto authenticationDto) {
+    public GetAuthDto authenticate(@RequestBody @Valid AuthenticationDto authenticationDto) {
         return authenticationService.authenticateUser(UserMapper.INSTANCE.authenticationDtoToUser(authenticationDto));
     }
 
