@@ -118,7 +118,8 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfColumnTest() {
-        ColumnDto columnDto = dtoBuilders.createColumnDto();
+        ColumnDto columnDto = ColumnDto.builder()
+                .build();
 
         createNewColumn(columnDto)
                 .then()

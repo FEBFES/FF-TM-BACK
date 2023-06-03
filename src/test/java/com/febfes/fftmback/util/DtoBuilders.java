@@ -11,38 +11,51 @@ import org.springframework.stereotype.Service;
 @Profile("test")
 public class DtoBuilders {
     public ProjectDto createProjectDto(String name) {
-        return new ProjectDto(null, name, null, null, null, null);
+        return ProjectDto.builder()
+                .name(name)
+                .build();
     }
 
     public ProjectDto createProjectDto(String name, String description) {
-        return new ProjectDto(null, name, description, null, null, null);
-    }
-
-    public ColumnDto createColumnDto() {
-        return new ColumnDto(null, null, null, null, null, null);
+        return ProjectDto.builder()
+                .name(name)
+                .description(description)
+                .build();
     }
 
     public ColumnDto createColumnDto(String name) {
-        return new ColumnDto(null, name, null, null, null, null);
+        return ColumnDto.builder()
+                .name(name)
+                .build();
     }
 
     public ColumnDto createColumnDto(String name, Long childTaskColumnId) {
-        return new ColumnDto(null, name, null, null, null, childTaskColumnId);
-    }
-
-    public TaskDto createTaskDto() {
-        return new TaskDto(null, null, null, null, null, null, null, null, null, 0L, null);
+        return ColumnDto.builder()
+                .name(name)
+                .childTaskColumnId(childTaskColumnId)
+                .build();
     }
 
     public TaskDto createTaskDto(String name) {
-        return new TaskDto(null, name, null, null, null, null, null, null, null, 0L, null);
+        return TaskDto.builder()
+                .name(name)
+                .filesCounter(0L)
+                .build();
     }
 
     public TaskDto createTaskDtoWithType(String name, String type) {
-        return new TaskDto(null, name, null, null, null, null, null, null, type, 0L, null);
+        return TaskDto.builder()
+                .name(name)
+                .type(type)
+                .filesCounter(0L)
+                .build();
     }
 
     public TaskDto createTaskDtoWithPriority(String name, String priority) {
-        return new TaskDto(null, name, null, null, null, null, null, TaskPriority.valueOf(priority.toUpperCase()), null, 0L, null);
+        return TaskDto.builder()
+                .name(name)
+                .filesCounter(0L)
+                .priority(TaskPriority.valueOf(priority.toUpperCase()))
+                .build();
     }
 }

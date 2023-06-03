@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(uses = FileMapper.class)
+@Mapper(uses = {FileMapper.class, UserMapper.class})
 public interface TaskMapper {
 
     TaskMapper INSTANCE = Mappers.getMapper(TaskMapper.class);

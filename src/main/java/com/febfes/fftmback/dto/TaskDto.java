@@ -1,10 +1,12 @@
 package com.febfes.fftmback.dto;
 
 import com.febfes.fftmback.domain.common.TaskPriority;
+import lombok.Builder;
 
 import java.util.Date;
 import java.util.List;
 
+@Builder
 public record TaskDto(
 
         Long id,
