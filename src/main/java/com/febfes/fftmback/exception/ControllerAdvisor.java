@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -55,7 +54,7 @@ public class ControllerAdvisor {
     ) {
         List<String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
-                .collect(Collectors.toList());
+                .toList();
         ex.printStackTrace();
         return createResponseBodyForExceptions(HttpStatus.UNPROCESSABLE_ENTITY, MethodArgumentNotValidException.class.getSimpleName(),
                 errors.toString(), httpRequest.getRequestURI());
@@ -82,6 +81,18 @@ public class ControllerAdvisor {
     ) {
         ex.printStackTrace();
         return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, TokenExpiredException.class.getSimpleName(),
+                ex.getMessage(), httpRequest.getRequestURI());
+    }
+
+    @ExceptionHandler(ProjectOwnerException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @Hidden
+    public ApiErrorDto handleProjectOwnerException(
+            ProjectOwnerException ex,
+            HttpServletRequest httpRequest
+    ) {
+        ex.printStackTrace();
+        return createResponseBodyForExceptions(HttpStatus.CONFLICT, ProjectOwnerException.class.getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 

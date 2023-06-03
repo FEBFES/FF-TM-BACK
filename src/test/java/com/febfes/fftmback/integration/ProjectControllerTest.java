@@ -12,10 +12,14 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import lombok.NonNull;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
@@ -44,6 +48,9 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Autowired
     private DtoBuilders dtoBuilders;
+
+    @Autowired
+    private TransactionTemplate txTemplate;
 
     @BeforeEach
     void beforeEach() {
@@ -187,7 +194,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProjectByOwnerId(createdProjectId, createdUserId);
+        ProjectEntity updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.getIsFavourite())
                 .isTrue();
     }
@@ -204,7 +211,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProjectByOwnerId(createdProjectId, createdUserId);
+        ProjectEntity updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.getIsFavourite())
                 .isFalse();
     }
@@ -226,10 +233,98 @@ class ProjectControllerTest extends BasicTestClass {
                 .isEqualTo(PROJECT_NAME);
     }
 
+    @Test
+    void successfulAddNewMembersTest() {
+        Long secondCreatedUserId = createNewUser(USER_EMAIL + "1", USER_USERNAME + "1");
+        Long thirdCreatedUserId = createNewUser(USER_EMAIL + "2", USER_USERNAME + "2");
+        Long createdProjectId = createNewProject(PROJECT_NAME + "new_members_test");
+        List<Long> memberIds = List.of(secondCreatedUserId, thirdCreatedUserId);
+
+        requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .body(memberIds)
+                .when()
+                .post("%s/{id}/members".formatted(PATH_TO_PROJECTS_API), createdProjectId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+        // it's to avoid org.hibernate.LazyInitializationException
+        txTemplate.execute(new TransactionCallbackWithoutResult() {
+
+            @Override
+            protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
+                ProjectEntity updatedProject = projectService.getProject(createdProjectId);
+                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(2);
+                UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
+                Assertions.assertThat(secondAddedMember.getProjects().size()).isEqualTo(1);
+                UserEntity thirdAddedMember = userService.getUserById(thirdCreatedUserId);
+                Assertions.assertThat(thirdAddedMember.getProjects().size()).isEqualTo(1);
+            }
+        });
+    }
+
+    @Test
+    void successfulRemoveMemberTest() {
+        successfulAddNewMembersTest();
+        Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
+        Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).getId();
+        requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .when()
+                .delete("%s/{id}/members/{memberId}".formatted(PATH_TO_PROJECTS_API), createdProjectId, secondCreatedUserId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+        // it's to avoid org.hibernate.LazyInitializationException
+        txTemplate.execute(new TransactionCallbackWithoutResult() {
+
+            @Override
+            protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
+                ProjectEntity updatedProject = projectService.getProject(createdProjectId);
+                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(1);
+                UserEntity updatedSecondAddedMember = userService.getUserById(secondCreatedUserId);
+                Assertions.assertThat(updatedSecondAddedMember.getProjects().size()).isZero();
+            }
+        });
+    }
+
+    @Test
+    void successfulGetUserProjectsTest() {
+        successfulAddNewMembersTest();
+        Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
+        projectService.createProject(
+                ProjectEntity.builder().name(PROJECT_NAME + "1").build(),
+                userService.getUserById(secondCreatedUserId).getUsername()
+        );
+
+        String tokenForSecondUser = authenticationService.authenticateUser(
+                UserEntity.builder().username(USER_USERNAME + "1").encryptedPassword(USER_PASSWORD).build()
+        ).accessToken();
+        Response response = given().header("Authorization", "Bearer " + tokenForSecondUser)
+                .contentType(ContentType.JSON)
+                .when()
+                .get(PATH_TO_PROJECTS_API);
+        response.then()
+                .statusCode(HttpStatus.SC_OK);
+
+        int size = response
+                .jsonPath()
+                .getInt("data.size()");
+        Assertions.assertThat(size)
+                .isEqualTo(2);
+    }
+
     private Long createNewProject(String projectName) {
         ProjectDto createProjectDto = dtoBuilders.createProjectDto(projectName);
         Response createResponse = createNewProject(createProjectDto);
         return createResponse.jsonPath().getLong("id");
+    }
+
+    private Long createNewUser(String email, String username) {
+        authenticationService.registerUser(
+                UserEntity.builder().email(email).username(username).encryptedPassword(USER_PASSWORD).build()
+        );
+        return userService.getUserIdByUsername(username);
     }
 
     private Response createNewProject(ProjectDto projectDto) {

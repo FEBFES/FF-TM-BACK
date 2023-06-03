@@ -9,6 +9,7 @@ import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.UserService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
+import io.restassured.mapper.TypeRef;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.List;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static io.restassured.RestAssured.given;
@@ -116,6 +118,31 @@ class UserControllerTest extends BasicTestClass {
                 .statusCode(HttpStatus.SC_OK);
     }
 
+    @Test
+    void successfulGetUsersWithFilterTest() {
+        List<UserDto> users = requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .params("filter", "[{\"property\":\"displayName\",\"operator\":\"LIKE\",\"value\":\"user\"}]")
+                .when()
+                .get(PATH_TO_USERS_API)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(new TypeRef<>() {
+                });
+        Assertions.assertEquals(1, users.size());
+    }
+
+    @Test
+    void getUsersWithNullFilterTest() {
+        requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .when()
+                .get(PATH_TO_USERS_API)
+                .then()
+                .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+    }
     @Test
     void successfulGetUserPicFromUserInfoTest() {
         successfulLoadUserPicTest();

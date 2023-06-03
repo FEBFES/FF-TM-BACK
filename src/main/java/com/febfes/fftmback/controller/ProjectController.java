@@ -6,20 +6,21 @@ import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
+import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class ProjectController {
     public List<ProjectDto> getProjectsForUser() {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = user.getId();
-        return projectService.getProjectsByOwnerId(userId).stream()
+        return projectService.getProjectsForUser(userId).stream()
                 .map(ProjectMapper.INSTANCE::projectToProjectDto)
                 .toList();
     }
@@ -59,7 +60,7 @@ public class ProjectController {
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public ProjectDto getProject(@PathVariable Long id) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProjectByOwnerId(id, user.getId()));
+        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProjectForUser(id, user.getId()));
     }
 
     @Operation(summary = "Edit project by its id")
@@ -95,5 +96,27 @@ public class ProjectController {
                 .stream()
                 .map(TaskTypeEntity::getName)
                 .collect(Collectors.toList());
+    }
+
+    @Operation(summary = "Add new members to the project")
+    @PostMapping(path = "{id}/members")
+    @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
+    public List<UserDto> addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<UserEntity> addedMembers = projectService.addNewMembers(id, memberIds, user.getId());
+        return addedMembers.stream()
+                .map(UserMapper.INSTANCE::userToUserDto)
+                .collect(Collectors.toList());
+    }
+
+    @Operation(summary = "Delete member from project")
+    @DeleteMapping(path = "{id}/members/{memberId}")
+    @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
+    public UserDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity removedMember = projectService.removeMember(id, memberId, user.getId());
+        return UserMapper.INSTANCE.userToUserDto(removedMember);
     }
 }

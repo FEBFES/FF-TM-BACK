@@ -80,7 +80,7 @@ public record FilterSpecification<T>(
 
     private boolean canParseToDate(Object value) {
         try {
-            LocalDateTime.parse((String) value, FORMATTER);
+            LocalDateTime ignored = LocalDateTime.parse((String) value, FORMATTER);
             return true;
         } catch (Exception ignored) {
         }

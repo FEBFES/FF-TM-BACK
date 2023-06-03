@@ -10,7 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "user_entity")
@@ -59,6 +61,17 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @JoinColumn(name = "owner_id")
     @ToString.Exclude
     private List<ProjectEntity> projectEntityList;
+
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            })
+    @JoinTable(name = "user_project",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "project_id")})
+    @ToString.Exclude
+    private Set<ProjectEntity> projects = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
