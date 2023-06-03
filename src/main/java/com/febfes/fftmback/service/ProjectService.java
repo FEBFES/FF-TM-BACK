@@ -28,7 +28,9 @@ public interface ProjectService {
 
     void removeProjectFromFavourite(Long projectId, Long userId);
 
-    List<UserEntity> addNewMembers(Long projectId, List<Long> memberIds, Long ownerId);
+    void projectOwnerCheck(Long projectId, Long ownerId);
 
-    UserEntity removeMember(Long projectId, Long memberId, Long ownerId);
+    List<UserEntity> addNewMembers(Long projectId, List<Long> memberIds);
+
+    UserEntity removeMember(Long projectId, Long memberId);
 }
