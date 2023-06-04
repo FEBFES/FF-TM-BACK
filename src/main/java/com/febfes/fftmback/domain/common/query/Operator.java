@@ -128,15 +128,4 @@ public enum Operator {
     Operator(List<Class<?>> possibleClasses) {
         this.possibleClasses = possibleClasses;
     }
-
-//    private static Path<?> getPathToView(
-//            Root<?> root,
-//            CriteriaBuilder cb,
-//            FilterRequest request,
-//            Predicate predicate
-//    ) {
-//        Class<?> clazz = request.getValue().getClass();
-//        Path<?> path = root.get(request.getProperty());
-//        return
-//    }
 }
