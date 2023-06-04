@@ -254,7 +254,8 @@ class ProjectControllerTest extends BasicTestClass {
             @Override
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
                 ProjectEntity updatedProject = projectService.getProject(createdProjectId);
-                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(2);
+                // as owner is also a member
+                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(3);
                 UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
                 Assertions.assertThat(secondAddedMember.getProjects().size()).isEqualTo(1);
                 UserEntity thirdAddedMember = userService.getUserById(thirdCreatedUserId);
@@ -281,7 +282,7 @@ class ProjectControllerTest extends BasicTestClass {
             @Override
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
                 ProjectEntity updatedProject = projectService.getProject(createdProjectId);
-                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(1);
+                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(2);
                 UserEntity updatedSecondAddedMember = userService.getUserById(secondCreatedUserId);
                 Assertions.assertThat(updatedSecondAddedMember.getProjects().size()).isZero();
             }

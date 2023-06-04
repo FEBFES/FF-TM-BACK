@@ -8,14 +8,17 @@ import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 
-public class UserFilterTest extends BasicTestClass {
+public class UserFilterTest extends BasicStaticDataTestClass {
 
     public static final String USER_DISPLAY_NAME = "test_display_name";
 
@@ -38,25 +41,23 @@ public class UserFilterTest extends BasicTestClass {
                 .encryptedPassword(USER_PASSWORD).displayName("something").build());
     }
 
-    @Test
-    void displayNameLikeFilterTest() {
-        List<FilterRequest> filters1st = getFilterListForLikeDisplayName(USER_DISPLAY_NAME);
-        Assertions.assertEquals(3, userRepository.findAll(new FilterSpecification<>(filters1st)).size());
-
-        List<FilterRequest> filters2nd = getFilterListForLikeDisplayName("123");
-        Assertions.assertEquals(1, userRepository.findAll(new FilterSpecification<>(filters2nd)).size());
-
-        List<FilterRequest> filters3rd = getFilterListForLikeDisplayName("456");
-        Assertions.assertEquals(1, userRepository.findAll(new FilterSpecification<>(filters3rd)).size());
-
-        List<FilterRequest> filters4th = getFilterListForLikeDisplayName("12");
-        Assertions.assertEquals(2, userRepository.findAll(new FilterSpecification<>(filters4th)).size());
-
-        List<FilterRequest> filters5th = getFilterListForLikeDisplayName("56");
-        Assertions.assertEquals(2, userRepository.findAll(new FilterSpecification<>(filters5th)).size());
+    @ParameterizedTest
+    @MethodSource("displayNameLikeFilterData")
+    void displayNameLikeFilterTest(List<FilterRequest> filters, int expected) {
+        Assertions.assertEquals(expected, userRepository.findAll(new FilterSpecification<>(filters)).size());
     }
 
-    private List<FilterRequest> getFilterListForLikeDisplayName(String value) {
+    static Stream<Arguments> displayNameLikeFilterData() {
+        return Stream.of(
+                Arguments.of(getFilterListForLikeDisplayName(USER_DISPLAY_NAME), 3),
+                Arguments.of(getFilterListForLikeDisplayName("123"), 1),
+                Arguments.of(getFilterListForLikeDisplayName("456"), 1),
+                Arguments.of(getFilterListForLikeDisplayName("12"), 2),
+                Arguments.of(getFilterListForLikeDisplayName("56"), 2)
+        );
+    }
+
+    private static List<FilterRequest> getFilterListForLikeDisplayName(String value) {
         return List.of(
                 FilterRequest.builder()
                         .property("displayName")

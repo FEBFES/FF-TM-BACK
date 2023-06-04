@@ -104,7 +104,8 @@ public class ProjectController {
     @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
     public List<UserDto> addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<UserEntity> addedMembers = projectService.addNewMembers(id, memberIds, user.getId());
+        memberIds.forEach(memberId -> projectService.projectOwnerCheck(id, user.getId()));
+        List<UserEntity> addedMembers = projectService.addNewMembers(id, memberIds);
         return addedMembers.stream()
                 .map(UserMapper.INSTANCE::userToUserDto)
                 .collect(Collectors.toList());
@@ -113,10 +114,11 @@ public class ProjectController {
     @Operation(summary = "Delete member from project")
     @DeleteMapping(path = "{id}/members/{memberId}")
     @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
-    @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Only owner can remove a member", content = @Content)
     public UserDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity removedMember = projectService.removeMember(id, memberId, user.getId());
+        projectService.projectOwnerCheck(id, user.getId());
+        UserEntity removedMember = projectService.removeMember(id, memberId);
         return UserMapper.INSTANCE.userToUserDto(removedMember);
     }
 }
