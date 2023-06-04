@@ -1,10 +1,8 @@
 package com.febfes.fftmback.domain.common.query;
 
+import com.febfes.fftmback.domain.dao.BaseView;
 import com.febfes.fftmback.util.DateUtils;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
@@ -15,7 +13,7 @@ import java.util.List;
 @Slf4j
 public enum Operator {
 
-    EQUAL(List.of(Boolean.class, Date.class, Number.class, String.class)) {
+    EQUAL(List.of(Boolean.class, Date.class, Number.class, String.class, BaseView.class)) {
         /*
         Example: SELECT * FROM table WHERE field = ?
          */
@@ -31,7 +29,7 @@ public enum Operator {
         }
     },
 
-    NOT_EQUAL(List.of(Boolean.class, Date.class, Number.class, String.class)) {
+    NOT_EQUAL(List.of(Boolean.class, Date.class, Number.class, String.class, BaseView.class)) {
         /*
         Example: SELECT * FROM table WHERE field != ?
          */
@@ -41,6 +39,10 @@ public enum Operator {
                 FilterRequest request,
                 Predicate predicate
         ) {
+            if (request.getFieldType().equals(FieldType.BASEVIEW)) {
+                Path<?> path = root.get(request.getProperty());
+                return cb.and(cb.notEqual(path.get("id"), ((BaseView) request.getValue()).getId()));
+            }
             Object value = request.getFieldType().parse(request.getValue().toString());
             Expression<?> property = root.get(request.getProperty());
             return cb.and(cb.notEqual(property, value), predicate);

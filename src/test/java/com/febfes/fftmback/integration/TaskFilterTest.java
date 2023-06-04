@@ -7,6 +7,7 @@ import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.exception.NoSuitableTypeFilterException;
 import com.febfes.fftmback.exception.ValueFilterException;
 import com.febfes.fftmback.repository.TaskViewRepository;
@@ -186,9 +187,9 @@ class TaskFilterTest extends BasicStaticDataTestClass {
 
         List<FilterRequest> filtersOwnerId = List.of(
                 FilterRequest.builder()
-                        .property("ownerId")
+                        .property("owner")
                         .operator(Operator.NOT_EQUAL)
-                        .value(1)
+                        .value(UserView.builder().id(1L).build())
                         .build()
         );
         Assertions.assertEquals(2, taskViewRepository.findAll(new FilterSpecification<>(filtersOwnerId)).size());
@@ -208,7 +209,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
         // it will fail as LIKE operator only accept strings
         List<FilterRequest> filtersFailed = List.of(
                 FilterRequest.builder()
-                        .property("ownerId")
+                        .property("owner")
                         .operator(Operator.LIKE)
                         .value(1)
                         .build()

@@ -7,7 +7,7 @@ import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
-import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.repository.TaskViewRepository;
@@ -87,16 +87,17 @@ public class TaskServiceImpl implements TaskService {
             Long id,
             Long projectId,
             Long columnId,
-            TaskDto taskDto
+            EditTaskDto editTaskDto
     ) {
         TaskEntity task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
-        task.setName(taskDto.name());
-        task.setDescription(taskDto.description());
+        task.setName(editTaskDto.name());
+        task.setDescription(editTaskDto.description());
         task.setColumnId(columnId);
         task.setProjectId(projectId);
-        task.setPriority(taskDto.priority());
-        fillTaskType(task, taskDto.type(), projectId);
+        task.setPriority(editTaskDto.priority());
+        task.setAssigneeId(editTaskDto.assigneeId());
+        fillTaskType(task, editTaskDto.type(), projectId);
         taskRepository.save(task);
         log.info("Updated task: {}", task);
         return getTaskById(id);

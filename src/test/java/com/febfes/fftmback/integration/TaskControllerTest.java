@@ -3,7 +3,9 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.dao.*;
+import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.dto.TaskShortDto;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -49,6 +51,9 @@ class TaskControllerTest extends BasicTestClass {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -144,7 +149,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfTaskTest() {
-        TaskDto taskDto = dtoBuilders.createTaskDto();
+        TaskDto taskDto = TaskDto.builder().build();
 
         createNewTask(taskDto)
                 .then()
@@ -157,17 +162,30 @@ class TaskControllerTest extends BasicTestClass {
         Response createResponse = createNewTask(createTaskDto);
         long createdTaskId = createResponse.jsonPath().getLong("id");
 
+        authenticationService.registerUser(UserEntity.builder().email(USER_EMAIL + "1")
+                .username(USER_USERNAME + "1").encryptedPassword(USER_PASSWORD).build());
+        Long newUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
         String newTaskName = TASK_NAME + "edit";
-        TaskDto editTaskDto = dtoBuilders.createTaskDto(newTaskName);
+        EditTaskDto editTaskDto = new EditTaskDto(newTaskName, "newDescription", newUserId, TaskPriority.HIGH, "bug");
 
-        requestWithBearerToken()
+        TaskShortDto taskShortDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editTaskDto)
                 .when()
                 .put("%s/{projectId}/columns/{columnId}/tasks/{taskId}".formatted(PATH_TO_PROJECTS_API),
                         createdProjectId, createdColumnId, createdTaskId)
                 .then()
-                .statusCode(HttpStatus.SC_OK);
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(TaskShortDto.class);
+        Assertions.assertEquals(editTaskDto.name(), taskShortDto.name());
+        Assertions.assertEquals(editTaskDto.description(), taskShortDto.description());
+        Assertions.assertEquals(editTaskDto.assigneeId(), taskShortDto.assignee().id());
+        Assertions.assertEquals(USER_EMAIL + "1", taskShortDto.assignee().email());
+        Assertions.assertEquals(USER_USERNAME + "1", taskShortDto.assignee().username());
+        Assertions.assertEquals(editTaskDto.priority(), taskShortDto.priority());
+        Assertions.assertEquals(editTaskDto.type(), taskShortDto.type());
     }
 
     @Test
@@ -214,7 +232,7 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     @Test
-    void createTaskWithType() {
+    void createTaskWithTypeTest() {
         taskTypeService.createTaskType(TaskTypeEntity
                 .builder()
                 .name(TASK_TYPE)
@@ -229,7 +247,7 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     @Test
-    void createAndTaskWithPriority() {
+    void createTaskWithPriorityTest() {
         TaskDto taskDto = dtoBuilders.createTaskDtoWithPriority(TASK_NAME, TaskPriority.LOW.name().toLowerCase());
         createNewTask(taskDto)
                 .then()

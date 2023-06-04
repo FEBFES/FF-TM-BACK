@@ -2,9 +2,11 @@ package com.febfes.fftmback.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 
 import java.util.Date;
 
+@Builder
 public record ColumnDto(
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Long id,
@@ -23,7 +25,4 @@ public record ColumnDto(
 
         Long childTaskColumnId
 ) {
-        public ColumnDto(String name) {
-                this(null, name, null, null, null, null);
-        }
 }

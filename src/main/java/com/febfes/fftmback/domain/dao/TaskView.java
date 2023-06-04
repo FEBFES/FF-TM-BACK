@@ -28,8 +28,13 @@ public class TaskView extends BaseView {
     @Column(name = "\"columnId\"")
     private Long columnId;
 
-    @Column(name = "\"ownerId\"")
-    private Long ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "\"ownerId\"", referencedColumnName = "id")
+    private UserView owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "\"assigneeId\"", referencedColumnName = "id")
+    private UserView assignee;
 
     @Column(name = "\"priority\"", columnDefinition = "priority")
     @Enumerated(EnumType.STRING)
@@ -38,10 +43,6 @@ public class TaskView extends BaseView {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "\"taskTypeId\"", referencedColumnName = "id")
     private TaskTypeEntity taskType;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "\"ownerUserPicId\"", referencedColumnName = "id")
-    private FileEntity ownerUserPic;
 
     @Column(name = "\"filesCounter\"")
     private Long filesCounter;
