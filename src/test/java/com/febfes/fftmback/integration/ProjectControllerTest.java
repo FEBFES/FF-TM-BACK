@@ -197,6 +197,9 @@ class ProjectControllerTest extends BasicTestClass {
         ProjectEntity updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.getIsFavourite())
                 .isTrue();
+        List<ProjectEntity> userProjects = projectService.getProjectsForUser(createdUserId);
+        Assertions.assertThat(userProjects.get(0).getIsFavourite())
+                .isTrue();
     }
 
     @Test
@@ -213,6 +216,9 @@ class ProjectControllerTest extends BasicTestClass {
                 .statusCode(HttpStatus.SC_OK);
         ProjectEntity updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.getIsFavourite())
+                .isFalse();
+        List<ProjectEntity> userProjects = projectService.getProjectsForUser(createdUserId);
+        Assertions.assertThat(userProjects.get(0).getIsFavourite())
                 .isFalse();
     }
 

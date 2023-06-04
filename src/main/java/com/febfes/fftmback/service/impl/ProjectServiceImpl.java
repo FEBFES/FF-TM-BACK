@@ -23,7 +23,10 @@ import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -69,9 +72,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectEntity> getProjectsForUser(Long userId) {
         UserEntity user = userService.getUserById(userId);
-        Set<ProjectEntity> userProjects = user.getProjects();
+        List<ProjectEntity> userProjects = user.getProjects().stream()
+                .peek(project -> project.setIsFavourite(projectRepository.isProjectFavourite(project.getId(), userId)))
+                .collect(Collectors.toList());
         log.info("Received {} projects for user with id={}", userProjects.size(), userId);
-        return userProjects.stream().toList();
+        return userProjects;
     }
 
     @Override
@@ -181,10 +186,6 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.save(project);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
         return userService.getUserById(memberId);
-    }
-
-    private Set<Long> getFavouriteProjectsForUser(Long userId) {
-        return projectRepository.findAllFavouriteProjectIdsForUser(userId);
     }
 
     private void updateProjectField(
