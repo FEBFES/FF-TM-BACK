@@ -66,7 +66,7 @@ public class FileServiceImpl implements FileService {
     ) {
         String uuid = UUID.randomUUID().toString();
         // TODO: need some optimization (because we find in repository if it exists and only then we save)
-        FileEntity.FileEntityBuilder fileBuilder = FileEntity.builder()
+        FileEntity.FileEntityBuilder<?, ?> fileBuilder = FileEntity.builder()
                 .userId(userId)
                 .entityId(entityId)
                 .name(file.getOriginalFilename())

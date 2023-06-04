@@ -1,8 +1,6 @@
 package com.febfes.fftmback.controller;
 
-import com.febfes.fftmback.annotation.ApiEdit;
-import com.febfes.fftmback.annotation.ApiGetOne;
-import com.febfes.fftmback.annotation.ProtectedApi;
+import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.mapper.UserMapper;
@@ -11,10 +9,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("v1/users")
@@ -39,5 +37,13 @@ public class UserController {
             @RequestBody EditUserDto editUserDto
     ) {
         userService.updateUser(UserMapper.INSTANCE.editUserDtoToUser(editUserDto), id);
+    }
+
+    @Operation(summary = "Get users with filter")
+    @ApiGet()
+    public List<UserDto> getUsersWithFilter(@RequestParam(value = "filter") @FilterParam String filter) {
+        return userService.getUsersByFilter(filter).stream()
+                .map(UserMapper.INSTANCE::userToUserDto)
+                .collect(Collectors.toList());
     }
 }

@@ -14,9 +14,10 @@ import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.DatabaseCleanup;
 import com.febfes.fftmback.util.DateUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
@@ -28,7 +29,7 @@ import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME
 import static com.febfes.fftmback.integration.TaskControllerTest.TASK_NAME;
 import static com.febfes.fftmback.util.DateUtils.STANDARD_DATE_PATTERN;
 
-class TaskFilterTest extends BasicTestClass {
+class TaskFilterTest extends BasicStaticDataTestClass {
 
     @Autowired
     private TaskViewRepository taskViewRepository;
@@ -135,17 +136,6 @@ class TaskFilterTest extends BasicTestClass {
             1 column:
                 2 user: 1 task
          */
-    }
-
-    @AfterEach
-    @Override
-    void afterEach() {
-
-    }
-
-    @AfterAll
-    static void afterAll(@Autowired DatabaseCleanup databaseCleanup) {
-        databaseCleanup.execute();
     }
 
     @Test

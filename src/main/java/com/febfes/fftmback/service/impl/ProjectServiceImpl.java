@@ -2,9 +2,11 @@ package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.ColumnService;
@@ -21,9 +23,10 @@ import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 @Slf4j
 @Service
@@ -48,26 +51,27 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectEntity project,
             String username
     ) {
-        project.setOwnerId(userService.getUserIdByUsername(username));
+        Long ownerId = userService.getUserIdByUsername(username);
+        project.setOwnerId(ownerId);
+        if (isNull(project.getMembers())) {
+            project.setMembers(new HashSet<>());
+        }
         ProjectEntity projectEntity = projectRepository.save(project);
         log.info("Saved project: {}", projectEntity);
         Long projectId = projectEntity.getId();
         columnService.createDefaultColumnsForProject(projectId);
         taskTypeService.createDefaultTaskTypesForProject(projectId);
+        // by default, the owner will also be a member of the project
+        addNewMembers(projectEntity.getId(), List.of(ownerId));
         return projectEntity;
     }
 
     @Override
-    public List<ProjectEntity> getProjectsByOwnerId(Long ownerId) {
-        Set<Long> favouriteProjects = getFavouriteProjectsForUser(ownerId);
-        // TODO Возможно обработку является ли проект избранным стоит вынести в запрос
-        List<ProjectEntity> projectEntityList = projectRepository
-                .findAllByOwnerId(ownerId)
-                .stream()
-                .peek(project -> project.setIsFavourite(favouriteProjects.contains(project.getId())))
-                .toList();
-        log.info("Received {} projects for owner with id={}", projectEntityList.size(), ownerId);
-        return projectEntityList;
+    public List<ProjectEntity> getProjectsForUser(Long userId) {
+        UserEntity user = userService.getUserById(userId);
+        Set<ProjectEntity> userProjects = user.getProjects();
+        log.info("Received {} projects for user with id={}", userProjects.size(), userId);
+        return userProjects.stream().toList();
     }
 
     @Override
@@ -79,11 +83,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectEntity getProjectByOwnerId(Long id, Long ownerId) {
+    public ProjectEntity getProjectForUser(Long id, Long userId) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
-        projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, ownerId));
-        log.info("Received project {} by id={} and ownerId={}", projectEntity, id, ownerId);
+        projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, userId));
+        log.info("Received project {} by id={} and userId={}", projectEntity, id, userId);
         return projectEntity;
     }
 
@@ -146,6 +150,37 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void removeProjectFromFavourite(Long projectId, Long userId) {
         projectRepository.removeProjectFromFavourite(projectId, userId);
+    }
+
+    @Override
+    public void projectOwnerCheck(Long projectId, Long ownerId) {
+        ProjectEntity project = getProject(projectId);
+        if (!Objects.equals(project.getOwnerId(), ownerId)) {
+            throw new ProjectOwnerException(project.getOwnerId());
+        }
+    }
+
+    @Override
+    public List<UserEntity> addNewMembers(Long projectId, List<Long> memberIds) {
+        ProjectEntity project = getProject(projectId);
+        List<UserEntity> addedMembers = new ArrayList<>();
+        memberIds.forEach(memberId -> {
+            UserEntity member = userService.getUserById(memberId);
+            project.addMember(member);
+            addedMembers.add(member);
+        });
+        projectRepository.save(project);
+        log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
+        return addedMembers;
+    }
+
+    @Override
+    public UserEntity removeMember(Long projectId, Long memberId) {
+        ProjectEntity project = getProject(projectId);
+        project.removeMember(memberId);
+        projectRepository.save(project);
+        log.info("Removed member with id={} from project with id={}", memberId, projectId);
+        return userService.getUserById(memberId);
     }
 
     private Set<Long> getFavouriteProjectsForUser(Long userId) {
