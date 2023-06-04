@@ -1,5 +1,7 @@
 package com.febfes.fftmback.domain.common.query;
 
+import com.febfes.fftmback.domain.dao.BaseView;
+import com.febfes.fftmback.util.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.NumberFormat;
@@ -48,6 +50,12 @@ public enum FieldType {
     STRING {
         public Object parse(String value) {
             return value;
+        }
+    },
+
+    BASEVIEW {
+        public Object parse(String value) {
+            return JsonUtils.convertStringToObject(value, BaseView.class);
         }
     };
 
