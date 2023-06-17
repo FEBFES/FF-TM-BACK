@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1"
+      author: IvanShish
+      comment: "Create roles table"
+      changes:
+        - createTable:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(200)
+        - addDefaultValue:
+            tableName: role
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
+        - sql:
+            dbms: 'postgresql'
+            sql: INSERT INTO role (id, name, description) VALUES 
+                  (1, 'OWNER', 'Has all the possibilities on the project'),
+                  (2, 'MEMBER', 'Any interactions with tasks'),
+                  (3, 'MEMBER_PLUS', 'MEMBER + Any interaction with columns');
