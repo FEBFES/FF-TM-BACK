@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class RoleEntity extends BaseEntity{
+public class RoleEntity extends BaseEntity {
 
     @Column(name = "name")
     private String name;
