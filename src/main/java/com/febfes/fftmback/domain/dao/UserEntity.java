@@ -1,18 +1,13 @@
 package com.febfes.fftmback.domain.dao;
 
-import com.febfes.fftmback.domain.common.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "user_entity")
@@ -48,10 +43,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @Column(name = "display_name")
     private String displayName;
 
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "owner_id")
     @ToString.Exclude
@@ -71,11 +62,19 @@ public class UserEntity extends BaseEntity implements UserDetails {
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "project_id")})
     @ToString.Exclude
+    @Builder.Default
     private Set<ProjectEntity> projects = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.REMOVE)
+    @JoinTable(name = "project_user_role")
+    @MapKeyJoinColumn(name = "project_id")
+    @ToString.Exclude
+    @Builder.Default
+    private Map<ProjectEntity, RoleEntity> projectRoles = new HashMap<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return new HashSet<>();
     }
 
     @Override

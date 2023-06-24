@@ -5,7 +5,6 @@ select u.id                                as "id",
        u.encrypted_password                as "encryptedPassword",
        u.first_name                        as "firstName",
        u.last_name                         as "lastName",
-       u.role                              as "role",
        u.display_name                      as "displayName",
        (select fe.id
         from file_entity fe

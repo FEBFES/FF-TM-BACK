@@ -5,7 +5,7 @@ databaseChangeLog:
       comment: "Create user roles for project table"
       changes:
         - createTable:
-            tableName: project_role
+            tableName: project_user_role
             columns:
               - column:
                   name: role_id
@@ -24,21 +24,21 @@ databaseChangeLog:
                     nullable: false
         - addForeignKeyConstraint:
             constraintName: fk_project_id
-            baseTableName: project_role
+            baseTableName: project_user_role
             baseColumnNames: project_id
             referencedTableName: project
             referencedColumnNames: id
             onDelete: CASCADE
         - addForeignKeyConstraint:
             constraintName: fk_user_id
-            baseTableName: project_role
+            baseTableName: project_user_role
             baseColumnNames: user_id
             referencedTableName: user_entity
             referencedColumnNames: id
             onDelete: CASCADE
         - addForeignKeyConstraint:
             constraintName: fk_role_id
-            baseTableName: project_role
+            baseTableName: project_user_role
             baseColumnNames: role_id
             referencedTableName: role
             referencedColumnNames: id

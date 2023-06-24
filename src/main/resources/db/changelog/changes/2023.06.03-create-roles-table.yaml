@@ -37,3 +37,35 @@ databaseChangeLog:
                   (1, 'OWNER', 'Has all the possibilities on the project'),
                   (2, 'MEMBER', 'Any interactions with tasks'),
                   (3, 'MEMBER_PLUS', 'MEMBER + Any interaction with columns');
+  - changeSet:
+      id: "2"
+      author: IvanShish
+      comment: "Delete role column from users table"
+      changes:
+        - dropView:
+            catalogName: ff-tm
+            schemaName: public
+            viewName: v_user
+        - createView:
+            catalogName: ff-tm
+            selectQuery: select u.id                                as "id",
+                                u.create_date                       as "createDate",
+                                u.email                             as "email",
+                                u.username                          as "username",
+                                u.encrypted_password                as "encryptedPassword",
+                                u.first_name                        as "firstName",
+                                u.last_name                         as "lastName",
+                                u.display_name                      as "displayName",
+                                (select fe.id
+                                from file_entity fe
+                                where fe.user_id = u.id
+                                and fe.entity_type = 'USER_PIC') as "userPicId"
+                                from public.user_entity u
+            replaceIfExists: true
+            schemaName: public
+            viewName: v_user
+        - dropColumn:
+            tableName: user_entity
+            columns:
+              - column:
+                  name: role

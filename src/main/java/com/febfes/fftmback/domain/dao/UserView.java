@@ -1,6 +1,5 @@
 package com.febfes.fftmback.domain.dao;
 
-import com.febfes.fftmback.domain.common.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -33,10 +32,6 @@ public class UserView extends BaseView {
 
     @Column(name = "\"displayName\"")
     private String displayName;
-
-    @Column(name = "\"role\"")
-    @Enumerated(EnumType.STRING)
-    private Role role;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "\"userPicId\"", referencedColumnName = "id")
