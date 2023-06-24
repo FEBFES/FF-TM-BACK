@@ -17,6 +17,8 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 public class RoleEntity extends BaseEntity {
 
+    public static final String ENTITY_NAME = "Role";
+
     @Column(name = "name")
     private String name;
 

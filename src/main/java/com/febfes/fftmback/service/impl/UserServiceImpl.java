@@ -57,10 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(
-            UserEntity user,
-            Long id
-    ) {
+    public void updateUser(UserEntity user, Long id) {
         UserEntity userToUpdate = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id));
         userToUpdate.setFirstName(user.getFirstName());

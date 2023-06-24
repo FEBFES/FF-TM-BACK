@@ -1,7 +1,8 @@
 package com.febfes.fftmback.domain.common;
 
-public enum Role {
+public enum RoleName {
 
     OWNER,
-    MEMBER
+    MEMBER,
+    MEMBER_PLUS
 }

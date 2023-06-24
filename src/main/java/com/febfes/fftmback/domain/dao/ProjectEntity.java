@@ -2,10 +2,7 @@ package com.febfes.fftmback.domain.dao;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
@@ -55,6 +52,7 @@ public class ProjectEntity extends BaseEntity {
             }, mappedBy = "projects")
     @JsonIgnoreProperties(value = "projects")
     @ToString.Exclude
+    @Builder.Default
     private Set<UserEntity> members = new HashSet<>();
 
     public void addMember(UserEntity member) {
