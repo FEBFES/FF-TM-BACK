@@ -10,7 +10,7 @@ import java.util.Arrays;
 public enum PatchOperation {
     UPDATE("update");
 
-    private String code;
+    private final String code;
 
     public static PatchOperation getByCode(String code) {
         return Arrays.stream(PatchOperation.values())

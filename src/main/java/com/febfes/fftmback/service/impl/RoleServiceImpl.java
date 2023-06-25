@@ -38,6 +38,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public RoleEntity getRoleByProjectAndUser(ProjectEntity project, UserEntity user) {
+        return user.getProjectRoles().get(project);
+    }
+
+    @Override
     public void changeUserRoleOnProject(Long projectId, Long userId, RoleName roleName) {
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, projectId));

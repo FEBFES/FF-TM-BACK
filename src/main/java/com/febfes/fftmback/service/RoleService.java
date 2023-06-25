@@ -13,6 +13,8 @@ public interface RoleService {
 
     RoleEntity getRoleByName(RoleName roleName);
 
+    RoleEntity getRoleByProjectAndUser(ProjectEntity project, UserEntity user);
+
     void changeUserRoleOnProject(Long projectId, Long userId, RoleName roleName);
 
     void changeUserRoleOnProject(ProjectEntity project, UserEntity user, RoleName roleName);

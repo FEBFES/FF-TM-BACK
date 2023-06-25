@@ -4,12 +4,14 @@ import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.RoleService;
 import com.febfes.fftmback.service.TaskTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,6 +36,7 @@ public class ProjectController {
 
     private final @NonNull ProjectService projectService;
     private final @NonNull TaskTypeService taskTypeService;
+    private final @NonNull RoleService roleService;
 
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
@@ -58,9 +61,9 @@ public class ProjectController {
     @Operation(summary = "Get project by its id")
     @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
-    public ProjectDto getProject(@PathVariable Long id) {
+    public OneProjectDto getProject(@PathVariable Long id) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return ProjectMapper.INSTANCE.projectToProjectDto(projectService.getProjectForUser(id, user.getId()));
+        return projectService.getProjectForUser(id, user.getId());
     }
 
     @Operation(summary = "Edit project by its id")

@@ -5,17 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -83,21 +79,5 @@ public class WebSecurity {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
-    }
-
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        String hierarchy = "OWNER > MEMBER_PLUS and MEMBER_PLUS > MEMBER";
-        roleHierarchy.setHierarchy(hierarchy);
-        return roleHierarchy;
-    }
-
-    @Bean
-    public AuthorityAuthorizationManager<RequestAuthorizationContext> memberAuthorityAuthorizationManager() {
-        AuthorityAuthorizationManager<RequestAuthorizationContext> objectAuthorityAuthorizationManager =
-                AuthorityAuthorizationManager.hasAuthority("MEMBER");
-        objectAuthorityAuthorizationManager.setRoleHierarchy(roleHierarchy());
-        return objectAuthorityAuthorizationManager;
     }
 }

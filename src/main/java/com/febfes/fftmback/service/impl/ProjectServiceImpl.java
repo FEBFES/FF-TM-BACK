@@ -5,10 +5,14 @@ import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
+import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
+import com.febfes.fftmback.dto.RoleDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
+import com.febfes.fftmback.mapper.ProjectMapper;
+import com.febfes.fftmback.mapper.RoleMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.patch.ProjectPatchFieldProcessor;
@@ -81,12 +85,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectEntity getProjectForUser(Long id, Long userId) {
+    public OneProjectDto getProjectForUser(Long id, Long userId) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
         projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, userId));
         log.info("Received project {} by id={} and userId={}", projectEntity, id, userId);
-        return projectEntity;
+        UserEntity user = userService.getUserById(userId);
+        RoleDto userRoleOnProject = RoleMapper.INSTANCE.roleToRoleDto(
+                roleService.getRoleByProjectAndUser(projectEntity, user)
+        );
+        return ProjectMapper.INSTANCE.projectToOneProjectDto(projectEntity, userRoleOnProject);
     }
 
     @Override

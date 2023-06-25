@@ -96,6 +96,27 @@ public class RoleControllerTest extends BasicTestClass {
         checkProjectUserRole(RoleName.MEMBER_PLUS, newUserId);
     }
 
+    @Test
+    void failedChangeRoleTest() {
+        String newUsername = USER_USERNAME + "1";
+        authenticationService.registerUser(
+                UserEntity.builder().email(USER_EMAIL + "1").username(newUsername).encryptedPassword(USER_PASSWORD).build()
+        );
+        Long newUserId = userService.getUserIdByUsername(newUsername);
+        String newToken = authenticationService.authenticateUser(
+                UserEntity.builder().username(newUsername).encryptedPassword(USER_PASSWORD).build()
+        ).accessToken();
+        projectService.addNewMembers(createdProjectId, List.of(newUserId));
+
+        given().header("Authorization", "Bearer " + newToken)
+                .contentType(ContentType.JSON)
+                .when()
+                .post("%s/%s/projects/%d/users/%d/".formatted(PATH_TO_ROLES_API,
+                        RoleName.MEMBER_PLUS.name(), createdProjectId, newUserId))
+                .then()
+                .statusCode(HttpStatus.SC_FORBIDDEN);
+    }
+
     private RequestSpecification requestWithBearerToken() {
         return given().header("Authorization", "Bearer " + token);
     }

@@ -2,6 +2,7 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiGet;
 import com.febfes.fftmback.annotation.ProtectedApi;
+import com.febfes.fftmback.config.auth.RoleCheckerComponent;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.service.RoleService;
@@ -23,6 +24,7 @@ import java.util.List;
 public class RoleController {
 
     private final RoleService roleService;
+    private final RoleCheckerComponent roleCheckerComponent;
 
     @Operation(summary = "Get all roles")
     @ApiGet
@@ -37,6 +39,7 @@ public class RoleController {
             @PathVariable Long projectId,
             @PathVariable Long userId
     ) {
+        roleCheckerComponent.checkIfHasRole(projectId, RoleName.OWNER);
         roleService.changeUserRoleOnProject(projectId, userId, roleName);
     }
 }

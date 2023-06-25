@@ -1,7 +1,9 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.service.AuthenticationService;
@@ -194,8 +196,8 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
-        Assertions.assertThat(updatedProject.getIsFavourite())
+        OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
+        Assertions.assertThat(updatedProject.isFavourite())
                 .isTrue();
         List<ProjectEntity> userProjects = projectService.getProjectsForUser(createdUserId);
         Assertions.assertThat(userProjects.get(0).getIsFavourite())
@@ -214,8 +216,8 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
-        Assertions.assertThat(updatedProject.getIsFavourite())
+        OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
+        Assertions.assertThat(updatedProject.isFavourite())
                 .isFalse();
         List<ProjectEntity> userProjects = projectService.getProjectsForUser(createdUserId);
         Assertions.assertThat(userProjects.get(0).getIsFavourite())
@@ -319,6 +321,22 @@ class ProjectControllerTest extends BasicTestClass {
                 .getInt("data.size()");
         Assertions.assertThat(size)
                 .isEqualTo(2);
+    }
+
+    @Test
+    void successfulGetOneProjectTest() {
+        Long createdProjectId = createNewProject(PROJECT_NAME);
+        Response response = requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId);
+        OneProjectDto oneProjectDto = response.then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(OneProjectDto.class);
+        Assertions.assertThat(oneProjectDto.userRoleOnProject().name())
+                .isEqualTo(RoleName.OWNER);
     }
 
     private Long createNewProject(String projectName) {

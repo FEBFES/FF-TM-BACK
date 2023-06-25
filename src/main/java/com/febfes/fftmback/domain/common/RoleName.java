@@ -1,8 +1,15 @@
 package com.febfes.fftmback.domain.common;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public enum RoleName {
 
-    OWNER,
-    MEMBER,
-    MEMBER_PLUS
+    MEMBER(0),
+    MEMBER_PLUS(1),
+    OWNER(2);
+
+    final int priority;
 }
