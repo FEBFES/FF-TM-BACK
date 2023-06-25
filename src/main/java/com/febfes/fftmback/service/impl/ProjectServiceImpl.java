@@ -62,7 +62,7 @@ public class ProjectServiceImpl implements ProjectService {
         columnService.createDefaultColumnsForProject(projectId);
         taskTypeService.createDefaultTaskTypesForProject(projectId);
         // by default, the owner will also be a member of the project
-        addOwnerToProjectMembers(projectEntity, ownerId);
+        addOwnerToProjectMembers(project, ownerId);
         return projectEntity;
     }
 
@@ -92,7 +92,7 @@ public class ProjectServiceImpl implements ProjectService {
         log.info("Received project {} by id={} and userId={}", projectEntity, id, userId);
         UserEntity user = userService.getUserById(userId);
         RoleDto userRoleOnProject = RoleMapper.INSTANCE.roleToRoleDto(
-                roleService.getRoleByProjectAndUser(projectEntity, user)
+                roleService.getRoleByProjectAndUser(id, user)
         );
         return ProjectMapper.INSTANCE.projectToOneProjectDto(projectEntity, userRoleOnProject);
     }
@@ -172,7 +172,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<UserEntity> addedMembers = new ArrayList<>();
         memberIds.forEach(memberId -> {
             UserEntity member = userService.getUserById(memberId);
-            roleService.changeUserRoleOnProject(project, member, RoleName.MEMBER);
+            roleService.changeUserRoleOnProject(projectId, member, RoleName.MEMBER);
             project.addMember(member);
             addedMembers.add(member);
         });
@@ -206,7 +206,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private void addOwnerToProjectMembers(ProjectEntity project, Long ownerId) {
         UserEntity owner = userService.getUserById(ownerId);
-        roleService.changeUserRoleOnProject(project, owner, RoleName.OWNER);
+        roleService.changeUserRoleOnProject(project.getId(), owner, RoleName.OWNER);
         project.addMember(owner);
         projectRepository.save(project);
     }

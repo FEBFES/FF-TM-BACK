@@ -44,7 +44,7 @@ public class RoleCheckerComponent {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         ProjectEntity project = projectService.getProject(projectId);
         Set<RoleName> belowNecessary = ROLE_HIERARCHY.tailSet(roleName);
-        RoleEntity userRole = user.getProjectRoles().get(project);
+        RoleEntity userRole = user.getProjectRoles().get(project.getId());
         RoleName userRoleName = RoleName.valueOf(userRole.getName());
         return belowNecessary.contains(userRoleName);
     }

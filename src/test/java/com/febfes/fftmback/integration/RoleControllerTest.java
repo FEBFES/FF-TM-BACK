@@ -127,8 +127,7 @@ public class RoleControllerTest extends BasicTestClass {
             @Override
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
                 UserEntity user = userService.getUserById(userId);
-                ProjectEntity project = projectService.getProject(createdProjectId);
-                RoleEntity role = user.getProjectRoles().get(project);
+                RoleEntity role = user.getProjectRoles().get(createdProjectId);
                 Assertions.assertThat(role.getName())
                         .isEqualTo(expectedUserRoleName.name());
             }

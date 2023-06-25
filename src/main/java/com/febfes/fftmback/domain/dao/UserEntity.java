@@ -69,10 +69,10 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @JoinTable(name = "project_user_role",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    @MapKeyJoinColumn(name = "project_id")
+    @MapKeyColumn(name = "project_id")
     @ToString.Exclude
     @Builder.Default
-    private Map<ProjectEntity, RoleEntity> projectRoles = new HashMap<>();
+    private Map<Long, RoleEntity> projectRoles = new HashMap<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
