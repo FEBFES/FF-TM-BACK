@@ -9,7 +9,6 @@ import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.RoleDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.mapper.RoleMapper;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -156,14 +154,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void removeProjectFromFavourite(Long projectId, Long userId) {
         projectRepository.removeProjectFromFavourite(projectId, userId);
-    }
-
-    @Override
-    public void projectOwnerCheck(Long projectId, Long ownerId) {
-        ProjectEntity project = getProject(projectId);
-        if (!Objects.equals(project.getOwnerId(), ownerId)) {
-            throw new ProjectOwnerException(project.getOwnerId());
-        }
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
+import com.febfes.fftmback.config.auth.RoleCheckerComponent;
 import com.febfes.fftmback.domain.common.EntityType;
+import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.EditTaskDto;
@@ -37,6 +39,7 @@ public class TaskController {
 
     private final @NonNull TaskService taskService;
     private final @NonNull FileService fileService;
+    private final @NonNull RoleCheckerComponent roleCheckerComponent;
 
     @Operation(summary = "Get tasks with pagination")
     @ApiGet(path = "{projectId}/columns/{columnId}/tasks")
@@ -46,7 +49,6 @@ public class TaskController {
             @RequestParam(value = "filter", required = false) @FilterParam String filter,
             @ParameterObject ColumnParameters pathVars
     ) {
-
         List<TaskView> tasks = taskService.getTasks(page, limit, pathVars.columnId(), filter);
         return tasks.stream()
                 .map(TaskMapper.INSTANCE::taskViewToTaskShortDto)
@@ -67,6 +69,7 @@ public class TaskController {
             @ParameterObject ColumnParameters pathVars,
             @RequestBody @Valid EditTaskDto taskDto
     ) {
+        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         TaskView task = taskService.createTask(
                 TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), taskDto),
@@ -81,6 +84,7 @@ public class TaskController {
             @ParameterObject TaskParameters pathVars,
             @RequestBody EditTaskDto editTaskDto
     ) {
+        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
         TaskView task = taskService.updateTask(pathVars.taskId(), pathVars.projectId(), pathVars.columnId(), editTaskDto);
         return TaskMapper.INSTANCE.taskViewToTaskShortDto(task);
     }
@@ -88,6 +92,7 @@ public class TaskController {
     @Operation(summary = "Delete task by its id")
     @ApiDelete(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
     public void deleteTask(@ParameterObject TaskParameters pathVars) {
+        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
         taskService.deleteTask(pathVars.taskId());
     }
 }

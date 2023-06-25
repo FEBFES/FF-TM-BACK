@@ -1,6 +1,8 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
+import com.febfes.fftmback.config.auth.RoleCheckerComponent;
+import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
@@ -11,7 +13,6 @@ import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.RoleService;
 import com.febfes.fftmback.service.TaskTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,7 +37,7 @@ public class ProjectController {
 
     private final @NonNull ProjectService projectService;
     private final @NonNull TaskTypeService taskTypeService;
-    private final @NonNull RoleService roleService;
+    private final @NonNull RoleCheckerComponent roleCheckerComponent;
 
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
@@ -72,12 +73,14 @@ public class ProjectController {
             @PathVariable Long id,
             @RequestBody ProjectDto projectDto
     ) {
+        roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
         projectService.editProject(id, ProjectMapper.INSTANCE.projectDtoToProject(projectDto));
     }
 
     @Operation(summary = "Delete project by its id")
     @ApiDelete(path = "{id}")
     public void deleteProject(@PathVariable Long id) {
+        roleCheckerComponent.checkIfHasRole(id, RoleName.OWNER);
         projectService.deleteProject(id);
     }
 
@@ -106,8 +109,7 @@ public class ProjectController {
     @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
     @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
     public List<UserDto> addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
-        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        memberIds.forEach(memberId -> projectService.projectOwnerCheck(id, user.getId()));
+        roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
         List<UserEntity> addedMembers = projectService.addNewMembers(id, memberIds);
         return addedMembers.stream()
                 .map(UserMapper.INSTANCE::userToUserDto)
@@ -119,8 +121,7 @@ public class ProjectController {
     @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
     @ApiResponse(responseCode = "409", description = "Only owner can remove a member", content = @Content)
     public UserDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
-        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        projectService.projectOwnerCheck(id, user.getId());
+        roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
         UserEntity removedMember = projectService.removeMember(id, memberId);
         return UserMapper.INSTANCE.userToUserDto(removedMember);
     }
