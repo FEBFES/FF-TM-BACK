@@ -8,17 +8,14 @@ import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.RoleCheckException;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.Serial;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 @Component
-@RequiredArgsConstructor
 public class RoleCheckerComponent {
 
     private final ProjectRepository projectRepository;
@@ -31,16 +28,15 @@ public class RoleCheckerComponent {
             return -1;
         }
         return 0;
-    }) {
-        @Serial
-        private static final long serialVersionUID = 6400382130527468356L;
+    });
 
-        {
-            add(RoleName.OWNER);
-            add(RoleName.MEMBER_PLUS);
-            add(RoleName.MEMBER);
-        }
-    };
+    public RoleCheckerComponent(ProjectRepository projectRepository, UserRepository userRepository) {
+        this.projectRepository = projectRepository;
+        this.userRepository = userRepository;
+        ROLE_HIERARCHY.add(RoleName.OWNER);
+        ROLE_HIERARCHY.add(RoleName.MEMBER_PLUS);
+        ROLE_HIERARCHY.add(RoleName.MEMBER);
+    }
 
     private boolean hasRole(UserEntity user, Long projectId, RoleName roleName) {
         ProjectEntity project = projectRepository.findById(projectId)
