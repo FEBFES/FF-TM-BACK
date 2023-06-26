@@ -18,6 +18,7 @@ public class DatabaseCleanup implements InitializingBean {
     public final static String VIEW_PREFIX = "v_";
     public final static String USER_VIEW = "v_user";
     public final static String USER_TABLE = "user_entity";
+    private final static List<String> TABLES_NOT_TO_CLEAN = List.of("role");
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -47,6 +48,7 @@ public class DatabaseCleanup implements InitializingBean {
         tableNames = entityManager.getMetamodel().getEntities().stream()
                 .filter(e -> e.getJavaType().getAnnotation(Table.class) != null)
                 .map(e -> e.getJavaType().getAnnotation(Table.class).name())
+                .filter(tableName -> !TABLES_NOT_TO_CLEAN.contains(tableName))
                 .collect(Collectors.toList());
     }
 }

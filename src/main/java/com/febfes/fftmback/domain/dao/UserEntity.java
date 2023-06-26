@@ -1,18 +1,13 @@
 package com.febfes.fftmback.domain.dao;
 
-import com.febfes.fftmback.domain.common.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "user_entity")
@@ -21,8 +16,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"projectEntityList", "taskEntityList", "projects", "projectRoles"})
+@ToString(callSuper = true, exclude = {"projectEntityList", "taskEntityList", "projects", "projectRoles"})
 public class UserEntity extends BaseEntity implements UserDetails {
 
     public static final String ENTITY_NAME = "User";
@@ -48,18 +43,12 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @Column(name = "display_name")
     private String displayName;
 
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "owner_id")
-    @ToString.Exclude
     private List<TaskEntity> taskEntityList;
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "owner_id")
-    @ToString.Exclude
     private List<ProjectEntity> projectEntityList;
 
     @ManyToMany(fetch = FetchType.LAZY,
@@ -70,12 +59,20 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @JoinTable(name = "user_project",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "project_id")})
-    @ToString.Exclude
+    @Builder.Default
     private Set<ProjectEntity> projects = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @JoinTable(name = "project_user_role",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
+    @MapKeyColumn(name = "project_id")
+    @Builder.Default
+    private Map<Long, RoleEntity> projectRoles = new HashMap<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return new HashSet<>();
     }
 
     @Override

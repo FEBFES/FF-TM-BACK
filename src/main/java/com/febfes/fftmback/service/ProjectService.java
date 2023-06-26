@@ -3,6 +3,7 @@ package com.febfes.fftmback.service;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
+import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface ProjectService {
 
     ProjectEntity getProject(Long id);
 
-    ProjectEntity getProjectForUser(Long id, Long userId);
+    OneProjectDto getProjectForUser(Long id, Long userId);
 
     void editProject(Long id, ProjectEntity project);
 
@@ -27,8 +28,6 @@ public interface ProjectService {
     void addProjectToFavourite(Long projectId, Long userId);
 
     void removeProjectFromFavourite(Long projectId, Long userId);
-
-    void projectOwnerCheck(Long projectId, Long ownerId);
 
     List<UserEntity> addNewMembers(Long projectId, List<Long> memberIds);
 

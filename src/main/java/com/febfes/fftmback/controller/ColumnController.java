@@ -4,6 +4,8 @@ import com.febfes.fftmback.annotation.ApiCreate;
 import com.febfes.fftmback.annotation.ApiDelete;
 import com.febfes.fftmback.annotation.ApiEdit;
 import com.febfes.fftmback.annotation.ProtectedApi;
+import com.febfes.fftmback.config.auth.RoleCheckerComponent;
+import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ColumnController {
 
     private final @NonNull ColumnService columnService;
+    private final @NonNull RoleCheckerComponent roleCheckerComponent;
 
     @Operation(summary = "Create new column in a project with given id")
     @ApiCreate(path = "{projectId}/columns")
@@ -35,6 +38,7 @@ public class ColumnController {
             @PathVariable Long projectId,
             @RequestBody @Valid ColumnDto columnDto
     ) {
+        roleCheckerComponent.checkIfHasRole(projectId, RoleName.MEMBER_PLUS);
         TaskColumnEntity newColumn = columnService.createColumn(
                 ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId)
         );
@@ -43,11 +47,11 @@ public class ColumnController {
 
     @Operation(summary = "Edit column by its columnId")
     @ApiEdit(path = "{projectId}/columns/{columnId}")
-    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use ColumnParameters
     public void editColumn(
             @ParameterObject ColumnParameters pathVars,
             @RequestBody ColumnDto columnDto
     ) {
+        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER_PLUS);
         columnService.editColumn(
                 ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, pathVars.columnId(), pathVars.projectId())
         );
@@ -55,8 +59,8 @@ public class ColumnController {
 
     @Operation(summary = "Delete column by its columnId")
     @ApiDelete(path = "{projectId}/columns/{columnId}")
-    @SuppressWarnings("MVCPathVariableInspection") // fake warning because we use ColumnParameters
     public void deleteColumn(@ParameterObject ColumnParameters pathVars) {
+        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER_PLUS);
         columnService.deleteColumn(pathVars.columnId());
     }
 }

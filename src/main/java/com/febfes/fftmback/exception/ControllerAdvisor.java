@@ -96,6 +96,18 @@ public class ControllerAdvisor {
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
+    @ExceptionHandler(RoleCheckException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @Hidden
+    public ApiErrorDto handleRoleCheckException(
+            RoleCheckException ex,
+            HttpServletRequest httpRequest
+    ) {
+        ex.printStackTrace();
+        return createResponseBodyForExceptions(HttpStatus.FORBIDDEN, RoleCheckException.class.getSimpleName(),
+                ex.getMessage(), httpRequest.getRequestURI());
+    }
+
     @ExceptionHandler({Exception.class, SaveFileException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @Hidden

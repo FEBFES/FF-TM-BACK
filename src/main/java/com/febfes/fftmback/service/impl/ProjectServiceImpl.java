@@ -1,18 +1,19 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.common.PatchOperation;
+import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
+import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
+import com.febfes.fftmback.dto.RoleDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
+import com.febfes.fftmback.mapper.ProjectMapper;
+import com.febfes.fftmback.mapper.RoleMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
-import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.TaskTypeService;
-import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.patch.ProjectPatchFieldProcessor;
 import com.febfes.fftmback.util.patch.ProjectPatchIsFavouriteProcessor;
 import jakarta.annotation.PostConstruct;
@@ -24,12 +25,8 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
-
-import static java.util.Objects.isNull;
 
 @Slf4j
 @Service
@@ -41,6 +38,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ColumnService columnService;
     private final UserService userService;
     private final TaskTypeService taskTypeService;
+    private final RoleService roleService;
 
     private ProjectPatchFieldProcessor patchIsFavouriteProcessor;
 
@@ -56,16 +54,13 @@ public class ProjectServiceImpl implements ProjectService {
     ) {
         Long ownerId = userService.getUserIdByUsername(username);
         project.setOwnerId(ownerId);
-        if (isNull(project.getMembers())) {
-            project.setMembers(new HashSet<>());
-        }
         ProjectEntity projectEntity = projectRepository.save(project);
         log.info("Saved project: {}", projectEntity);
         Long projectId = projectEntity.getId();
         columnService.createDefaultColumnsForProject(projectId);
         taskTypeService.createDefaultTaskTypesForProject(projectId);
         // by default, the owner will also be a member of the project
-        addNewMembers(projectEntity.getId(), List.of(ownerId));
+        addOwnerToProjectMembers(project, ownerId);
         return projectEntity;
     }
 
@@ -88,12 +83,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectEntity getProjectForUser(Long id, Long userId) {
+    public OneProjectDto getProjectForUser(Long id, Long userId) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
         projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, userId));
         log.info("Received project {} by id={} and userId={}", projectEntity, id, userId);
-        return projectEntity;
+        UserEntity user = userService.getUserById(userId);
+        RoleDto userRoleOnProject = RoleMapper.INSTANCE.roleToRoleDto(
+                roleService.getRoleByProjectAndUser(id, user)
+        );
+        return ProjectMapper.INSTANCE.projectToOneProjectDto(projectEntity, userRoleOnProject);
     }
 
     @Override
@@ -158,19 +157,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void projectOwnerCheck(Long projectId, Long ownerId) {
-        ProjectEntity project = getProject(projectId);
-        if (!Objects.equals(project.getOwnerId(), ownerId)) {
-            throw new ProjectOwnerException(project.getOwnerId());
-        }
-    }
-
-    @Override
     public List<UserEntity> addNewMembers(Long projectId, List<Long> memberIds) {
         ProjectEntity project = getProject(projectId);
         List<UserEntity> addedMembers = new ArrayList<>();
         memberIds.forEach(memberId -> {
             UserEntity member = userService.getUserById(memberId);
+            roleService.changeUserRoleOnProject(projectId, member, RoleName.MEMBER);
             project.addMember(member);
             addedMembers.add(member);
         });
@@ -200,6 +192,13 @@ public class ProjectServiceImpl implements ProjectService {
             e.printStackTrace();
             log.info("Can't find field \"{}\" in Project entity", patchDto.key());
         }
+    }
+
+    private void addOwnerToProjectMembers(ProjectEntity project, Long ownerId) {
+        UserEntity owner = userService.getUserById(ownerId);
+        roleService.changeUserRoleOnProject(project.getId(), owner, RoleName.OWNER);
+        project.addMember(owner);
+        projectRepository.save(project);
     }
 
 }

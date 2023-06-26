@@ -35,3 +35,6 @@ build/
 
 ### scripts ###
 deploy.sh
+
+./userPics
+./files

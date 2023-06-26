@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.febfes.fftmback.config.jwt.JwtService;
-import com.febfes.fftmback.domain.common.Role;
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.auth.GetAuthDto;
@@ -49,7 +48,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new EntityAlreadyExistsException(UserEntity.ENTITY_NAME);
         }
         user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.MEMBER);
         user.setDisplayName(isNull(user.getDisplayName()) ? generateDisplayUserName() : user.getDisplayName());
         userRepository.save(user);
         log.info("User saved: {}", user);

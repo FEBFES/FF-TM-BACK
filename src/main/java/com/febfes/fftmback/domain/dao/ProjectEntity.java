@@ -2,10 +2,7 @@ package com.febfes.fftmback.domain.dao;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
@@ -19,7 +16,8 @@ import java.util.Set;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = {"taskColumnEntityList", "taskEntityList", "members"})
+@EqualsAndHashCode(callSuper = true, exclude = {"taskColumnEntityList", "taskEntityList", "members"})
 public class ProjectEntity extends BaseEntity {
 
     public static final String ENTITY_NAME = "Project";
@@ -32,13 +30,11 @@ public class ProjectEntity extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "project_id")
-    @ToString.Exclude
     private List<TaskColumnEntity> taskColumnEntityList;
     //TODO problem when project was deleted
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "project_id")
-    @ToString.Exclude
     private List<TaskEntity> taskEntityList;
     //TODO problem when project was deleted
 
@@ -54,7 +50,7 @@ public class ProjectEntity extends BaseEntity {
                     CascadeType.MERGE
             }, mappedBy = "projects")
     @JsonIgnoreProperties(value = "projects")
-    @ToString.Exclude
+    @Builder.Default
     private Set<UserEntity> members = new HashSet<>();
 
     public void addMember(UserEntity member) {

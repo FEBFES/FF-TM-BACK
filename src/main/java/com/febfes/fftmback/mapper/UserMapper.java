@@ -16,6 +16,7 @@ import static java.util.Objects.isNull;
 
 @Mapper
 public interface UserMapper {
+
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(target = "encryptedPassword", source = "password")
