@@ -10,6 +10,7 @@ import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.UserDto;
+import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.ProjectService;
@@ -122,6 +123,9 @@ public class ProjectController {
     @ApiResponse(responseCode = "409", description = "Only owner can remove a member", content = @Content)
     public UserDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
+        if (roleCheckerComponent.userHasRole(id, memberId, RoleName.OWNER)) {
+            throw new ProjectOwnerException();
+        }
         UserEntity removedMember = projectService.removeMember(id, memberId);
         return UserMapper.INSTANCE.userToUserDto(removedMember);
     }

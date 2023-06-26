@@ -16,8 +16,8 @@ import java.util.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"projectEntityList", "taskEntityList", "projects", "projectRoles"})
+@ToString(callSuper = true, exclude = {"projectEntityList", "taskEntityList", "projects", "projectRoles"})
 public class UserEntity extends BaseEntity implements UserDetails {
 
     public static final String ENTITY_NAME = "User";
@@ -45,12 +45,10 @@ public class UserEntity extends BaseEntity implements UserDetails {
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "owner_id")
-    @ToString.Exclude
     private List<TaskEntity> taskEntityList;
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "owner_id")
-    @ToString.Exclude
     private List<ProjectEntity> projectEntityList;
 
     @ManyToMany(fetch = FetchType.LAZY,
@@ -61,7 +59,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @JoinTable(name = "user_project",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "project_id")})
-    @ToString.Exclude
     @Builder.Default
     private Set<ProjectEntity> projects = new HashSet<>();
 
@@ -70,7 +67,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
     @MapKeyColumn(name = "project_id")
-    @ToString.Exclude
     @Builder.Default
     private Map<Long, RoleEntity> projectRoles = new HashMap<>();
 

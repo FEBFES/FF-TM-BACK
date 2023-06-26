@@ -5,6 +5,7 @@ import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.config.auth.RoleCheckerComponent;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
+import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,6 +41,9 @@ public class RoleController {
             @PathVariable Long userId
     ) {
         roleCheckerComponent.checkIfHasRole(projectId, RoleName.OWNER);
+        if (roleCheckerComponent.userHasRole(projectId, userId, RoleName.OWNER)) {
+            throw new ProjectOwnerException();
+        }
         roleService.changeUserRoleOnProject(projectId, userId, roleName);
     }
 }

@@ -263,6 +263,8 @@ class ProjectControllerTest extends BasicTestClass {
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
                 ProjectEntity updatedProject = projectService.getProject(createdProjectId);
                 // as owner is also a member
+                int size = updatedProject.getMembers().size();
+                System.out.println(size);
                 Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(3);
                 UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
                 Assertions.assertThat(secondAddedMember.getProjects().size()).isEqualTo(1);
