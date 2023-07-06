@@ -4,6 +4,7 @@ import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.dto.UserDto;
+import com.febfes.fftmback.dto.UserPicDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.UserService;
@@ -98,12 +99,17 @@ class UserControllerTest extends BasicTestClass {
     void successfulLoadUserPicTest() {
         Long userId = userService.getUserIdByUsername(createdUsername);
         File imageFile = new File("src/test/resources/image.jpg");
-        requestWithBearerToken()
+        UserPicDto userPicDto = requestWithBearerToken()
                 .multiPart("image", imageFile, "multipart/form-data")
                 .when()
                 .post("/api/v1/files/user-pic/{userId}", userId)
                 .then()
-                .statusCode(HttpStatus.SC_OK);
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(UserPicDto.class);
+        Assertions.assertEquals("/files/user-pic/%d".formatted(userId), userPicDto.fileUrn());
+        Assertions.assertEquals(userId, userPicDto.userId());
     }
 
     @Test
@@ -143,6 +149,7 @@ class UserControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
+
     @Test
     void successfulGetUserPicFromUserInfoTest() {
         successfulLoadUserPicTest();
