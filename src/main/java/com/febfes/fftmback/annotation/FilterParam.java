@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER})
 @Parameter(
-        name = "filter",
+        name = "taskFilter",
         description = """
                 Filter parameter. You need to send an array of filters. Filter consists of:
                 1. Property - property name in entity. For example: name
@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
                 4. ValueTo - for BETWEEN operator (value=1 BETWEEN valueTo=2)
                 5. Values - for IN filter (IN (1, 2, 3))
                                 
-                For example: filter=[{"property":"name","operator":"LIKE","value":"string"}]
+                For example: taskFilter=[{"property":"name","operator":"LIKE","value":"string"}]
                 """
 )
 public @interface FilterParam {

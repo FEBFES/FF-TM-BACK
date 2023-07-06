@@ -3,7 +3,10 @@ package com.febfes.fftmback.controller;
 import com.febfes.fftmback.annotation.ApiDelete;
 import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.domain.common.EntityType;
+import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.UserPicDto;
+import com.febfes.fftmback.mapper.FileMapper;
 import com.febfes.fftmback.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,14 +36,14 @@ public class FileController {
     @Operation(summary = "Upload user pic")
     @PostMapping(
             path = "user-pic/{userId}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.MULTIPART_FORM_DATA_VALUE
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public void saveUserPic(
+    public UserPicDto saveUserPic(
             @PathVariable Long userId,
             @RequestParam("image") MultipartFile userPic
     ) {
-        fileService.saveFile(userId, userId, EntityType.USER_PIC, userPic);
+        FileEntity file = fileService.saveFile(userId, userId, EntityType.USER_PIC, userPic);
+        return FileMapper.INSTANCE.fileToUserPicDto(file);
     }
 
     @Operation(summary = "Get user pic")
@@ -56,8 +59,7 @@ public class FileController {
     @Operation(summary = "Upload task files")
     @PostMapping(
             path = "task/{taskId}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.MULTIPART_FORM_DATA_VALUE
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public void saveTaskFiles(@PathVariable Long taskId, @RequestParam("files") MultipartFile[] files) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

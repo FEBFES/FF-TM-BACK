@@ -59,7 +59,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void saveFile(
+    public FileEntity saveFile(
             Long userId,
             Long entityId,
             EntityType entityType,
@@ -84,8 +84,8 @@ public class FileServiceImpl implements FileService {
                             "%s%s.%s".formatted(filesFolder, uuid, FileUtils.getExtension(file.getOriginalFilename()))
                     );
         }
+        FileEntity fileEntity = fileBuilder.build();
         try {
-            FileEntity fileEntity = fileBuilder.build();
             file.transferTo(new File(fileEntity.getFilePath()));
             // TODO: i'm talking about this (look upper)
             if (!EntityType.USER_PIC.equals(entityType) || !repository.existsByEntityIdAndEntityType(entityId, entityType.name())) {
@@ -95,6 +95,7 @@ public class FileServiceImpl implements FileService {
             throw new SaveFileException(file.getName());
         }
         log.info("File saved by user with id={}", userId);
+        return fileEntity;
     }
 
     @Override
