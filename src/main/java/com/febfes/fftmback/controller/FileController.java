@@ -75,6 +75,12 @@ public class FileController {
     @Operation(summary = "Delete file by its id")
     @ApiDelete(path = "{fileId}")
     public void deleteFile(@PathVariable Long fileId) {
-        fileService.deleteFileById(fileId);
+        fileService.deleteFileById(fileId, EntityType.TASK);
+    }
+
+    @Operation(summary = "Delete user pic by userId")
+    @ApiDelete(path = "user-pic/{userId}")
+    public void deleteUserPic(@PathVariable Long userId) {
+        fileService.deleteFileById(userId, EntityType.USER_PIC);
     }
 }

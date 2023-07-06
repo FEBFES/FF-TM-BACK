@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -97,8 +98,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void deleteFileById(Long fileId) {
-        repository.deleteById(fileId);
-        log.info("Deleted file with id={}", fileId);
+    @Transactional
+    public void deleteFileById(Long id, EntityType entityType) {
+        if (EntityType.USER_PIC.equals(entityType)) {
+            repository.deleteByEntityIdAndEntityType(id, entityType.name());
+        } else if (EntityType.TASK.equals(entityType)) {
+            repository.deleteById(id);
+        }
+        log.info("Deleted file with id={}", id);
     }
 }

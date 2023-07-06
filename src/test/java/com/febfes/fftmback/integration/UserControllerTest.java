@@ -4,6 +4,7 @@ import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.dto.UserDto;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.UserService;
@@ -143,6 +144,7 @@ class UserControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
+
     @Test
     void successfulGetUserPicFromUserInfoTest() {
         successfulLoadUserPicTest();
@@ -157,6 +159,19 @@ class UserControllerTest extends BasicTestClass {
                 .as(UserDto.class);
         Assertions.assertNotNull(userDto.userPic());
         Assertions.assertEquals("/files/user-pic/%d".formatted(userId), userDto.userPic());
+    }
+
+    @Test
+    void successfulDeleteUserPicTest() {
+        successfulLoadUserPicTest();
+        Long userId = userService.getUserIdByUsername(createdUsername);
+        requestWithBearerToken()
+                .when()
+                .delete("/api/v1/files/user-pic/{userId}", userId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+        Assertions.assertThrows(EntityNotFoundException.class,
+                () -> fileService.getFile("/files/user-pic/%d".formatted(userId)));
     }
 
 
