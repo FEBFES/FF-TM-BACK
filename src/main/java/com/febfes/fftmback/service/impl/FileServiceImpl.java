@@ -99,12 +99,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public void deleteFileById(Long id, EntityType entityType) {
-        if (EntityType.USER_PIC.equals(entityType)) {
-            repository.deleteByEntityIdAndEntityType(id, entityType.name());
-        } else if (EntityType.TASK.equals(entityType)) {
-            repository.deleteById(id);
-        }
+    public void deleteFileById(Long id) {
+        repository.deleteById(id);
         log.info("Deleted file with id={}", id);
     }
 }

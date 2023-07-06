@@ -17,5 +17,5 @@ public interface FileService {
 
     void saveFile(Long userId, Long entityId, EntityType entityType, MultipartFile file);
 
-    void deleteFileById(Long fileId, EntityType entityType);
+    void deleteFileById(Long fileId);
 }
