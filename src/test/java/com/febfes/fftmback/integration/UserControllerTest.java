@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.dto.UserPicDto;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.UserService;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.util.List;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
+import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -163,7 +165,23 @@ class UserControllerTest extends BasicTestClass {
                 .response()
                 .as(UserDto.class);
         Assertions.assertNotNull(userDto.userPic());
-        Assertions.assertEquals("/files/user-pic/%d".formatted(userId), userDto.userPic());
+        Assertions.assertEquals(String.format(USER_PIC_URN, userId), userDto.userPic());
+    }
+
+    @Test
+    void successfulDeleteUserPicTest() {
+        successfulLoadUserPicTest();
+        Long userId = userService.getUserIdByUsername(createdUsername);
+        requestWithBearerToken()
+                .when()
+                .delete("/api/v1/files/user-pic/{userId}", userId)
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+        String userPicUrn = String.format(USER_PIC_URN, userId);
+        Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> fileService.getFile(userPicUrn)
+        );
     }
 
 

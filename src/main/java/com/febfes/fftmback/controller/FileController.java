@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
+
 @RestController
 @RequestMapping("v1/files")
 @RequiredArgsConstructor
@@ -78,5 +80,11 @@ public class FileController {
     @ApiDelete(path = "{fileId}")
     public void deleteFile(@PathVariable Long fileId) {
         fileService.deleteFileById(fileId);
+    }
+
+    @Operation(summary = "Delete user pic by userId")
+    @ApiDelete(path = "user-pic/{userId}")
+    public void deleteUserPic(@PathVariable Long userId) {
+        fileService.deleteFileById(fileService.getFile(String.format(USER_PIC_URN, userId)).getId());
     }
 }
