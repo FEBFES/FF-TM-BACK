@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("v1/users")
@@ -44,6 +43,6 @@ public class UserController {
     public List<UserDto> getUsersWithFilter(@RequestParam(value = "filter") @FilterParam String filter) {
         return userService.getUsersByFilter(filter).stream()
                 .map(UserMapper.INSTANCE::userToUserDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

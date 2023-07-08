@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("v1/projects")
@@ -52,7 +51,7 @@ public class TaskController {
         List<TaskView> tasks = taskService.getTasks(page, limit, pathVars.columnId(), filter);
         return tasks.stream()
                 .map(TaskMapper.INSTANCE::taskViewToTaskShortDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Operation(summary = "Get task by its id")

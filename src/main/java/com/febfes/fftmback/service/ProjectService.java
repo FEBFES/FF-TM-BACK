@@ -7,6 +7,7 @@ import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ProjectService {
     ProjectEntity createProject(ProjectEntity project, String username);
@@ -28,6 +29,8 @@ public interface ProjectService {
     void addProjectToFavourite(Long projectId, Long userId);
 
     void removeProjectFromFavourite(Long projectId, Long userId);
+
+    Set<UserEntity> getProjectMembers(Long projectId);
 
     List<UserEntity> addNewMembers(Long projectId, List<Long> memberIds);
 

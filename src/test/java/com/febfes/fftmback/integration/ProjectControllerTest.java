@@ -6,12 +6,14 @@ import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
+import io.restassured.mapper.TypeRef;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.NonNull;
@@ -297,6 +299,23 @@ class ProjectControllerTest extends BasicTestClass {
                 Assertions.assertThat(updatedSecondAddedMember.getProjects().size()).isZero();
             }
         });
+    }
+
+    @Test
+    void successfulGetMembersTest() {
+        successfulAddNewMembersTest();
+        Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).getId();
+        List<UserDto> projectMembers = requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("%s/{id}/members".formatted(PATH_TO_PROJECTS_API), createdProjectId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(new TypeRef<>() {
+                });
+        Assertions.assertThat(projectMembers).hasSize(3);
     }
 
     @Test

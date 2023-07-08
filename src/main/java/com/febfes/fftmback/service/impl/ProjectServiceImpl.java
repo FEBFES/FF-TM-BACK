@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -69,7 +69,7 @@ public class ProjectServiceImpl implements ProjectService {
         UserEntity user = userService.getUserById(userId);
         List<ProjectEntity> userProjects = user.getProjects().stream()
                 .peek(project -> project.setIsFavourite(projectRepository.isProjectFavourite(project.getId(), userId)))
-                .collect(Collectors.toList());
+                .toList();
         log.info("Received {} projects for user with id={}", userProjects.size(), userId);
         return userProjects;
     }
@@ -122,7 +122,7 @@ public class ProjectServiceImpl implements ProjectService {
                 columnService.getColumnListWithOrder(id, taskFilter)
                         .stream()
                         .map(ColumnWithTasksMapper.INSTANCE::columnToColumnWithTasksDto)
-                        .collect(Collectors.toList())
+                        .toList()
         );
     }
 
@@ -154,6 +154,12 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void removeProjectFromFavourite(Long projectId, Long userId) {
         projectRepository.removeProjectFromFavourite(projectId, userId);
+    }
+
+    @Override
+    public Set<UserEntity> getProjectMembers(Long projectId) {
+        ProjectEntity project = getProject(projectId);
+        return project.getMembers();
     }
 
     @Override
