@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Profile("test")
@@ -49,6 +48,6 @@ public class DatabaseCleanup implements InitializingBean {
                 .filter(e -> e.getJavaType().getAnnotation(Table.class) != null)
                 .map(e -> e.getJavaType().getAnnotation(Table.class).name())
                 .filter(tableName -> !TABLES_NOT_TO_CLEAN.contains(tableName))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

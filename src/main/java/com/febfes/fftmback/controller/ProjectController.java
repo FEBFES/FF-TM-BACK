@@ -27,7 +27,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("v1/projects")
@@ -102,7 +101,7 @@ public class ProjectController {
                 .getTaskTypesByProjectId(id)
                 .stream()
                 .map(TaskTypeEntity::getName)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Operation(summary = "Get project members")
@@ -110,7 +109,7 @@ public class ProjectController {
     public List<UserDto> getProjectMembers(@PathVariable Long id) {
         return projectService.getProjectMembers(id).stream()
                 .map(UserMapper.INSTANCE::userToUserDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Operation(summary = "Add new members to the project")
@@ -122,7 +121,7 @@ public class ProjectController {
         List<UserEntity> addedMembers = projectService.addNewMembers(id, memberIds);
         return addedMembers.stream()
                 .map(UserMapper.INSTANCE::userToUserDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Operation(summary = "Delete member from project")

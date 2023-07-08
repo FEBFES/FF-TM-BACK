@@ -315,7 +315,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .response()
                 .as(new TypeRef<>() {
                 });
-        Assertions.assertThat(projectMembers.size()).isEqualTo(3);
+        Assertions.assertThat(projectMembers).hasSize(3);
     }
 
     @Test

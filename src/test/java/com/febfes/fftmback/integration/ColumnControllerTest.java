@@ -213,7 +213,7 @@ class ColumnControllerTest extends BasicTestClass {
                 .statusCode(HttpStatus.SC_OK);
         Collections.swap(columnIdWithOrderList, 1, 2);
         dashboardDto = getDashboard();
-        Assertions.assertThat(dashboardDto.columns().stream().map(ColumnWithTasksDto::id).collect(Collectors.toList()))
+        Assertions.assertThat(dashboardDto.columns().stream().map(ColumnWithTasksDto::id).toList())
                 .isEqualTo(columnIdWithOrderList);
     }
 
