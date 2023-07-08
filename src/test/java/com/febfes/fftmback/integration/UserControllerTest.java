@@ -17,18 +17,24 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
 import static io.restassured.RestAssured.given;
+import static java.util.Objects.nonNull;
 import static org.hamcrest.Matchers.equalTo;
 
 class UserControllerTest extends BasicTestClass {
@@ -53,6 +59,9 @@ class UserControllerTest extends BasicTestClass {
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @DynamicPropertySource
     static void registerPgProperties(DynamicPropertyRegistry registry) {
@@ -84,10 +93,10 @@ class UserControllerTest extends BasicTestClass {
                 .body("username", equalTo(createdUsername));
     }
 
-    @Test
-    void successfulUpdateUserTest() {
+    @ParameterizedTest
+    @MethodSource("updateUserData")
+    void successfulUpdateUserTest(EditUserDto editUserDto) {
         Long userId = userService.getUserIdByUsername(createdUsername);
-        EditUserDto editUserDto = new EditUserDto(FIRST_NAME, LAST_NAME, DISPLAY_NAME, PASSWORD);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editUserDto)
@@ -95,6 +104,22 @@ class UserControllerTest extends BasicTestClass {
                 .put("%s/{id}".formatted(PATH_TO_USERS_API), userId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
+        UserEntity user = userService.getUserById(userId);
+        Assertions.assertEquals(editUserDto.firstName(), user.getFirstName());
+        Assertions.assertEquals(editUserDto.lastName(), user.getLastName());
+        Assertions.assertEquals(editUserDto.displayName(), user.getDisplayName());
+        if (nonNull(editUserDto.password())) {
+            Assertions.assertTrue(passwordEncoder.matches(editUserDto.password(), user.getPassword()));
+        } else {
+            Assertions.assertNotNull(user.getEncryptedPassword());
+        }
+    }
+
+    static Stream<Arguments> updateUserData() {
+        return Stream.of(
+                Arguments.of(new EditUserDto(FIRST_NAME, LAST_NAME, DISPLAY_NAME, PASSWORD), 3),
+                Arguments.of(new EditUserDto(FIRST_NAME, LAST_NAME, DISPLAY_NAME, null), 1)
+        );
     }
 
     @Test

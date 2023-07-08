@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -63,7 +65,9 @@ public class UserServiceImpl implements UserService {
         userToUpdate.setFirstName(user.getFirstName());
         userToUpdate.setLastName(user.getLastName());
         userToUpdate.setDisplayName(user.getDisplayName());
-        userToUpdate.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
+        if (nonNull(user.getPassword())) {  // password can't be null, but front can send null password as it doesn't have it
+            userToUpdate.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
+        }
         userRepository.save(userToUpdate);
         log.info("Updated user: {}", userToUpdate);
     }
