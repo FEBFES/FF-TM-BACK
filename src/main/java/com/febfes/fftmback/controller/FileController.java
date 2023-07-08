@@ -5,6 +5,7 @@ import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.TaskFileDto;
 import com.febfes.fftmback.dto.UserPicDto;
 import com.febfes.fftmback.mapper.FileMapper;
 import com.febfes.fftmback.service.FileService;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
 
@@ -61,9 +64,14 @@ public class FileController {
             path = "task/{taskId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public void saveTaskFiles(@PathVariable Long taskId, @RequestParam("files") MultipartFile[] files) {
+    public List<TaskFileDto> saveTaskFiles(@PathVariable Long taskId, @RequestParam("files") MultipartFile[] files) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Arrays.stream(files).forEach(file -> fileService.saveFile(user.getId(), taskId, EntityType.TASK, file));
+        List<TaskFileDto> response = new ArrayList<>();
+        Arrays.stream(files).forEach(file -> {
+            FileEntity savedFile = fileService.saveFile(user.getId(), taskId, EntityType.TASK, file);
+            response.add(FileMapper.INSTANCE.fileToTaskFileDto(savedFile));
+        });
+        return response;
     }
 
     @Operation(summary = "Get task file")

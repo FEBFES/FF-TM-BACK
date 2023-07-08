@@ -5,11 +5,13 @@ import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.dao.*;
 import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.dto.TaskFileDto;
 import com.febfes.fftmback.dto.TaskShortDto;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
+import io.restassured.mapper.TypeRef;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Assertions;
@@ -319,14 +321,22 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     private void saveTaskFile(Long taskId) {
-        File taskFile = new File("src/test/resources/task-file.txt");
+        String taskFileName = "task-file.txt";
+        File taskFile = new File(String.format("src/test/resources/%s", taskFileName));
 
-        requestWithBearerToken()
+        List<TaskFileDto> savedFiles = requestWithBearerToken()
                 .multiPart("files", taskFile)
                 .contentType("multipart/form-data")
                 .when()
                 .post("/api/v1/files/task/{taskId}", taskId)
                 .then()
-                .statusCode(HttpStatus.SC_OK);
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(new TypeRef<>() {
+                });
+        Assertions.assertEquals(1, savedFiles.size());
+        Assertions.assertEquals(userService.getUserIdByUsername(createdUsername), savedFiles.get(0).userId());
+        Assertions.assertEquals(taskFileName, savedFiles.get(0).name());
     }
 }
