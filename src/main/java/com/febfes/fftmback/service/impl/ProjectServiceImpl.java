@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -154,6 +155,12 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void removeProjectFromFavourite(Long projectId, Long userId) {
         projectRepository.removeProjectFromFavourite(projectId, userId);
+    }
+
+    @Override
+    public Set<UserEntity> getProjectMembers(Long projectId) {
+        ProjectEntity project = getProject(projectId);
+        return project.getMembers();
     }
 
     @Override

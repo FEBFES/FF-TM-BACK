@@ -105,6 +105,14 @@ public class ProjectController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Get project members")
+    @ApiGet(path = "{id}/members")
+    public List<UserDto> getProjectMembers(@PathVariable Long id) {
+        return projectService.getProjectMembers(id).stream()
+                .map(UserMapper.INSTANCE::userToUserDto)
+                .collect(Collectors.toList());
+    }
+
     @Operation(summary = "Add new members to the project")
     @PostMapping(path = "{id}/members")
     @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
