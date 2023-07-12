@@ -2,11 +2,14 @@ package com.febfes.fftmback.config;
 
 import com.febfes.fftmback.domain.common.TaskPriority;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.swagger.springdoc.SpecificationArgResolverSpringdocOperationCustomizer;
 import net.kaczmarzyk.spring.data.jpa.web.SpecificationArgumentResolver;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.format.FormatterRegistry;
@@ -16,10 +19,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.List;
 
 @Configuration
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class AppConfig implements WebMvcConfigurer {
 
-    final MyConversionService conversionService;
+    @Autowired
+    @Qualifier("mvcConversionService")
+    @Lazy
+    ConversionService conversionService;
+
+//    final MyConversionService conversionService;
 
     @Bean
     public SpecificationArgResolverSpringdocOperationCustomizer specificationArgResolverSpringdocOperationCustomizer() {
@@ -45,8 +53,8 @@ public class AppConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new PageableHandlerMethodArgumentResolver());
-//        argumentResolvers.add(new SpecificationArgumentResolver());
-        argumentResolvers.add(new SpecificationArgumentResolver(conversionService));
+        argumentResolvers.add(new SpecificationArgumentResolver());
+//        argumentResolvers.add(new SpecificationArgumentResolver(conversionService));
 //        argumentResolvers.add(new SpecificationArgumentResolver(argumentResolverConversionService()));
     }
 
@@ -54,6 +62,7 @@ public class AppConfig implements WebMvcConfigurer {
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new StringToPriorityConverter());
         registry.addConverter(new PriorityToStringConverter());
+        registry.addConverterFactory(new StringToEnumConverterFactory());
     }
 
     public static class StringToPriorityConverter implements Converter<String, TaskPriority> {

@@ -2,6 +2,7 @@ package com.febfes.fftmback.domain.common.specification;
 
 import com.febfes.fftmback.domain.dao.TaskView;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.domain.EqualIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.JoinFetch;
@@ -17,7 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
         @Spec(path = "description", params = "description", spec = LikeIgnoreCase.class),
         @Spec(path = "own.id", params = "ownerId", spec = Equal.class),
         @Spec(path = "asg.id", params = "assigneeId", spec = Equal.class),
-        @Spec(path = "priority", params = "priority", spec = Equal.class),
+        @Spec(path = "priority", params = "priority", spec = EqualIgnoreCase.class),
         @Spec(path = "tt.name", params = "taskType", spec = Equal.class)
 })
 public interface TaskSpec extends Specification<TaskView> {
