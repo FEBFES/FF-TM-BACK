@@ -16,5 +16,9 @@ public interface UserService extends UserDetailsService {
 
     void updateUser(UserEntity user, Long id);
 
-    List<UserEntity> getUsersByFilter(String filter);
+    List<UserView> getUsersByFilter(String filter);
+
+    List<UserView> getUsersByUserId(List<Long> userIds);
+
+    UserView getUserByUserId(Long userId);
 }

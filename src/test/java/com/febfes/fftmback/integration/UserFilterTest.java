@@ -4,7 +4,7 @@ import com.febfes.fftmback.domain.common.query.FilterRequest;
 import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.common.query.Operator;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.repository.UserRepository;
+import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,7 +23,7 @@ public class UserFilterTest extends BasicStaticDataTestClass {
     public static final String USER_DISPLAY_NAME = "test_display_name";
 
     @Autowired
-    UserRepository userRepository;
+    UserViewRepository userViewRepository;
 
     @BeforeAll
     static void beforeAll(
@@ -44,7 +44,7 @@ public class UserFilterTest extends BasicStaticDataTestClass {
     @ParameterizedTest
     @MethodSource("displayNameLikeFilterData")
     void displayNameLikeFilterTest(List<FilterRequest> filters, int expected) {
-        Assertions.assertEquals(expected, userRepository.findAll(new FilterSpecification<>(filters)).size());
+        Assertions.assertEquals(expected, userViewRepository.findAll(new FilterSpecification<>(filters)).size());
     }
 
     static Stream<Arguments> displayNameLikeFilterData() {

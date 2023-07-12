@@ -73,11 +73,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntity> getUsersByFilter(@NonNull String filter) {
-        return userRepository.findAll(makeUsersFilter(filter));
+    public List<UserView> getUsersByFilter(@NonNull String filter) {
+        return userViewRepository.findAll(makeUsersFilter(filter));
     }
 
-    private FilterSpecification<UserEntity> makeUsersFilter(@NonNull String filter) {
+    @Override
+    public List<UserView> getUsersByUserId(List<Long> userIds) {
+        return userIds.stream()
+                .map(this::getUserByUserId)
+                .toList();
+    }
+
+    @Override
+    public UserView getUserByUserId(Long userId) {
+        return userViewRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, userId));
+    }
+
+    private FilterSpecification<UserView> makeUsersFilter(@NonNull String filter) {
         log.info("Receiving users with a filter: {}", filter);
         List<FilterRequest> filters = JsonUtils.convertStringToObject(filter, new TypeReference<>() {
         });

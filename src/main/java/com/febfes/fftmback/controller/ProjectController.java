@@ -6,6 +6,7 @@ import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
@@ -108,7 +109,7 @@ public class ProjectController {
     @ApiGet(path = "{id}/members")
     public List<UserDto> getProjectMembers(@PathVariable Long id) {
         return projectService.getProjectMembers(id).stream()
-                .map(UserMapper.INSTANCE::userToUserDto)
+                .map(UserMapper.INSTANCE::userViewToUserDto)
                 .toList();
     }
 
@@ -118,9 +119,9 @@ public class ProjectController {
     @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
     public List<UserDto> addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        List<UserEntity> addedMembers = projectService.addNewMembers(id, memberIds);
+        List<UserView> addedMembers = projectService.addNewMembers(id, memberIds);
         return addedMembers.stream()
-                .map(UserMapper.INSTANCE::userToUserDto)
+                .map(UserMapper.INSTANCE::userViewToUserDto)
                 .toList();
     }
 
@@ -133,7 +134,7 @@ public class ProjectController {
         if (roleCheckerComponent.userHasRole(id, memberId, RoleName.OWNER)) {
             throw new ProjectOwnerException();
         }
-        UserEntity removedMember = projectService.removeMember(id, memberId);
-        return UserMapper.INSTANCE.userToUserDto(removedMember);
+        UserView removedMember = projectService.removeMember(id, memberId);
+        return UserMapper.INSTANCE.userViewToUserDto(removedMember);
     }
 }
