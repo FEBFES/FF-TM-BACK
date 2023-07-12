@@ -46,7 +46,7 @@ public class TaskController {
     public List<TaskShortDto> getTasks(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
-            /*@FilterParam*/ TaskSpec taskSpec,
+            TaskSpec taskSpec,
             @ParameterObject ColumnParameters pathVars
     ) {
         List<TaskView> tasks = taskService.getTasks(page, limit, pathVars.columnId(), taskSpec);
