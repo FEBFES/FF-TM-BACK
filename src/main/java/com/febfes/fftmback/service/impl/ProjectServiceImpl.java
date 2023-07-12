@@ -3,7 +3,6 @@ package com.febfes.fftmback.service.impl;
 import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.OneProjectDto;
@@ -125,8 +124,8 @@ public class ProjectServiceImpl implements ProjectService {
                         .stream()
                         .map(column -> {
                             // TODO: maybe we can optimize it somehow?
-                            List<TaskView> filteredTasks = taskService.getTasks(column.getId(), taskFilter);
-                            return ColumnWithTasksMapper.INSTANCE.columnToColumnWithTasksDto(column, filteredTasks);
+//                            List<TaskView> filteredTasks = taskService.getTasks(column.getId(), taskFilter);
+                            return ColumnWithTasksMapper.INSTANCE.columnToColumnWithTasksDto(column, new ArrayList<>());
                         })
                         .toList()
         );

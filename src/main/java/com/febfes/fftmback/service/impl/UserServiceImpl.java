@@ -1,15 +1,11 @@
 package com.febfes.fftmback.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.febfes.fftmback.domain.common.query.FilterRequest;
-import com.febfes.fftmback.domain.common.query.FilterSpecification;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.JsonUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
@@ -74,13 +71,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserEntity> getUsersByFilter(@NonNull String filter) {
-        return userRepository.findAll(makeUsersFilter(filter));
-    }
-
-    private FilterSpecification<UserEntity> makeUsersFilter(@NonNull String filter) {
-        log.info("Receiving users with a filter: {}", filter);
-        List<FilterRequest> filters = JsonUtils.convertStringToObject(filter, new TypeReference<>() {
-        });
-        return new FilterSpecification<>(filters);
+//        return userRepository.findAll(makeUsersFilter(filter));
+        return new ArrayList<>();
     }
 }

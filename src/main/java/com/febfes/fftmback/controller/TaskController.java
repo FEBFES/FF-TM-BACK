@@ -4,6 +4,7 @@ import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.config.auth.RoleCheckerComponent;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.EditTaskDto;
@@ -45,10 +46,10 @@ public class TaskController {
     public List<TaskShortDto> getTasks(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
-            @RequestParam(value = "filter", required = false) @FilterParam String filter,
+            /*@FilterParam*/ TaskSpec taskSpec,
             @ParameterObject ColumnParameters pathVars
     ) {
-        List<TaskView> tasks = taskService.getTasks(page, limit, pathVars.columnId(), filter);
+        List<TaskView> tasks = taskService.getTasks(page, limit, pathVars.columnId(), taskSpec);
         return tasks.stream()
                 .map(TaskMapper.INSTANCE::taskViewToTaskShortDto)
                 .toList();
