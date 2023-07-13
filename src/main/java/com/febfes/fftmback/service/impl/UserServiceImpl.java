@@ -1,12 +1,12 @@
 package com.febfes.fftmback.service.impl;
 
+import com.febfes.fftmback.domain.common.specification.UserSpec;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.UserService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
@@ -70,8 +69,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntity> getUsersByFilter(@NonNull String filter) {
-//        return userRepository.findAll(makeUsersFilter(filter));
-        return new ArrayList<>();
+    public List<UserEntity> getUsersByFilter(UserSpec userSpec) {
+        return userRepository.findAll(userSpec);
     }
 }

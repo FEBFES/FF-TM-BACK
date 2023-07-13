@@ -1,5 +1,6 @@
 package com.febfes.fftmback.service;
 
+import com.febfes.fftmback.domain.common.specification.UserSpec;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,5 +17,5 @@ public interface UserService extends UserDetailsService {
 
     void updateUser(UserEntity user, Long id);
 
-    List<UserEntity> getUsersByFilter(String filter);
+    List<UserEntity> getUsersByFilter(UserSpec userSpec);
 }

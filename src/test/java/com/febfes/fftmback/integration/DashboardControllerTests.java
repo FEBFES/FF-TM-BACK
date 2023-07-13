@@ -114,7 +114,7 @@ class DashboardControllerTests extends BasicTestClass {
 
         Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
-                .params("taskFilter", "[{\"property\":\"name\",\"operator\":\"EQUAL\",\"value\":\"%s\"}]".formatted(TASK_NAME))
+                .params("taskName", TASK_NAME)
                 .when()
                 .get("/api/v1/projects/{id}/dashboard", projectEntity.getId());
         DashboardDto dashboardDto = response.then()

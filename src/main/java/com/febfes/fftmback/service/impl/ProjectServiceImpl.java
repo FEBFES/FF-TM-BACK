@@ -2,6 +2,7 @@ package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.common.specification.ColumnWithTasksSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
@@ -39,7 +40,6 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserService userService;
     private final TaskTypeService taskTypeService;
     private final RoleService roleService;
-    private final TaskService taskService;
 
     private ProjectPatchFieldProcessor patchIsFavouriteProcessor;
 
@@ -118,15 +118,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public DashboardDto getDashboard(Long id, String taskFilter) {
+    public DashboardDto getDashboard(Long id, ColumnWithTasksSpec columnWithTasksSpec) {
         return new DashboardDto(
-                columnService.getOrderedColumns(id)
+                columnService.getOrderedColumns(id, columnWithTasksSpec)
                         .stream()
-                        .map(column -> {
-                            // TODO: maybe we can optimize it somehow?
-//                            List<TaskView> filteredTasks = taskService.getTasks(column.getId(), taskFilter);
-                            return ColumnWithTasksMapper.INSTANCE.columnToColumnWithTasksDto(column, new ArrayList<>());
-                        })
+                        .map(ColumnWithTasksMapper.INSTANCE::columnToColumnWithTasksDto)
                         .toList()
         );
     }

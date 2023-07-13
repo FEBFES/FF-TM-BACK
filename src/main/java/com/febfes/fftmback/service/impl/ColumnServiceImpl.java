@@ -1,5 +1,6 @@
 package com.febfes.fftmback.service.impl;
 
+import com.febfes.fftmback.domain.common.specification.ColumnWithTasksSpec;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.ColumnRepository;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.febfes.fftmback.domain.common.specification.ColumnWithTasksSpec.byProjectId;
 
 @Slf4j
 @Service
@@ -83,9 +86,9 @@ public class ColumnServiceImpl implements ColumnService {
     }
 
     @Override
-    public List<TaskColumnEntity> getOrderedColumns(Long projectId) {
+    public List<TaskColumnEntity> getOrderedColumns(Long projectId, ColumnWithTasksSpec columnWithTasksSpec) {
         Map<Long, TaskColumnEntity> childIdToColumnEntity = columnRepository
-                .findAllByProjectId(projectId)
+                .findAll(columnWithTasksSpec.and(byProjectId(projectId)))
                 .stream()
                 .collect(Collectors.toMap(TaskColumnEntity::getChildTaskColumnId, Function.identity()));
         List<TaskColumnEntity> result = new ArrayList<>();

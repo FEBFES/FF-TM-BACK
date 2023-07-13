@@ -1,41 +1,33 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.TaskPriority;
-import com.febfes.fftmback.domain.common.query.FilterRequest;
-import com.febfes.fftmback.domain.common.query.FilterSpecification;
-import com.febfes.fftmback.domain.common.query.Operator;
+import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.domain.dao.UserView;
-import com.febfes.fftmback.exception.NoSuitableTypeFilterException;
-import com.febfes.fftmback.exception.ValueFilterException;
 import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.DateUtils;
+import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.stream.Stream;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME;
 import static com.febfes.fftmback.integration.TaskControllerTest.TASK_NAME;
-import static com.febfes.fftmback.util.DateUtils.STANDARD_DATE_PATTERN;
 
 class TaskFilterTest extends BasicStaticDataTestClass {
 
     @Autowired
     private TaskViewRepository taskViewRepository;
-
-    private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(STANDARD_DATE_PATTERN);
 
     @BeforeAll
     static void beforeAll(
@@ -139,142 +131,24 @@ class TaskFilterTest extends BasicStaticDataTestClass {
          */
     }
 
-    @Test
-    void equalFilterTest() {
-        List<FilterRequest> filters = List.of(
-                FilterRequest.builder()
-                        .property("name")
-                        .operator(Operator.EQUAL)
-                        .value(TASK_NAME)
-                        .build()
-        );
-        Assertions.assertEquals(1, taskViewRepository.findAll(new FilterSpecification<>(filters)).size());
-
-        List<FilterRequest> filtersProjectId = List.of(
-                FilterRequest.builder()
-                        .property("projectId")
-                        .operator(Operator.EQUAL)
-                        .value(1)
-                        .build()
-        );
-        Assertions.assertEquals(4, taskViewRepository.findAll(new FilterSpecification<>(filtersProjectId)).size());
-
-        List<FilterRequest> filtersProjectIdAndName = List.of(
-                FilterRequest.builder()
-                        .property("projectId")
-                        .operator(Operator.EQUAL)
-                        .value(1)
-                        .build(),
-                FilterRequest.builder()
-                        .property("name")
-                        .operator(Operator.EQUAL)
-                        .value(TASK_NAME)
-                        .build()
-        );
-        Assertions.assertEquals(1, taskViewRepository.findAll(new FilterSpecification<>(filtersProjectIdAndName)).size());
+    @ParameterizedTest
+    @MethodSource("taskFilterData")
+    void taskFilterTest(TaskSpec taskSpec, int expected) {
+        Assertions.assertEquals(expected, taskViewRepository.findAll(taskSpec).size());
     }
 
-    @Test
-    void notEqualFilterTest() {
-        List<FilterRequest> filters = List.of(
-                FilterRequest.builder()
-                        .property("name")
-                        .operator(Operator.NOT_EQUAL)
-                        .value(TASK_NAME)
-                        .build()
-        );
-        Assertions.assertEquals(4, taskViewRepository.findAll(new FilterSpecification<>(filters)).size());
-
-        List<FilterRequest> filtersOwnerId = List.of(
-                FilterRequest.builder()
-                        .property("owner")
-                        .operator(Operator.NOT_EQUAL)
-                        .value(UserView.builder().id(1L).build())
-                        .build()
-        );
-        Assertions.assertEquals(2, taskViewRepository.findAll(new FilterSpecification<>(filtersOwnerId)).size());
-    }
-
-    @Test
-    void likeFilterTest() {
-        List<FilterRequest> filters = List.of(
-                FilterRequest.builder()
-                        .property("name")
-                        .operator(Operator.LIKE)
-                        .value(TASK_NAME)
-                        .build()
-        );
-        Assertions.assertEquals(5, taskViewRepository.findAll(new FilterSpecification<>(filters)).size());
-
-        // it will fail as LIKE operator only accept strings
-        List<FilterRequest> filtersFailed = List.of(
-                FilterRequest.builder()
-                        .property("owner")
-                        .operator(Operator.LIKE)
-                        .value(1)
-                        .build()
-        );
-        Assertions.assertThrows(
-                NoSuitableTypeFilterException.class,
-                () -> taskViewRepository.findAll(new FilterSpecification<>(filtersFailed))
-        );
-    }
-
-    @Test
-    void inFilterTest() {
-        List<FilterRequest> filters = List.of(
-                FilterRequest.builder()
-                        .property("name")
-                        .operator(Operator.IN)
-                        .values(List.of(TASK_NAME + "1", TASK_NAME + "2"))
-                        .build()
-        );
-        Assertions.assertEquals(2, taskViewRepository.findAll(new FilterSpecification<>(filters)).size());
-
-        // it will fail as IN operator only accept values belong to the same class
-        List<FilterRequest> filtersFailed = List.of(
-                FilterRequest.builder()
-                        .property("name")
-                        .operator(Operator.IN)
-                        .values(List.of(TASK_NAME, 1))
-                        .build()
-        );
-        Assertions.assertThrows(
-                ValueFilterException.class,
-                () -> taskViewRepository.findAll(new FilterSpecification<>(filtersFailed))
-        );
-    }
-
-    @Test
-    void betweenFilterTest() {
-        LocalDateTime value = DateUtils.convertDateToLocalDateTime(DateUtils.getCurrentDatePlusSeconds(-1000));
-        String valueString = FORMATTER.format(value);
-
-        LocalDateTime valueTo = DateUtils.convertDateToLocalDateTime(DateUtils.getCurrentDatePlusSeconds(1000));
-        String valueToString = FORMATTER.format(valueTo);
-
-        List<FilterRequest> filters = List.of(
-                FilterRequest.builder()
-                        .property("createDate")
-                        .operator(Operator.BETWEEN)
-                        .value(valueString)
-                        .valueTo(valueToString)
-                        .build()
-        );
-        Assertions.assertEquals(5, taskViewRepository.findAll(new FilterSpecification<>(filters)).size());
-
-        // it will fail as BETWEEN operator only accept value and valueTo belong to the same class
-        List<FilterRequest> filtersFailed = List.of(
-                FilterRequest.builder()
-                        .property("name")
-                        .operator(Operator.BETWEEN)
-                        .value(1)
-                        .valueTo(valueToString)
-                        .build()
-        );
-        Assertions.assertThrows(
-                ValueFilterException.class,
-                () -> taskViewRepository.findAll(new FilterSpecification<>(filtersFailed))
+    static Stream<Arguments> taskFilterData() {
+        // TODO: add more data
+        return Stream.of(
+                Arguments.of(SpecificationBuilder.specification(TaskSpec.class)
+                        .withParam("id", "1")
+                        .build(), 1),
+                Arguments.of(SpecificationBuilder.specification(TaskSpec.class)
+                        .withParam("name", TASK_NAME)
+                        .build(), 5),
+                Arguments.of(SpecificationBuilder.specification(TaskSpec.class)
+                        .withParam("description", "12345")
+                        .build(), 4)
         );
     }
 }
