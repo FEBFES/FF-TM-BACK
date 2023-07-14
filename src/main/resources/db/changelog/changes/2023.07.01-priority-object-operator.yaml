@@ -6,6 +6,9 @@ databaseChangeLog:
       changes:
         - sql:
             dbms: 'postgresql'
+            sql: DROP CAST IF EXISTS (varchar AS priority)
+        - sql:
+            dbms: 'postgresql'
             sql: CREATE FUNCTION priority_eq(p priority, s character varying) RETURNS boolean AS '
                  BEGIN
                  RETURN p::text = s;
