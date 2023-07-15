@@ -7,10 +7,7 @@ import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
-import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.dto.OneProjectDto;
-import com.febfes.fftmback.dto.PatchDto;
-import com.febfes.fftmback.dto.RoleDto;
+import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.mapper.ProjectMapper;
@@ -166,8 +163,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<UserView> getProjectMembers(Long projectId) {
         ProjectEntity project = getProject(projectId);
         Set<UserEntity> users = project.getMembers();
-        // TODO: How to optimize it?
-        return userService.getUsersByUserId(users.stream().map(UserEntity::getId).toList());
+        return userService.getUsersByUserIds(users.stream().map(UserEntity::getId).toList());
     }
 
     @Override
@@ -182,8 +178,7 @@ public class ProjectServiceImpl implements ProjectService {
         });
         projectRepository.save(project);
         log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
-        // TODO: How to optimize it?
-        return userService.getUsersByUserId(addedMembers.stream().map(UserEntity::getId).toList());
+        return userService.getUsersByUserIds(addedMembers.stream().map(UserEntity::getId).toList());
     }
 
     @Override

@@ -19,7 +19,7 @@ public interface UserService extends UserDetailsService {
 
     List<UserView> getUsersByFilter(UserSpec userSpec);
 
-    List<UserView> getUsersByUserId(List<Long> userIds);
+    List<UserView> getUsersByUserIds(List<Long> userIds);
 
     UserView getUserByUserId(Long userId);
 }
