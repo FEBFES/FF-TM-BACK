@@ -69,7 +69,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntity> getUsersByFilter(UserSpec userSpec) {
-        return userRepository.findAll(userSpec);
+    public List<UserView> getUsersByFilter(UserSpec userSpec) {
+        return userViewRepository.findAll(userSpec);
+    }
+
+    @Override
+    public List<UserView> getUsersByUserIds(List<Long> userIds) {
+        return userIds.stream()
+                .map(this::getUserByUserId)
+                .toList();
+    }
+
+    @Override
+    public UserView getUserByUserId(Long userId) {
+        return userViewRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, userId));
     }
 }

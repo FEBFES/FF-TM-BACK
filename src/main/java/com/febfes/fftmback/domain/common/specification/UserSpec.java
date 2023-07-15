@@ -1,6 +1,6 @@
 package com.febfes.fftmback.domain.common.specification;
 
-import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.dao.UserView;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
@@ -16,5 +16,5 @@ import org.springframework.data.jpa.domain.Specification;
         @Spec(path = "lastName", params = "lastName", spec = LikeIgnoreCase.class),
         @Spec(path = "displayName", params = "displayName", spec = LikeIgnoreCase.class)
 })
-public interface UserSpec extends Specification<UserEntity> {
+public interface UserSpec extends Specification<UserView> {
 }

@@ -2,7 +2,7 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.specification.UserSpec;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.repository.UserRepository;
+import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +21,7 @@ public class UserFilterTest extends BasicStaticDataTestClass {
     public static final String USER_DISPLAY_NAME = "test_display_name";
 
     @Autowired
-    UserRepository userRepository;
+    UserViewRepository userViewRepository;
 
     @BeforeAll
     static void beforeAll(
@@ -42,7 +42,7 @@ public class UserFilterTest extends BasicStaticDataTestClass {
     @ParameterizedTest
     @MethodSource("displayNameLikeFilterData")
     void displayNameLikeFilterTest(UserSpec userSpec, int expected) {
-        Assertions.assertEquals(expected, userRepository.findAll(userSpec).size());
+        Assertions.assertEquals(expected, userViewRepository.findAll(userSpec).size());
     }
 
     static Stream<Arguments> displayNameLikeFilterData() {

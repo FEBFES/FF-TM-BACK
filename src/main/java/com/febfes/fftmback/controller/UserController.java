@@ -49,7 +49,7 @@ public class UserController {
     @ApiGet()
     public List<UserDto> getUsersWithFilter(UserSpec userSpec) {
         return userService.getUsersByFilter(userSpec).stream()
-                .map(UserMapper.INSTANCE::userToUserDto)
+                .map(UserMapper.INSTANCE::userViewToUserDto)
                 .toList();
     }
 }

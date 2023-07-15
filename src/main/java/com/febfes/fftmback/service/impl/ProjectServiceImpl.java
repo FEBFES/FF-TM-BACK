@@ -6,6 +6,7 @@ import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
@@ -159,13 +160,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Set<UserEntity> getProjectMembers(Long projectId) {
+    public List<UserView> getProjectMembers(Long projectId) {
         ProjectEntity project = getProject(projectId);
-        return project.getMembers();
+        Set<UserEntity> users = project.getMembers();
+        return userService.getUsersByUserIds(users.stream().map(UserEntity::getId).toList());
     }
 
     @Override
-    public List<UserEntity> addNewMembers(Long projectId, List<Long> memberIds) {
+    public List<UserView> addNewMembers(Long projectId, List<Long> memberIds) {
         ProjectEntity project = getProject(projectId);
         List<UserEntity> addedMembers = new ArrayList<>();
         memberIds.forEach(memberId -> {
@@ -176,16 +178,16 @@ public class ProjectServiceImpl implements ProjectService {
         });
         projectRepository.save(project);
         log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
-        return addedMembers;
+        return userService.getUsersByUserIds(addedMembers.stream().map(UserEntity::getId).toList());
     }
 
     @Override
-    public UserEntity removeMember(Long projectId, Long memberId) {
+    public UserView removeMember(Long projectId, Long memberId) {
         ProjectEntity project = getProject(projectId);
         project.removeMember(memberId);
         projectRepository.save(project);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
-        return userService.getUserById(memberId);
+        return userService.getUserViewById(memberId);
     }
 
     private void updateProjectField(
