@@ -1,5 +1,6 @@
 package com.febfes.fftmback.service;
 
+import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.DashboardDto;
@@ -22,7 +23,7 @@ public interface ProjectService {
 
     void deleteProject(Long id);
 
-    DashboardDto getDashboard(Long id, String taskFilter);
+    DashboardDto getDashboard(Long id, TaskSpec taskSpec);
 
     void editProjectPartially(Long id, Long ownerId, List<PatchDto> patchDtoList);
 

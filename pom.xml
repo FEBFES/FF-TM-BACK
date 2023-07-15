@@ -74,6 +74,20 @@
             <version>2.0.2</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/net.kaczmarzyk/specification-arg-resolver -->
+        <dependency>
+            <groupId>net.kaczmarzyk</groupId>
+            <artifactId>specification-arg-resolver</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-60</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>

@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ColumnService;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 
 
 class DashboardControllerTests extends BasicTestClass {
@@ -57,7 +57,7 @@ class DashboardControllerTests extends BasicTestClass {
     }
 
     @Test
-    void testSingleSuccessTest1() {
+    void successfulGetDashboardTest() {
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername
@@ -78,18 +78,22 @@ class DashboardControllerTests extends BasicTestClass {
                 createdUsername
         );
 
-        requestWithBearerToken()
+        DashboardDto dashboardDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get("/api/v1/projects/{id}/dashboard", projectEntity.getId())
                 .then()
                 .statusCode(200)
-                .body("columns[4].name", equalTo(COLUMN_NAME))
-                .body("columns[4].tasks[0].name", equalTo(TASK_NAME));
+                .extract()
+                .response()
+                .as(DashboardDto.class);
+        ColumnWithTasksDto createdColumn = dashboardDto.columns().get(4);
+        Assertions.assertEquals(COLUMN_NAME, createdColumn.name());
+        Assertions.assertEquals(TASK_NAME, createdColumn.tasks().get(0).name());
     }
 
     @Test
-    void successfulDashboardWithFilterTest() {
+    void successfulGetDashboardWithFilterTest() {
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUsername
@@ -100,6 +104,18 @@ class DashboardControllerTests extends BasicTestClass {
         );
         taskService.createTask(
                 TaskEntity.builder().projectId(projectEntity.getId()).columnId(1L).name(TASK_NAME + "2").build(),
+                createdUsername
+        );
+        taskService.createTask(
+                TaskEntity.builder().projectId(projectEntity.getId()).columnId(1L).name("2").build(),
+                createdUsername
+        );
+        taskService.createTask(
+                TaskEntity.builder().projectId(projectEntity.getId()).columnId(2L).name(TASK_NAME + "3").build(),
+                createdUsername
+        );
+        taskService.createTask(
+                TaskEntity.builder().projectId(projectEntity.getId()).columnId(3L).name("3").build(),
                 createdUsername
         );
 
@@ -114,7 +130,7 @@ class DashboardControllerTests extends BasicTestClass {
 
         Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
-                .params("taskFilter", "[{\"property\":\"name\",\"operator\":\"EQUAL\",\"value\":\"%s\"}]".formatted(TASK_NAME))
+                .params("taskName", TASK_NAME)
                 .when()
                 .get("/api/v1/projects/{id}/dashboard", projectEntity.getId());
         DashboardDto dashboardDto = response.then()
@@ -122,7 +138,7 @@ class DashboardControllerTests extends BasicTestClass {
                 .extract()
                 .response()
                 .as(DashboardDto.class);
-        Assertions.assertEquals(1, dashboardDto.columns().get(0).tasks().size());
+        Assertions.assertEquals(2, dashboardDto.columns().get(0).tasks().size());
     }
 
     private RequestSpecification requestWithBearerToken() {

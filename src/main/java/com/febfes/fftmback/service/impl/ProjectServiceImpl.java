@@ -2,13 +2,11 @@ package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.dto.OneProjectDto;
-import com.febfes.fftmback.dto.PatchDto;
-import com.febfes.fftmback.dto.RoleDto;
+import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.mapper.ProjectMapper;
@@ -119,17 +117,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public DashboardDto getDashboard(Long id, String taskFilter) {
-        return new DashboardDto(
-                columnService.getOrderedColumns(id)
-                        .stream()
-                        .map(column -> {
-                            // TODO: maybe we can optimize it somehow?
-                            List<TaskView> filteredTasks = taskService.getTasks(column.getId(), taskFilter);
-                            return ColumnWithTasksMapper.INSTANCE.columnToColumnWithTasksDto(column, filteredTasks);
-                        })
-                        .toList()
-        );
+    public DashboardDto getDashboard(Long id, TaskSpec taskSpec) {
+        List<ColumnWithTasksDto> columnsWithTasks = columnService.getOrderedColumns(id)
+                .stream()
+                .map(column -> {
+                    List<TaskView> filteredTasks = taskService.getTasks(column.getId(), taskSpec);
+                    return ColumnWithTasksMapper.INSTANCE.columnToColumnWithTasksDto(column, filteredTasks);
+                })
+                .toList();
+        return new DashboardDto(columnsWithTasks);
     }
 
     @Override
