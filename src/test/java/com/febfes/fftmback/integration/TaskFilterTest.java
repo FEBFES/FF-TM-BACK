@@ -141,16 +141,16 @@ class TaskFilterTest extends BasicStaticDataTestClass {
         // TODO: add more data
         return Stream.of(
                 Arguments.of(SpecificationBuilder.specification(TaskSpec.class)
-                        .withParam("id", "1")
+                        .withParam("taskId", "1")
                         .build(), 1),
                 Arguments.of(SpecificationBuilder.specification(TaskSpec.class)
-                        .withParam("name", TASK_NAME)
+                        .withParam("taskName", TASK_NAME)
                         .build(), 5),
                 Arguments.of(SpecificationBuilder.specification(TaskSpec.class)
-                        .withParam("description", "12345")
+                        .withParam("taskDescription", "12345")
                         .build(), 4),
                 Arguments.of(SpecificationBuilder.specification(TaskSpec.class)
-                        .withParam("priority", TaskPriority.LOW.name())
+                        .withParam("taskPriority", TaskPriority.LOW.name())
                         .build(), 1)
         );
     }

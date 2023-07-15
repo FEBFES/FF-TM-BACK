@@ -127,8 +127,8 @@ class TaskControllerTest extends BasicTestClass {
         createNewTask(TASK_NAME + "2");
 
         Map<String, String> params = new HashMap<>();
-        params.put("name", TASK_NAME);
-        params.put("description", "1");
+        params.put("taskName", TASK_NAME);
+        params.put("taskDescription", "1");
         Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .params(params)
