@@ -1,11 +1,10 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.common.query.FilterRequest;
-import com.febfes.fftmback.domain.common.query.FilterSpecification;
-import com.febfes.fftmback.domain.common.query.Operator;
+import com.febfes.fftmback.domain.common.specification.UserSpec;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
+import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,7 +12,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
@@ -43,27 +41,23 @@ public class UserFilterTest extends BasicStaticDataTestClass {
 
     @ParameterizedTest
     @MethodSource("displayNameLikeFilterData")
-    void displayNameLikeFilterTest(List<FilterRequest> filters, int expected) {
-        Assertions.assertEquals(expected, userViewRepository.findAll(new FilterSpecification<>(filters)).size());
+    void displayNameLikeFilterTest(UserSpec userSpec, int expected) {
+        Assertions.assertEquals(expected, userViewRepository.findAll(userSpec).size());
     }
 
     static Stream<Arguments> displayNameLikeFilterData() {
         return Stream.of(
-                Arguments.of(getFilterListForLikeDisplayName(USER_DISPLAY_NAME), 3),
-                Arguments.of(getFilterListForLikeDisplayName("123"), 1),
-                Arguments.of(getFilterListForLikeDisplayName("456"), 1),
-                Arguments.of(getFilterListForLikeDisplayName("12"), 2),
-                Arguments.of(getFilterListForLikeDisplayName("56"), 2)
+                Arguments.of(getSpecForDisplayName(USER_DISPLAY_NAME), 3),
+                Arguments.of(getSpecForDisplayName("123"), 1),
+                Arguments.of(getSpecForDisplayName("456"), 1),
+                Arguments.of(getSpecForDisplayName("12"), 2),
+                Arguments.of(getSpecForDisplayName("56"), 2)
         );
     }
 
-    private static List<FilterRequest> getFilterListForLikeDisplayName(String value) {
-        return List.of(
-                FilterRequest.builder()
-                        .property("displayName")
-                        .operator(Operator.LIKE)
-                        .value(value)
-                        .build()
-        );
+    private static UserSpec getSpecForDisplayName(String value) {
+        return SpecificationBuilder.specification(UserSpec.class)
+                .withParam("displayName", value)
+                .build();
     }
 }

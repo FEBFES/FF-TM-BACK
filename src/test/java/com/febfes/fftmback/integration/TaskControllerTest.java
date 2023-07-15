@@ -23,7 +23,9 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static com.febfes.fftmback.integration.ColumnControllerTest.COLUMN_NAME;
@@ -124,9 +126,12 @@ class TaskControllerTest extends BasicTestClass {
         createNewTask(TASK_NAME + "1");
         createNewTask(TASK_NAME + "2");
 
+        Map<String, String> params = new HashMap<>();
+        params.put("taskName", TASK_NAME);
+        params.put("taskDescription", "1");
         Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
-                .params("filter", "[{\"property\":\"name\",\"operator\":\"LIKE\",\"value\":\"%s\"}]".formatted(TASK_NAME))
+                .params(params)
                 .pathParams("projectId", createdProjectId, "columnId", createdColumnId)
                 .when()
                 .get("%s/{projectId}/columns/{columnId}/tasks".formatted(PATH_TO_PROJECTS_API));
@@ -311,6 +316,7 @@ class TaskControllerTest extends BasicTestClass {
                         .projectId(createdProjectId)
                         .columnId(createdColumnId)
                         .name(taskName)
+                        .description("1")
                         .build(),
                 createdUsername
         );

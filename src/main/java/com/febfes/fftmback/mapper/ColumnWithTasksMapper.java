@@ -14,6 +14,6 @@ public interface ColumnWithTasksMapper {
 
     ColumnWithTasksMapper INSTANCE = Mappers.getMapper(ColumnWithTasksMapper.class);
 
-    @Mapping(target = "tasks", source = "filteredTasks")
-    ColumnWithTasksDto columnToColumnWithTasksDto(TaskColumnEntity columnEntity, List<TaskView> filteredTasks);
+    @Mapping(target = "tasks", source = "taskList")
+    ColumnWithTasksDto columnToColumnWithTasksDto(TaskColumnEntity columnEntity, List<TaskView> taskList);
 }

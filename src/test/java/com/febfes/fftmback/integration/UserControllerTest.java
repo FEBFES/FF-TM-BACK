@@ -155,7 +155,7 @@ class UserControllerTest extends BasicTestClass {
     void successfulGetUsersWithFilterTest() {
         List<UserDto> users = requestWithBearerToken()
                 .contentType(ContentType.JSON)
-                .params("filter", "[{\"property\":\"displayName\",\"operator\":\"LIKE\",\"value\":\"user\"}]")
+                .params("displayName", "user")
                 .when()
                 .get(PATH_TO_USERS_API)
                 .then()
@@ -165,16 +165,6 @@ class UserControllerTest extends BasicTestClass {
                 .as(new TypeRef<>() {
                 });
         Assertions.assertEquals(1, users.size());
-    }
-
-    @Test
-    void getUsersWithNullFilterTest() {
-        requestWithBearerToken()
-                .contentType(ContentType.JSON)
-                .when()
-                .get(PATH_TO_USERS_API)
-                .then()
-                .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
     @Test

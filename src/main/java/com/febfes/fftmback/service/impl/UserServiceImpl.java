@@ -1,16 +1,12 @@
 package com.febfes.fftmback.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.febfes.fftmback.domain.common.query.FilterRequest;
-import com.febfes.fftmback.domain.common.query.FilterSpecification;
+import com.febfes.fftmback.domain.common.specification.UserSpec;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.JsonUtils;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -73,12 +69,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserView> getUsersByFilter(@NonNull String filter) {
-        return userViewRepository.findAll(makeUsersFilter(filter));
+    public List<UserView> getUsersByFilter(UserSpec userSpec) {
+        return userViewRepository.findAll(userSpec);
     }
 
     @Override
-    public List<UserView> getUsersByUserId(List<Long> userIds) {
+    public List<UserView> getUsersByUserIds(List<Long> userIds) {
         return userIds.stream()
                 .map(this::getUserByUserId)
                 .toList();
@@ -88,12 +84,5 @@ public class UserServiceImpl implements UserService {
     public UserView getUserByUserId(Long userId) {
         return userViewRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, userId));
-    }
-
-    private FilterSpecification<UserView> makeUsersFilter(@NonNull String filter) {
-        log.info("Receiving users with a filter: {}", filter);
-        List<FilterRequest> filters = JsonUtils.convertStringToObject(filter, new TypeReference<>() {
-        });
-        return new FilterSpecification<>(filters);
     }
 }

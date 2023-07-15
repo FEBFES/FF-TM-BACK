@@ -2,9 +2,11 @@ package com.febfes.fftmback.domain.dao;
 
 
 import com.febfes.fftmback.domain.common.TaskPriority;
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Type;
 
 
 @Entity
@@ -40,6 +42,7 @@ public class TaskEntity extends BaseEntity {
 
     @Column(name = "priority")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
     private TaskPriority priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
