@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.util.Date;
 
 
 @Entity
@@ -48,4 +51,8 @@ public class TaskEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_type_id", referencedColumnName = "id")
     private TaskTypeEntity taskType;
+
+    @Column(name = "update_date")
+    @UpdateTimestamp
+    private Date updateDate;
 }

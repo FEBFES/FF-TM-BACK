@@ -20,7 +20,9 @@ public record TaskDto(
         Long filesCounter,
         List<TaskFileDto> files,
         UserDto owner,
-        UserDto assignee
+        UserDto assignee,
+
+        Date updateDate
 ) {
 
 }
