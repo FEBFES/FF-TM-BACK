@@ -11,5 +11,6 @@ select t.id                            as "id",
        (select count(*)
         from file_entity fe
         where fe.entity_id = t.id
-          and fe.entity_type = 'TASK') as "filesCounter"
+          and fe.entity_type = 'TASK') as "filesCounter",
+       t.update_date                   as "updateDate"
 from public.task t

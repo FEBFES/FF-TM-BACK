@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "v_task")
 @SuperBuilder
@@ -46,4 +48,7 @@ public class TaskView extends BaseView {
 
     @Column(name = "\"filesCounter\"")
     private Long filesCounter;
+
+    @Column(name = "\"updateDate\"")
+    private Date updateDate;
 }

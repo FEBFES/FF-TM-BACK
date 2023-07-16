@@ -193,6 +193,9 @@ class TaskControllerTest extends BasicTestClass {
         Assertions.assertEquals(USER_USERNAME + "1", taskShortDto.assignee().username());
         Assertions.assertEquals(editTaskDto.priority(), taskShortDto.priority());
         Assertions.assertEquals(editTaskDto.type(), taskShortDto.type());
+        Assertions.assertNotNull(taskShortDto.createDate());
+        Assertions.assertNotNull(taskShortDto.updateDate());
+        Assertions.assertNotEquals(taskShortDto.createDate(), taskShortDto.updateDate());
     }
 
     @Test
