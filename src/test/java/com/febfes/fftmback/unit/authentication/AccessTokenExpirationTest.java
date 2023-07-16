@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.when;
 
-public class AccessTokenExpirationTest {
+class AccessTokenExpirationTest {
 
     @Mock
     private JwtService jwtService;
@@ -37,13 +37,13 @@ public class AccessTokenExpirationTest {
     }
 
     @Test
-    public void testCheckAccessTokenExpirationWithInvalidToken() {
+    void testCheckAccessTokenExpirationWithInvalidToken() {
         String token = "invalid_token";
         assertThrows(JWTDecodeException.class, () -> authenticationService.checkAccessTokenExpiration(token));
     }
 
     @Test
-    public void testCheckAccessTokenExpirationWithExpiredToken() {
+    void testCheckAccessTokenExpirationWithExpiredToken() {
         SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         when(jwtService.generateToken(anyMap(), any(UserEntity.class))).thenReturn(
                 Jwts
@@ -60,7 +60,7 @@ public class AccessTokenExpirationTest {
     }
 
     @Test
-    public void testCheckAccessTokenExpirationWithValidToken() {
+    void testCheckAccessTokenExpirationWithValidToken() {
         SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         when(jwtService.generateToken(anyMap(), any(UserEntity.class))).thenReturn(
                 Jwts

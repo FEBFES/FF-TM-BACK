@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public class AuthenticateUserTest {
+class AuthenticateUserTest {
 
     @Mock
     private UserRepository userRepository;
@@ -49,7 +49,7 @@ public class AuthenticateUserTest {
     }
 
     @Test
-    public void testAuthenticateUser() {
+    void testAuthenticateUser() {
         // Create a mock UserEntity object
         UserEntity user = new UserEntity();
         user.setId(1L);

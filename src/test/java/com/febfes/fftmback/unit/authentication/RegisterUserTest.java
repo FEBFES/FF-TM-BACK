@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class RegisterUserTest {
+class RegisterUserTest {
 
     @Mock
     private UserRepository userRepository;
@@ -34,7 +34,7 @@ public class RegisterUserTest {
     }
 
     @Test
-    public void testRegisterUser() {
+    void testRegisterUser() {
         // Create a new user
         UserEntity user = new UserEntity();
         user.setEmail("test@example.com");
@@ -55,7 +55,7 @@ public class RegisterUserTest {
     }
 
     @Test
-    public void testRegisterUserWithExistingEmailOrUsername() {
+    void testRegisterUserWithExistingEmailOrUsername() {
         // Create a new user
         UserEntity user = new UserEntity();
         user.setEmail("test@example.com");
