@@ -42,19 +42,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .selectFrom('0', '9')
             .build();
 
+    private String generateDisplayName() {
+        return "user" + generator.generate(6); // generate a 6-character username
+    }
+
     @Override
     public void registerUser(UserEntity user) {
         if (userRepository.existsByEmailOrUsername(user.getEmail(), user.getUsername())) {
             throw new EntityAlreadyExistsException(UserEntity.ENTITY_NAME);
         }
         user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
-        user.setDisplayName(isNull(user.getDisplayName()) ? generateDisplayUserName() : user.getDisplayName());
+        user.setDisplayName(isNull(user.getDisplayName()) ? generateDisplayName() : user.getDisplayName());
         userRepository.save(user);
         log.info("User saved: {}", user);
-    }
-
-    private String generateDisplayUserName() {
-        return "user" + generator.generate(6); // generate a 6-character username
     }
 
     @Override
@@ -71,25 +71,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         String jwtToken = jwtService.generateToken(receivedUser);
 
-        GetAuthDto.GetAuthDtoBuilder getAuthDto = GetAuthDto.builder()
+        RefreshTokenEntity refreshToken = refreshTokenService.getOrCreateRefreshToken(userId);
+        return GetAuthDto.builder()
                 .accessToken(jwtToken)
-                .userId(userId);
-        try {
-            RefreshTokenEntity existedRefreshToken = refreshTokenService.getByUserId(userId);
-            if (DateUtils.isDateBeforeCurrentDate(existedRefreshToken.getExpiryDate())) {
-                RefreshTokenEntity updatedRefreshToken = refreshTokenService.updateRefreshToken(existedRefreshToken);
-                log.info("User with id={} authenticated with updated refresh token", userId);
-                return getAuthDto.refreshToken(updatedRefreshToken.getToken()).build();
-            }
-            log.info("User with id={} authenticated with existed non expired refresh token", userId);
-            return getAuthDto.refreshToken(existedRefreshToken.getToken()).build();
-        } catch (EntityNotFoundException ignored) {
-            log.info("There is no refresh token in db for user with id={}", userId);
-        }
-
-        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(userId);
-        log.info("User with id={} authenticated", userId);
-        return getAuthDto.refreshToken(refreshToken.getToken()).build();
+                .userId(userId)
+                .refreshToken(refreshToken.getToken())
+                .build();
     }
 
     @Override
