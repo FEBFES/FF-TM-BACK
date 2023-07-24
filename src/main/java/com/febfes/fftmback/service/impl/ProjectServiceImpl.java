@@ -6,12 +6,12 @@ import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.mapper.RoleMapper;
+import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.patch.ProjectPatchFieldProcessor;
@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -160,14 +161,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<UserView> getProjectMembers(Long projectId) {
+    public List<MemberDto> getProjectMembers(Long projectId) {
         ProjectEntity project = getProject(projectId);
         Set<UserEntity> users = project.getMembers();
-        return userService.getUsersByUserIds(users.stream().map(UserEntity::getId).toList());
+        return users.stream()
+                .map(user -> convertUserEntityToMemberDto(user, projectId))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<UserView> addNewMembers(Long projectId, List<Long> memberIds) {
+    public List<MemberDto> addNewMembers(Long projectId, List<Long> memberIds) {
         ProjectEntity project = getProject(projectId);
         List<UserEntity> addedMembers = new ArrayList<>();
         memberIds.forEach(memberId -> {
@@ -177,17 +180,19 @@ public class ProjectServiceImpl implements ProjectService {
             addedMembers.add(member);
         });
         projectRepository.save(project);
-        log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
-        return userService.getUsersByUserIds(addedMembers.stream().map(UserEntity::getId).toList());
+        log.info("Added {} new members for project with id={}", addedMembers.size(), projectId);
+        return addedMembers.stream()
+                .map(user -> convertUserEntityToMemberDto(user, projectId))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public UserView removeMember(Long projectId, Long memberId) {
+    public MemberDto removeMember(Long projectId, Long memberId) {
         ProjectEntity project = getProject(projectId);
         project.removeMember(memberId);
         projectRepository.save(project);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
-        return userService.getUserViewById(memberId);
+        return convertUserEntityToMemberDto(userService.getUserById(memberId), projectId);
     }
 
     private void updateProjectField(
@@ -209,6 +214,12 @@ public class ProjectServiceImpl implements ProjectService {
         roleService.changeUserRoleOnProject(project.getId(), owner, RoleName.OWNER);
         project.addMember(owner);
         projectRepository.save(project);
+    }
+
+    private MemberDto convertUserEntityToMemberDto(UserEntity user, Long projectId) {
+        String userPic = userService.getUserPicByUserId(user.getId());
+        String role = userService.getUserRole(user.getId(), projectId);
+        return UserMapper.INSTANCE.userEntityToMemberDto(user, userPic, role);
     }
 
 }

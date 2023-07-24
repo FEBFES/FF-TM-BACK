@@ -74,15 +74,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserView> getUsersByUserIds(List<Long> userIds) {
-        return userIds.stream()
-                .map(this::getUserByUserId)
-                .toList();
+    public String getUserPicByUserId(Long userId) {
+        return userViewRepository.getUserPicById(userId);
     }
 
     @Override
-    public UserView getUserByUserId(Long userId) {
-        return userViewRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, userId));
+    public String getUserRole(Long userId, Long projectId) {
+        return userViewRepository.getUserRole(userId, projectId);
     }
 }

@@ -2,8 +2,8 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.dto.DashboardDto;
+import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 
@@ -30,9 +30,9 @@ public interface ProjectService {
 
     void removeProjectFromFavourite(Long projectId, Long userId);
 
-    List<UserView> getProjectMembers(Long projectId);
+    List<MemberDto> getProjectMembers(Long projectId);
 
-    List<UserView> addNewMembers(Long projectId, List<Long> memberIds);
+    List<MemberDto> addNewMembers(Long projectId, List<Long> memberIds);
 
-    UserView removeMember(Long projectId, Long memberId);
+    MemberDto removeMember(Long projectId, Long memberId);
 }

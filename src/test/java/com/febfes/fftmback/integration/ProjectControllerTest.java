@@ -3,10 +3,10 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.UserService;
@@ -305,7 +305,7 @@ class ProjectControllerTest extends BasicTestClass {
     void successfulGetMembersTest() {
         successfulAddNewMembersTest();
         Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).getId();
-        List<UserDto> projectMembers = requestWithBearerToken()
+        List<MemberDto> projectMembers = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get("%s/{id}/members".formatted(PATH_TO_PROJECTS_API), createdProjectId)
@@ -316,6 +316,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .as(new TypeRef<>() {
                 });
         Assertions.assertThat(projectMembers).hasSize(3);
+        Assertions.assertThat(projectMembers.get(0).role()).isNotNull();
     }
 
     @Test
