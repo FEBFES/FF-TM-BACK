@@ -27,7 +27,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -166,7 +165,7 @@ public class ProjectServiceImpl implements ProjectService {
         Set<UserEntity> users = project.getMembers();
         return users.stream()
                 .map(user -> convertUserEntityToMemberDto(user, projectId))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -183,7 +182,7 @@ public class ProjectServiceImpl implements ProjectService {
         log.info("Added {} new members for project with id={}", addedMembers.size(), projectId);
         return addedMembers.stream()
                 .map(user -> convertUserEntityToMemberDto(user, projectId))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
