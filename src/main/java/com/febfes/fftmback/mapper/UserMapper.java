@@ -4,6 +4,7 @@ import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.dto.EditUserDto;
+import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.dto.auth.AuthenticationDto;
 import com.febfes.fftmback.dto.auth.UserDetailsDto;
@@ -32,6 +33,10 @@ public interface UserMapper {
 
     @Mapping(target = "userPic", qualifiedByName = "userPicToString")
     UserDto userViewToUserDto(UserView userView);
+
+    @Mapping(target = "userPic", source = "userPic")
+    @Mapping(target = "role", source = "role")
+    MemberDto userEntityToMemberDto(UserEntity user, String userPic, String role);
 
     @Named("userPicToString")
     static String userPicToString(FileEntity userPic) {

@@ -19,7 +19,7 @@ public interface UserService extends UserDetailsService {
 
     List<UserView> getUsersByFilter(UserSpec userSpec);
 
-    List<UserView> getUsersByUserIds(List<Long> userIds);
+    String getUserPicUrnByUserId(Long userId);
 
-    UserView getUserByUserId(Long userId);
+    String getUserRole(Long userId, Long projectId);
 }
