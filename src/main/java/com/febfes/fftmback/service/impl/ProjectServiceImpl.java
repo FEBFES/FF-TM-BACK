@@ -216,7 +216,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private MemberDto convertUserEntityToMemberDto(UserEntity user, Long projectId) {
-        String userPic = userService.getUserPicByUserId(user.getId());
+        String userPic = userService.getUserPicUrnByUserId(user.getId());
         String role = userService.getUserRole(user.getId(), projectId);
         return UserMapper.INSTANCE.userEntityToMemberDto(user, userPic, role);
     }

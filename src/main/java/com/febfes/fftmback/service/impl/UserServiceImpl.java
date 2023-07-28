@@ -74,8 +74,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getUserPicByUserId(Long userId) {
-        return userViewRepository.getUserPicById(userId);
+    public String getUserPicUrnByUserId(Long userId) {
+        return userViewRepository.getUserPicUrnById(userId);
     }
 
     @Override

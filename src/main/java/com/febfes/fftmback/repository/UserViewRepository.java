@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface UserViewRepository extends JpaRepository<UserView, Long>, JpaSpecificationExecutor<UserView> {
 
     @Query("SELECT uv.userPic.fileUrn FROM UserView uv WHERE uv.id = :userId")
-    String getUserPicById(Long userId);
+    String getUserPicUrnById(Long userId);
 
     @Query(
             value = "SELECT r.name FROM role r WHERE r.id=(" +
