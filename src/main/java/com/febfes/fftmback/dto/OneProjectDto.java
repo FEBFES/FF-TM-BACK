@@ -9,7 +9,7 @@ public record OneProjectDto(
         String description,
         Date createDate,
         Boolean isFavourite,
-        Set<UserDto> members,
+        Set<MemberDto> members,
         RoleDto userRoleOnProject
 ) {
 }

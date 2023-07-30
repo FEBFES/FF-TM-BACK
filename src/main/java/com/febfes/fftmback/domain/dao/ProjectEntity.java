@@ -51,15 +51,15 @@ public class ProjectEntity extends BaseEntity {
             }, mappedBy = "projects")
     @JsonIgnoreProperties(value = "projects")
     @Builder.Default
-    private Set<UserEntity> members = new HashSet<>();
+    private Set<UserView> members = new HashSet<>();
 
-    public void addMember(UserEntity member) {
+    public void addMember(UserView member) {
         this.members.add(member);
         member.getProjects().add(this);
     }
 
     public void removeMember(Long memberId) {
-        Optional<UserEntity> member = this.members.stream()
+        Optional<UserView> member = this.members.stream()
                 .filter(m -> m.getId().equals(memberId))
                 .findFirst();
         if (member.isPresent()) {

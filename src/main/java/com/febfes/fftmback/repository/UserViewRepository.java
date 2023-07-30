@@ -11,8 +11,8 @@ public interface UserViewRepository extends JpaRepository<UserView, Long>, JpaSp
     String getUserPicUrnById(Long userId);
 
     @Query(
-            value = "SELECT r.name FROM role r WHERE r.id=(" +
-                    "SELECT pur.role_id FROM project_user_role pur WHERE pur.user_id = ?1 AND pur.project_id = ?2)",
+            value = "SELECT r.name FROM role r INNER JOIN project_user_role pur " +
+                    "ON pur.role_id=r.id AND pur.user_id = ?1 AND pur.project_id = ?2",
             nativeQuery = true
     )
     String getUserRole(Long userId, Long projectId);

@@ -38,6 +38,10 @@ public interface UserMapper {
     @Mapping(target = "role", source = "role")
     MemberDto userEntityToMemberDto(UserEntity user, String userPic, String role);
 
+    @Mapping(target = "role", source = "role")
+    @Mapping(target = "userPic", qualifiedByName = "userPicToString")
+    MemberDto userViewToMemberDto(UserView user, String role);
+
     @Named("userPicToString")
     static String userPicToString(FileEntity userPic) {
         return isNull(userPic) ? null : userPic.getFileUrn();
