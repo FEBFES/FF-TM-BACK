@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Table(name = "v_user")
 @SuperBuilder
@@ -40,19 +37,4 @@ public class UserView extends BaseView {
     @JoinColumn(name = "\"userPicId\"", referencedColumnName = "id")
     private FileEntity userPic;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
-    @JoinTable(name = "user_project",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "project_id")})
-    @Builder.Default
-    private Set<ProjectEntity> projects = new HashSet<>();
-
-    @Transient
-    private String roleOnProject;
-
-//    @Formula("SELECT * FROM ")
 }

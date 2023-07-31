@@ -1,14 +1,10 @@
 package com.febfes.fftmback.domain.dao;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Entity
 @Table(name = "project")
@@ -16,8 +12,8 @@ import java.util.Set;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@ToString(callSuper = true, exclude = {"taskColumnEntityList", "taskEntityList", "members"})
-@EqualsAndHashCode(callSuper = true, exclude = {"taskColumnEntityList", "taskEntityList", "members"})
+@ToString(callSuper = true, exclude = {"taskColumnEntityList", "taskEntityList"})
+@EqualsAndHashCode(callSuper = true, exclude = {"taskColumnEntityList", "taskEntityList"})
 public class ProjectEntity extends BaseEntity {
 
     public static final String ENTITY_NAME = "Project";
@@ -43,28 +39,4 @@ public class ProjectEntity extends BaseEntity {
 
     @Transient
     private Boolean isFavourite;
-
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            }, mappedBy = "projects")
-    @JsonIgnoreProperties(value = "projects")
-    @Builder.Default
-    private Set<UserView> members = new HashSet<>();
-
-    public void addMember(UserView member) {
-        this.members.add(member);
-        member.getProjects().add(this);
-    }
-
-    public void removeMember(Long memberId) {
-        Optional<UserView> member = this.members.stream()
-                .filter(m -> m.getId().equals(memberId))
-                .findFirst();
-        if (member.isPresent()) {
-            this.members.remove(member.get());
-            member.get().getProjects().remove(this);
-        }
-    }
 }

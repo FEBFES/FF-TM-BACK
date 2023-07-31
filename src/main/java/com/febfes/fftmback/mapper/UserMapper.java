@@ -3,6 +3,7 @@ package com.febfes.fftmback.mapper;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
+import com.febfes.fftmback.domain.projection.MemberProjection;
 import com.febfes.fftmback.dto.EditUserDto;
 import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.UserDto;
@@ -29,18 +30,10 @@ public interface UserMapper {
     @Mapping(target = "encryptedPassword", source = "password")
     UserEntity editUserDtoToUser(EditUserDto editUserDto);
 
-    UserDto userToUserDto(UserEntity userEntity);
-
     @Mapping(target = "userPic", qualifiedByName = "userPicToString")
     UserDto userViewToUserDto(UserView userView);
 
-    @Mapping(target = "userPic", source = "userPic")
-    @Mapping(target = "role", source = "role")
-    MemberDto userEntityToMemberDto(UserEntity user, String userPic, String role);
-
-    @Mapping(target = "role", source = "role")
-    @Mapping(target = "userPic", qualifiedByName = "userPicToString")
-    MemberDto userViewToMemberDto(UserView user, String role);
+    MemberDto memberProjectionToMemberDto(MemberProjection memberProjection);
 
     @Named("userPicToString")
     static String userPicToString(FileEntity userPic) {
