@@ -201,8 +201,8 @@ class ProjectControllerTest extends BasicTestClass {
         OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.isFavourite())
                 .isTrue();
-        List<ProjectEntity> userProjects = projectService.getProjectsForUser(createdUserId);
-        Assertions.assertThat(userProjects.get(0).getIsFavourite())
+        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId);
+        Assertions.assertThat(userProjects.get(0).isFavourite())
                 .isTrue();
     }
 
@@ -221,8 +221,8 @@ class ProjectControllerTest extends BasicTestClass {
         OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.isFavourite())
                 .isFalse();
-        List<ProjectEntity> userProjects = projectService.getProjectsForUser(createdUserId);
-        Assertions.assertThat(userProjects.get(0).getIsFavourite())
+        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId);
+        Assertions.assertThat(userProjects.get(0).isFavourite())
                 .isFalse();
     }
 
@@ -263,15 +263,13 @@ class ProjectControllerTest extends BasicTestClass {
 
             @Override
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
-                ProjectEntity updatedProject = projectService.getProject(createdProjectId);
+                List<MemberDto> members = userService.getProjectMembersWithRole(createdProjectId);
                 // as owner is also a member
-                int size = updatedProject.getMembers().size();
-                System.out.println(size);
-                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(3);
-                UserEntity secondAddedMember = userService.getUserById(secondCreatedUserId);
-                Assertions.assertThat(secondAddedMember.getProjects().size()).isEqualTo(1);
-                UserEntity thirdAddedMember = userService.getUserById(thirdCreatedUserId);
-                Assertions.assertThat(thirdAddedMember.getProjects().size()).isEqualTo(1);
+                Assertions.assertThat(members.size()).isEqualTo(3);
+                List<ProjectDto> secondUserProjects = projectService.getProjectsForUser(secondCreatedUserId);
+                Assertions.assertThat(secondUserProjects.size()).isEqualTo(1);
+                List<ProjectDto> thirdUserProjects = projectService.getProjectsForUser(thirdCreatedUserId);
+                Assertions.assertThat(thirdUserProjects.size()).isEqualTo(1);
             }
         });
     }
@@ -280,7 +278,7 @@ class ProjectControllerTest extends BasicTestClass {
     void successfulRemoveMemberTest() {
         successfulAddNewMembersTest();
         Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
-        Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).getId();
+        Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).id();
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
@@ -288,23 +286,16 @@ class ProjectControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        // it's to avoid org.hibernate.LazyInitializationException
-        txTemplate.execute(new TransactionCallbackWithoutResult() {
-
-            @Override
-            protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
-                ProjectEntity updatedProject = projectService.getProject(createdProjectId);
-                Assertions.assertThat(updatedProject.getMembers().size()).isEqualTo(2);
-                UserEntity updatedSecondAddedMember = userService.getUserById(secondCreatedUserId);
-                Assertions.assertThat(updatedSecondAddedMember.getProjects().size()).isZero();
-            }
-        });
+        List<MemberDto> members = userService.getProjectMembersWithRole(createdProjectId);
+        Assertions.assertThat(members.size()).isEqualTo(2);
+        List<ProjectDto> secondMemberProjects = projectService.getProjectsForUser(secondCreatedUserId);
+        Assertions.assertThat(secondMemberProjects.size()).isZero();
     }
 
     @Test
     void successfulGetMembersTest() {
         successfulAddNewMembersTest();
-        Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).getId();
+        Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).id();
         List<MemberDto> projectMembers = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
@@ -316,7 +307,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .as(new TypeRef<>() {
                 });
         Assertions.assertThat(projectMembers).hasSize(3);
-        Assertions.assertThat(projectMembers.get(0).role()).isNotNull();
+        Assertions.assertThat(projectMembers.get(0).roleOnProject()).isNotNull();
     }
 
     @Test

@@ -36,7 +36,4 @@ public class ProjectEntity extends BaseEntity {
 
     @Column(name = "owner_id")
     private Long ownerId;
-
-    @Transient
-    private Boolean isFavourite;
 }

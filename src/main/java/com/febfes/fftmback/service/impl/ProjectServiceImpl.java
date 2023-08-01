@@ -2,16 +2,19 @@ package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.common.UserProjectId;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
-import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.domain.dao.UserView;
+import com.febfes.fftmback.domain.dao.UserProject;
+import com.febfes.fftmback.domain.projection.ProjectProjection;
+import com.febfes.fftmback.domain.projection.ProjectWithMembersProjection;
 import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
-import com.febfes.fftmback.mapper.UserMapper;
+import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
+import com.febfes.fftmback.repository.UserProjectRepository;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.patch.ProjectPatchFieldProcessor;
 import com.febfes.fftmback.util.patch.ProjectPatchIsFavouriteProcessor;
@@ -23,9 +26,7 @@ import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -34,6 +35,7 @@ import java.util.Set;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final UserProjectRepository userProjectRepository;
     private final ColumnService columnService;
     private final UserService userService;
     private final TaskTypeService taskTypeService;
@@ -65,13 +67,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectEntity> getProjectsForUser(Long userId) {
-        UserEntity user = userService.getUserById(userId);
-        List<ProjectEntity> userProjects = user.getProjects().stream()
-                .peek(project -> project.setIsFavourite(projectRepository.isProjectFavourite(project.getId(), userId)))
-                .toList();
+    public List<ProjectDto> getProjectsForUser(Long userId) {
+        List<ProjectProjection> userProjects = projectRepository.getUserProjects(userId);
         log.info("Received {} projects for user with id={}", userProjects.size(), userId);
-        return userProjects;
+        return userProjects.stream()
+                .map(ProjectMapper.INSTANCE::projectProjectionToProjectDto)
+                .toList();
     }
 
     @Override
@@ -84,16 +85,10 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public OneProjectDto getProjectForUser(Long id, Long userId) {
-//        ProjectEntity projectEntity = projectRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
-//        projectEntity.setIsFavourite(projectRepository.isProjectFavourite(id, userId));
-//        log.info("Received project {} by id={} and userId={}", projectEntity, id, userId);
-//        UserEntity user = userService.getUserById(userId);
-//        RoleDto userRoleOnProject = RoleMapper.INSTANCE.roleToRoleDto(
-//                roleService.getRoleByProjectAndUser(id, user)
-//        );
-//        return ProjectMapper.INSTANCE.projectToOneProjectDto(projectEntity, userRoleOnProject);
-        return null;
+        ProjectWithMembersProjection project = projectRepository.getProjectByIdAndUserId(id, userId);
+        log.info("Received project {} by id={} and userId={}", project, id, userId);
+        List<MemberDto> members = userService.getProjectMembersWithRole(id);
+        return ProjectMapper.INSTANCE.projectWithMembersProjectionToOneProjectDto(project, members);
     }
 
     @Override
@@ -160,47 +155,27 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<MemberDto> getProjectMembers(Long projectId) {
-        ProjectEntity project = getProject(projectId);
-        Set<UserView> users = project.getMembers();
-        return users.stream()
-                .map(user -> {
-                    String role = userService.getUserRole(user.getId(), projectId);
-                    return UserMapper.INSTANCE.userViewToMemberDto(user, role);
-                })
-//                .map(user -> convertUserEntityToMemberDto(user, projectId))
-                .toList();
-    }
-
-    @Override
     public List<MemberDto> addNewMembers(Long projectId, List<Long> memberIds) {
-        ProjectEntity project = getProject(projectId);
-        List<UserView> addedMembers = new ArrayList<>();
+        userService.getProjectMembersWithRole(projectId);
         memberIds.forEach(memberId -> {
-//            UserEntity member = userService.getUserById(memberId);
-            UserView member = userService.getUserViewById(memberId);
+            UserProject userProject = UserProject.builder()
+                    .id(UserProjectId.builder()
+                            .userId(memberId)
+                            .projectId(projectId)
+                            .build())
+                    .build();
+            userProjectRepository.save(userProject);
             roleService.changeUserRoleOnProject(projectId, memberId, RoleName.MEMBER);
-            project.addMember(member);
-            addedMembers.add(member);
         });
-        projectRepository.save(project);
-        log.info("Added {} new members for project with id={}", addedMembers.size(), projectId);
-        return addedMembers.stream()
-                .map(user -> {
-                    String role = userService.getUserRole(user.getId(), projectId);
-                    return UserMapper.INSTANCE.userViewToMemberDto(user, role);
-                })
-//                .map(user -> convertUserEntityToMemberDto(user, projectId))
-                .toList();
+        log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
+        return userService.getProjectMembersWithRole(projectId, memberIds);
     }
 
     @Override
     public MemberDto removeMember(Long projectId, Long memberId) {
-        ProjectEntity project = getProject(projectId);
-        project.removeMember(memberId);
-        projectRepository.save(project);
+        userProjectRepository.deleteByIdProjectIdAndIdUserId(projectId, memberId);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
-        return convertUserEntityToMemberDto(userService.getUserById(memberId), projectId);
+        return userService.getProjectMemberWithRole(projectId, memberId);
     }
 
     private void updateProjectField(
@@ -218,16 +193,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private void addOwnerToProjectMembers(ProjectEntity project, Long ownerId) {
-        UserView owner = userService.getUserViewById(ownerId);
+        UserProject userProject = UserProject.builder()
+                .id(UserProjectId.builder()
+                        .userId(ownerId)
+                        .projectId(project.getId())
+                        .build())
+                .build();
+        userProjectRepository.save(userProject);
         roleService.changeUserRoleOnProject(project.getId(), ownerId, RoleName.OWNER);
-        project.addMember(owner);
-        projectRepository.save(project);
-    }
-
-    private MemberDto convertUserEntityToMemberDto(UserEntity user, Long projectId) {
-        String userPic = userService.getUserPicUrnByUserId(user.getId());
-        String role = userService.getUserRole(user.getId(), projectId);
-        return UserMapper.INSTANCE.userEntityToMemberDto(user, userPic, role);
     }
 
 }

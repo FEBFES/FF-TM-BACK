@@ -1,6 +1,6 @@
 package com.febfes.fftmback.mapper;
 
-import com.febfes.fftmback.domain.dao.RoleEntity;
+import com.febfes.fftmback.domain.projection.RoleProjection;
 import com.febfes.fftmback.dto.RoleDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -10,5 +10,5 @@ public interface RoleMapper {
 
     RoleMapper INSTANCE = Mappers.getMapper(RoleMapper.class);
 
-    RoleDto roleToRoleDto(RoleEntity role);
+    RoleDto roleProjectionToRoleDto(RoleProjection role);
 }
