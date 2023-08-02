@@ -18,5 +18,7 @@ public interface ProjectWithMembersProjection {
 
 //    List<MemberProjection> getMembers();
 
-    RoleProjection getUserRoleOnProject();
+    String getRoleName();
+
+    String getRoleDescription();
 }

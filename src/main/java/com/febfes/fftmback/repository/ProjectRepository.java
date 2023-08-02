@@ -36,11 +36,11 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     @Query(
             nativeQuery = true,
             value = """
-                    SELECT P.*, (FP.user_id is not null) as "isFavourite", R.name, R.description
+                    SELECT P.*, (FP.user_id is not null) AS "isFavourite", R.name AS "roleName", R.description AS "roleDescription"
                     FROM project P
                     		LEFT JOIN favourite_project FP ON P.id = FP.project_id AND FP.user_id = :userId
-                    		LEFT JOIN project_user_role PUR on P.id = PUR.project_id AND PUR.user_id = :userId
-                    		LEFT JOIN role R on PUR.role_id = R.id
+                    		LEFT JOIN project_user_role PUR ON P.id = PUR.project_id AND PUR.user_id = :userId
+                    		LEFT JOIN role R ON PUR.role_id = R.id
                     WHERE P.id = :projectId
                     """
     )
@@ -49,10 +49,10 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     @Query(
             nativeQuery = true,
             value = """
-                    SELECT P.*, (FP.user_id is not null) as "isFavourite"
+                    SELECT P.*, (FP.user_id is not null) AS "isFavourite"
                     FROM project P
                     		LEFT JOIN favourite_project FP ON P.id = FP.project_id AND FP.user_id = :userId
-                    		INNER JOIN user_project UP on UP.project_id = P.id AND UP.user_id = :userId
+                    		INNER JOIN user_project UP ON UP.project_id = P.id AND UP.user_id = :userId
                     """
     )
     List<ProjectProjection> getUserProjects(Long userId);

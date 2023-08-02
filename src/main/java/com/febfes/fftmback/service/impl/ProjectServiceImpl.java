@@ -86,19 +86,20 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public OneProjectDto getProjectForUser(Long id, Long userId) {
         ProjectWithMembersProjection project = projectRepository.getProjectByIdAndUserId(id, userId);
-        log.info("Received project {} by id={} and userId={}", project, id, userId);
+        log.info("Received project by id={} and userId={}", id, userId);
         List<MemberDto> members = userService.getProjectMembersWithRole(id);
         return ProjectMapper.INSTANCE.projectWithMembersProjectionToOneProjectDto(project, members);
     }
 
     @Override
-    public void editProject(Long id, ProjectEntity project) {
+    public ProjectDto editProject(Long id, ProjectEntity project) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
         projectEntity.setName(project.getName());
         projectEntity.setDescription(project.getDescription());
         projectRepository.save(projectEntity);
         log.info("Updated project: {}", projectEntity);
+        return ProjectMapper.INSTANCE.projectToProjectDto(projectEntity);
     }
 
     @Override

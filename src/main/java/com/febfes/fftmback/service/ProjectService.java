@@ -16,7 +16,7 @@ public interface ProjectService {
 
     OneProjectDto getProjectForUser(Long id, Long userId);
 
-    void editProject(Long id, ProjectEntity project);
+    ProjectDto editProject(Long id, ProjectEntity project);
 
     void deleteProject(Long id);
 

@@ -68,12 +68,12 @@ public class ProjectController {
 
     @Operation(summary = "Edit project by its id")
     @ApiEdit(path = "{id}")
-    public void editProject(
+    public ProjectDto editProject(
             @PathVariable Long id,
             @RequestBody ProjectDto projectDto
     ) {
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        projectService.editProject(id, ProjectMapper.INSTANCE.projectDtoToProject(projectDto));
+        return projectService.editProject(id, ProjectMapper.INSTANCE.projectDtoToProject(projectDto));
     }
 
     @Operation(summary = "Delete project by its id")

@@ -14,6 +14,7 @@ import java.util.List;
 
 @Mapper(uses = {RoleMapper.class, UserMapper.class})
 public interface ProjectMapper {
+
     ProjectMapper INSTANCE = Mappers.getMapper(ProjectMapper.class);
 
     ProjectDto projectToProjectDto(ProjectEntity project);
@@ -23,6 +24,8 @@ public interface ProjectMapper {
     ProjectDto projectProjectionToProjectDto(ProjectProjection projectProjection);
 
     @Mapping(target = "members", source = "members")
+    @Mapping(target = "userRoleOnProject.name", source = "projectWithMembersProjection.roleName")
+    @Mapping(target = "userRoleOnProject.description", source = "projectWithMembersProjection.roleDescription")
     OneProjectDto projectWithMembersProjectionToOneProjectDto(
             ProjectWithMembersProjection projectWithMembersProjection,
             List<MemberDto> members

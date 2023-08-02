@@ -132,19 +132,18 @@ class ProjectControllerTest extends BasicTestClass {
         String newProjectName = PROJECT_NAME + "edit";
         ProjectDto editProjectDto = dtoBuilders.createProjectDto(newProjectName);
 
-        requestWithBearerToken()
+        ProjectDto updatedProjectDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editProjectDto)
                 .when()
                 .put("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
-                .statusCode(HttpStatus.SC_OK);
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(ProjectDto.class);
 
-        Response getResponse = requestWithBearerToken()
-                .contentType(ContentType.JSON)
-                .when()
-                .get("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId);
-        Assertions.assertThat(getResponse.jsonPath().getString("name"))
+        Assertions.assertThat(updatedProjectDto.name())
                 .isEqualTo(newProjectName);
     }
 
