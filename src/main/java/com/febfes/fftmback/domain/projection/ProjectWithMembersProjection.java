@@ -16,8 +16,6 @@ public interface ProjectWithMembersProjection {
 
     Boolean getIsFavourite();
 
-//    List<MemberProjection> getMembers();
-
     String getRoleName();
 
     String getRoleDescription();

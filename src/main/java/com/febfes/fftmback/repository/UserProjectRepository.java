@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserProjectRepository extends JpaRepository<UserProject, UserProjectId> {
 
-    void deleteByIdProjectIdAndIdUserId(Long projectId, Long UserId);
+    void deleteByIdProjectIdAndIdUserId(Long projectId, Long userId);
 }

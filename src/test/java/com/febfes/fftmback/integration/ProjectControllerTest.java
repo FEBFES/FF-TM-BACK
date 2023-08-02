@@ -264,11 +264,11 @@ class ProjectControllerTest extends BasicTestClass {
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
                 List<MemberDto> members = userService.getProjectMembersWithRole(createdProjectId);
                 // as owner is also a member
-                Assertions.assertThat(members.size()).isEqualTo(3);
+                Assertions.assertThat(members).hasSize(3);
                 List<ProjectDto> secondUserProjects = projectService.getProjectsForUser(secondCreatedUserId);
-                Assertions.assertThat(secondUserProjects.size()).isEqualTo(1);
+                Assertions.assertThat(secondUserProjects).hasSize(1);
                 List<ProjectDto> thirdUserProjects = projectService.getProjectsForUser(thirdCreatedUserId);
-                Assertions.assertThat(thirdUserProjects.size()).isEqualTo(1);
+                Assertions.assertThat(thirdUserProjects).hasSize(1);
             }
         });
     }
@@ -286,9 +286,9 @@ class ProjectControllerTest extends BasicTestClass {
                 .statusCode(HttpStatus.SC_OK);
 
         List<MemberDto> members = userService.getProjectMembersWithRole(createdProjectId);
-        Assertions.assertThat(members.size()).isEqualTo(2);
+        Assertions.assertThat(members).hasSize(2);
         List<ProjectDto> secondMemberProjects = projectService.getProjectsForUser(secondCreatedUserId);
-        Assertions.assertThat(secondMemberProjects.size()).isZero();
+        Assertions.assertThat(secondMemberProjects).isEmpty();
     }
 
     @Test
