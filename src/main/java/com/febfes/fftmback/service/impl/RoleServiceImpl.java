@@ -51,7 +51,7 @@ public class RoleServiceImpl implements RoleService {
         RoleEntity ownerRole = getRoleByName(roleName);
         user.getProjectRoles().put(projectId, ownerRole);
         userRepository.save(user);
-        log.info("Changed user role on project. User id: {}, Project id: {}, Role name: {}",
+        log.info("Changed user roleOnProject on project. User id: {}, Project id: {}, Role name: {}",
                 user.getId(), projectId, roleName.name());
     }
 }

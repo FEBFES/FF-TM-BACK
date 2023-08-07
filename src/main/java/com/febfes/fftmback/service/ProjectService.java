@@ -2,23 +2,21 @@ package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.UserView;
-import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.dto.OneProjectDto;
-import com.febfes.fftmback.dto.PatchDto;
+import com.febfes.fftmback.dto.*;
 
 import java.util.List;
 
 public interface ProjectService {
+
     ProjectEntity createProject(ProjectEntity project, String username);
 
-    List<ProjectEntity> getProjectsForUser(Long userId);
+    List<ProjectDto> getProjectsForUser(Long userId);
 
     ProjectEntity getProject(Long id);
 
     OneProjectDto getProjectForUser(Long id, Long userId);
 
-    void editProject(Long id, ProjectEntity project);
+    ProjectDto editProject(Long id, ProjectEntity project);
 
     void deleteProject(Long id);
 
@@ -30,9 +28,7 @@ public interface ProjectService {
 
     void removeProjectFromFavourite(Long projectId, Long userId);
 
-    List<UserView> getProjectMembers(Long projectId);
+    List<MemberDto> addNewMembers(Long projectId, List<Long> memberIds);
 
-    List<UserView> addNewMembers(Long projectId, List<Long> memberIds);
-
-    UserView removeMember(Long projectId, Long memberId);
+    MemberDto removeMember(Long projectId, Long memberId);
 }
