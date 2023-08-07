@@ -78,15 +78,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<MemberDto> getProjectMembersWithRole(Long projectId) {
-        List<MemberProjection> members = userViewRepository.getProjectMembersWithRole(projectId);
-        return members.stream()
+        return userViewRepository.getProjectMembersWithRole(projectId).stream()
                 .map(UserMapper.INSTANCE::memberProjectionToMemberDto)
                 .toList();
     }
 
     @Override
     public MemberDto getProjectMemberWithRole(Long projectId, Long memberId) {
-        MemberProjection member = userViewRepository.getProjectMemberWithRole(projectId, memberId);
+        MemberProjection member = userViewRepository.getProjectMemberWithRole(projectId, memberId)
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, memberId));
         return UserMapper.INSTANCE.memberProjectionToMemberDto(member);
     }
 

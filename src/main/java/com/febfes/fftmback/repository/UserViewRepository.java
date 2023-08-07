@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserViewRepository extends JpaRepository<UserView, Long>, JpaSpecificationExecutor<UserView> {
 
@@ -36,5 +37,5 @@ public interface UserViewRepository extends JpaRepository<UserView, Long>, JpaSp
                     """,
             nativeQuery = true
     )
-    MemberProjection getProjectMemberWithRole(Long projectId, Long userId);
+    Optional<MemberProjection> getProjectMemberWithRole(Long projectId, Long userId);
 }

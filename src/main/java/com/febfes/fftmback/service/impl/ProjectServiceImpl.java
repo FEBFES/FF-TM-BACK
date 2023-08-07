@@ -62,7 +62,7 @@ public class ProjectServiceImpl implements ProjectService {
         columnService.createDefaultColumnsForProject(projectId);
         taskTypeService.createDefaultTaskTypesForProject(projectId);
         // by default, the owner will also be a member of the project
-        addOwnerToProjectMembers(project, ownerId);
+        addOrChangeProjectMemberRole(project.getId(), ownerId, RoleName.OWNER);
         return projectEntity;
     }
 
@@ -85,7 +85,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public OneProjectDto getProjectForUser(Long id, Long userId) {
-        ProjectWithMembersProjection project = projectRepository.getProjectByIdAndUserId(id, userId);
+        ProjectWithMembersProjection project = projectRepository.getProjectByIdAndUserId(id, userId)
+                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
         log.info("Received project by id={} and userId={}", id, userId);
         List<MemberDto> members = userService.getProjectMembersWithRole(id);
         return ProjectMapper.INSTANCE.projectWithMembersProjectionToOneProjectDto(project, members);
@@ -157,26 +158,17 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<MemberDto> addNewMembers(Long projectId, List<Long> memberIds) {
-        userService.getProjectMembersWithRole(projectId);
-        memberIds.forEach(memberId -> {
-            UserProject userProject = UserProject.builder()
-                    .id(UserProjectId.builder()
-                            .userId(memberId)
-                            .projectId(projectId)
-                            .build())
-                    .build();
-            userProjectRepository.save(userProject);
-            roleService.changeUserRoleOnProject(projectId, memberId, RoleName.MEMBER);
-        });
+        memberIds.forEach(memberId -> addOrChangeProjectMemberRole(projectId, memberId, RoleName.MEMBER));
         log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
         return userService.getProjectMembersWithRole(projectId, memberIds);
     }
 
     @Override
     public MemberDto removeMember(Long projectId, Long memberId) {
+        MemberDto memberToDelete = userService.getProjectMemberWithRole(projectId, memberId);
         userProjectRepository.deleteByIdProjectIdAndIdUserId(projectId, memberId);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
-        return userService.getProjectMemberWithRole(projectId, memberId);
+        return memberToDelete;
     }
 
     private void updateProjectField(
@@ -193,15 +185,15 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    private void addOwnerToProjectMembers(ProjectEntity project, Long ownerId) {
+    private void addOrChangeProjectMemberRole(Long projectId, Long memberId, RoleName roleName) {
         UserProject userProject = UserProject.builder()
                 .id(UserProjectId.builder()
-                        .userId(ownerId)
-                        .projectId(project.getId())
+                        .userId(memberId)
+                        .projectId(projectId)
                         .build())
                 .build();
         userProjectRepository.save(userProject);
-        roleService.changeUserRoleOnProject(project.getId(), ownerId, RoleName.OWNER);
+        roleService.changeUserRoleOnProject(projectId, memberId, roleName);
     }
 
 }
