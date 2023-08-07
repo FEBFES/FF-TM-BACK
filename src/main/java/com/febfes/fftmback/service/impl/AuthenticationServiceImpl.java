@@ -42,8 +42,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .selectFrom('0', '9')
             .build();
 
+    private static final String USER_STRING = "user";
+
     private String generateDisplayName() {
-        return "user" + generator.generate(6); // generate a 6-character username
+        return USER_STRING + generator.generate(6); // generate a 6-character username
     }
 
     @Override

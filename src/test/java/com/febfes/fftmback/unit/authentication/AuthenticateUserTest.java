@@ -21,9 +21,17 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class AuthenticateUserTest {
+
+    private static final Long FIRST_ID = 1L;
+    private static final String USERNAME = "test_user";
+    private static final String USER_PASS = "password";
+    private static final String USER_ENCODED_PASS = "encodedPassword";
+    private static final String TOKEN = "refreshToken";
+    private static final String JWT_TOKEN = "jwtToken";
 
     @Mock
     private UserRepository userRepository;
@@ -52,22 +60,22 @@ class AuthenticateUserTest {
     void testAuthenticateUser() {
         // Create a mock UserEntity object
         UserEntity user = new UserEntity();
-        user.setId(1L);
-        user.setUsername("testuser");
-        user.setEncryptedPassword("password");
+        user.setId(FIRST_ID);
+        user.setUsername(USERNAME);
+        user.setEncryptedPassword(USER_PASS);
 
         // Create a mock RefreshTokenEntity object
         RefreshTokenEntity refreshToken = new RefreshTokenEntity();
-        refreshToken.setId(1L);
-        refreshToken.setToken("refreshToken");
+        refreshToken.setId(FIRST_ID);
+        refreshToken.setToken(TOKEN);
         refreshToken.setUserEntity(user);
         refreshToken.setExpiryDate(DateUtils.getCurrentDate());
 
         // Set up the mock objects to return the expected values
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(null);
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
-        when(passwordEncoder.encode(user.getPassword())).thenReturn("encodedPassword");
-        when(jwtService.generateToken(any(UserEntity.class))).thenReturn("jwtToken");
+        when(passwordEncoder.encode(user.getPassword())).thenReturn(USER_ENCODED_PASS);
+        when(jwtService.generateToken(any(UserEntity.class))).thenReturn(JWT_TOKEN);
         when(refreshTokenService.getOrCreateRefreshToken(anyLong())).thenReturn(refreshToken);
 
         // Call the registerUser method
@@ -77,16 +85,16 @@ class AuthenticateUserTest {
         GetAuthDto result = authenticationService.authenticateUser(user);
 
         // Verify that the expected values were returned
-        assertEquals("jwtToken", result.accessToken());
-        assertEquals(1L, result.userId().longValue());
-        assertEquals("refreshToken", result.refreshToken());
+        assertEquals(JWT_TOKEN, result.accessToken());
+        assertEquals(FIRST_ID, result.userId().longValue());
+        assertEquals(TOKEN, result.refreshToken());
 
         // Verify that the mock objects were called as expected
-        verify(authenticationManager, times(1)).authenticate(any(Authentication.class));
-        verify(userRepository, times(1)).findByUsername(anyString());
-        verify(passwordEncoder, times(1)).encode(anyString());
-        verify(jwtService, times(1)).generateToken(any(UserEntity.class));
-        verify(refreshTokenService, times(1)).getOrCreateRefreshToken(anyLong());
+        verify(authenticationManager).authenticate(any(Authentication.class));
+        verify(userRepository).findByUsername(anyString());
+        verify(passwordEncoder).encode(anyString());
+        verify(jwtService).generateToken(any(UserEntity.class));
+        verify(refreshTokenService).getOrCreateRefreshToken(anyLong());
     }
 
 }
