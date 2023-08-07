@@ -7,7 +7,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 @Entity
 @Table(name = "user_entity")
@@ -16,8 +19,8 @@ import java.util.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true, exclude = {"projectEntityList", "taskEntityList", "projects", "projectRoles"})
-@ToString(callSuper = true, exclude = {"projectEntityList", "taskEntityList", "projects", "projectRoles"})
+@EqualsAndHashCode(callSuper = true, exclude = {"projectRoles"})
+@ToString(callSuper = true, exclude = {"projectRoles"})
 public class UserEntity extends BaseEntity implements UserDetails {
 
     public static final String ENTITY_NAME = "User";
@@ -42,25 +45,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
 
     @Column(name = "display_name")
     private String displayName;
-
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "owner_id")
-    private List<TaskEntity> taskEntityList;
-
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "owner_id")
-    private List<ProjectEntity> projectEntityList;
-
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
-    @JoinTable(name = "user_project",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "project_id")})
-    @Builder.Default
-    private Set<ProjectEntity> projects = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinTable(name = "project_user_role",

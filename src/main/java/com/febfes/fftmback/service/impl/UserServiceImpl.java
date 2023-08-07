@@ -3,7 +3,10 @@ package com.febfes.fftmback.service.impl;
 import com.febfes.fftmback.domain.common.specification.UserSpec;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
+import com.febfes.fftmback.domain.projection.MemberProjection;
+import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.UserService;
@@ -74,12 +77,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getUserPicUrnByUserId(Long userId) {
-        return userViewRepository.getUserPicUrnById(userId);
+    public List<MemberDto> getProjectMembersWithRole(Long projectId) {
+        return userViewRepository.getProjectMembersWithRole(projectId).stream()
+                .map(UserMapper.INSTANCE::memberProjectionToMemberDto)
+                .toList();
     }
 
     @Override
-    public String getUserRole(Long userId, Long projectId) {
-        return userViewRepository.getUserRole(userId, projectId);
+    public MemberDto getProjectMemberWithRole(Long projectId, Long memberId) {
+        MemberProjection member = userViewRepository.getProjectMemberWithRole(projectId, memberId)
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, memberId));
+        return UserMapper.INSTANCE.memberProjectionToMemberDto(member);
+    }
+
+    @Override
+    public List<MemberDto> getProjectMembersWithRole(Long projectId, List<Long> membersIds) {
+        return membersIds.stream()
+                .map(memberId -> getProjectMemberWithRole(projectId, memberId))
+                .toList();
     }
 }

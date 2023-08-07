@@ -36,4 +36,5 @@ public class UserView extends BaseView {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "\"userPicId\"", referencedColumnName = "id")
     private FileEntity userPic;
+
 }

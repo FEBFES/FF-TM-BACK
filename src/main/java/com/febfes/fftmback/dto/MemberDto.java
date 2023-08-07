@@ -8,6 +8,6 @@ public record MemberDto(
         String lastName,
         String displayName,
         String userPic,
-        String role
+        String roleOnProject
 ) {
 }

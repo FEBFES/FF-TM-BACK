@@ -14,6 +14,7 @@ import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
+import com.febfes.fftmback.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,6 +37,7 @@ public class ProjectController {
 
     private final @NonNull ProjectService projectService;
     private final @NonNull TaskTypeService taskTypeService;
+    private final @NonNull UserService userService;
     private final @NonNull RoleCheckerComponent roleCheckerComponent;
 
     @Operation(summary = "Get all projects for authenticated user")
@@ -43,9 +45,7 @@ public class ProjectController {
     public List<ProjectDto> getProjectsForUser() {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = user.getId();
-        return projectService.getProjectsForUser(userId).stream()
-                .map(ProjectMapper.INSTANCE::projectToProjectDto)
-                .toList();
+        return projectService.getProjectsForUser(userId);
     }
 
     @Operation(summary = "Create new project")
@@ -68,12 +68,12 @@ public class ProjectController {
 
     @Operation(summary = "Edit project by its id")
     @ApiEdit(path = "{id}")
-    public void editProject(
+    public ProjectDto editProject(
             @PathVariable Long id,
             @RequestBody ProjectDto projectDto
     ) {
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        projectService.editProject(id, ProjectMapper.INSTANCE.projectDtoToProject(projectDto));
+        return projectService.editProject(id, ProjectMapper.INSTANCE.projectDtoToProject(projectDto));
     }
 
     @Operation(summary = "Delete project by its id")
@@ -106,7 +106,7 @@ public class ProjectController {
     @Operation(summary = "Get project members")
     @ApiGet(path = "{id}/members")
     public List<MemberDto> getProjectMembers(@PathVariable Long id) {
-        return projectService.getProjectMembers(id);
+        return userService.getProjectMembersWithRole(id);
     }
 
     @Operation(summary = "Add new members to the project")
