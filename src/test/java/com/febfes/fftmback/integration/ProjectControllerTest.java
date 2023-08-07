@@ -26,6 +26,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static io.restassured.RestAssured.given;
@@ -201,7 +202,10 @@ class ProjectControllerTest extends BasicTestClass {
         Assertions.assertThat(updatedProject.isFavourite())
                 .isTrue();
         List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId);
-        Assertions.assertThat(userProjects.get(0).isFavourite())
+        Optional<ProjectDto> userProject = userProjects.stream().findFirst();
+        Assertions.assertThat(userProject)
+                .isNotEmpty();
+        Assertions.assertThat(userProject.get().isFavourite())
                 .isTrue();
     }
 
@@ -221,7 +225,10 @@ class ProjectControllerTest extends BasicTestClass {
         Assertions.assertThat(updatedProject.isFavourite())
                 .isFalse();
         List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId);
-        Assertions.assertThat(userProjects.get(0).isFavourite())
+        Optional<ProjectDto> userProject = userProjects.stream().findFirst();
+        Assertions.assertThat(userProject)
+                .isNotEmpty();
+        Assertions.assertThat(userProject.get().isFavourite())
                 .isFalse();
     }
 
@@ -277,7 +284,10 @@ class ProjectControllerTest extends BasicTestClass {
     void successfulRemoveMemberTest() {
         successfulAddNewMembersTest();
         Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
-        Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).id();
+        Optional<ProjectDto> userProject = projectService.getProjectsForUser(createdUserId).stream().findFirst();
+        Assertions.assertThat(userProject)
+                .isNotEmpty();
+        Long createdProjectId = userProject.get().id();
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
@@ -306,7 +316,10 @@ class ProjectControllerTest extends BasicTestClass {
                 .as(new TypeRef<>() {
                 });
         Assertions.assertThat(projectMembers).hasSize(3);
-        Assertions.assertThat(projectMembers.get(0).roleOnProject()).isNotNull();
+        Optional<MemberDto> projectMember = projectMembers.stream().findFirst();
+        Assertions.assertThat(projectMember)
+                .isNotEmpty();
+        Assertions.assertThat(projectMember.get().roleOnProject()).isNotNull();
     }
 
     @Test
