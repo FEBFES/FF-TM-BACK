@@ -36,7 +36,7 @@ public class ColumnServiceImpl implements ColumnService {
     }
 
     @Override
-    public void editColumn(TaskColumnEntity column) {
+    public TaskColumnEntity editColumn(TaskColumnEntity column) {
         TaskColumnEntity oldColumn = columnRepository.findById(column.getId())
                 .orElseThrow(() -> new EntityNotFoundException(TaskColumnEntity.ENTITY_NAME, column.getId()));
         oldColumn.setName(column.getName());
@@ -53,9 +53,9 @@ public class ColumnServiceImpl implements ColumnService {
             );
             oldColumn.setChildTaskColumnId(column.getChildTaskColumnId());
         }
-        columnRepository.save(oldColumn);
-        log.info("Updated column: {}", oldColumn);
-
+        TaskColumnEntity updatedColumn = columnRepository.save(oldColumn);
+        log.info("Updated column: {}", updatedColumn);
+        return updatedColumn;
     }
 
     @Override
@@ -73,8 +73,7 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public void createDefaultColumnsForProject(Long projectId) {
-        DEFAULT_COLUMNS.forEach(columnName -> createColumn(TaskColumnEntity
-                .builder()
+        DEFAULT_COLUMNS.forEach(columnName -> createColumn(TaskColumnEntity.builder()
                 .name(columnName)
                 .projectId(projectId)
                 .build()
