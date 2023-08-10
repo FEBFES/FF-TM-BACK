@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import javax.crypto.SecretKey;
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -73,7 +74,7 @@ class AccessTokenExpirationTest {
                         .compact()
         );
         String token = jwtService.generateToken(new HashMap<>(), new UserEntity());
-        authenticationService.checkAccessTokenExpiration(token);
+        assertDoesNotThrow(() -> authenticationService.checkAccessTokenExpiration(token));
     }
 
 }

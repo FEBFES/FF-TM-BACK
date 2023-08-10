@@ -77,7 +77,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public RefreshTokenEntity getOrCreateRefreshToken(Long userId) {
+    public RefreshTokenEntity getRefreshTokenByUserId(Long userId) {
         try {
             RefreshTokenEntity existedRefreshToken = getByUserId(userId);
             if (DateUtils.isDateBeforeCurrentDate(existedRefreshToken.getExpiryDate())) {

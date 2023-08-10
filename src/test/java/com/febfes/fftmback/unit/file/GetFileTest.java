@@ -29,7 +29,7 @@ class GetFileTest {
     private static final String FILE_URN = "test-file-urn";
     private static final String ID_FOR_URN = "123";
     private static final String FILE_PATH = "test-file-path";
-    private static final byte[] EXPECTED_COUNT = "test content".getBytes();
+    private static final byte[] EXPECTED_BYTES = "test content".getBytes();
 
     @Mock
     private FileRepository fileRepository;
@@ -61,13 +61,10 @@ class GetFileTest {
     void testGetFileNotFound() {
         // Act
         assertThrows(EntityNotFoundException.class, () -> fileService.getFile(FILE_URN));
-
-        // Assert
-        // Exception expected
     }
 
     @Test
-    public void testGetFilesByEntityId() {
+    void testGetFilesByEntityId() {
         // Arrange
         FileEntity fileEntity1 = new FileEntity();
         fileEntity1.setEntityId(FIRST_ID);
@@ -88,7 +85,7 @@ class GetFileTest {
     }
 
     @Test
-    public void testGetFilesByEntityIdNoResults() {
+    void testGetFilesByEntityIdNoResults() {
         // Act
         List<FileEntity> result = fileService.getFilesByEntityId(FIRST_ID, EntityType.USER_PIC);
 
@@ -99,7 +96,7 @@ class GetFileTest {
 
     @Test
     @Disabled("need to mock static method")
-    public void testGetFileContent() throws IOException {
+    void testGetFileContent() throws IOException {
         // Arrange
         FileEntity fileEntity = new FileEntity();
         fileEntity.setId(FIRST_ID);
@@ -110,12 +107,12 @@ class GetFileTest {
         when(fileRepository.findByFileUrn(fileEntity.getFileUrn())).thenReturn(Optional.of(fileEntity));
 
         // static method
-        when(Files.readAllBytes(new File(fileEntity.getFilePath()).toPath())).thenReturn(EXPECTED_COUNT);
+        when(Files.readAllBytes(new File(fileEntity.getFilePath()).toPath())).thenReturn(EXPECTED_BYTES);
 
         // Act
         byte[] result = fileService.getFileContent(ID_FOR_URN, EntityType.USER_PIC);
 
         // Assert
-        assertArrayEquals(EXPECTED_COUNT, result);
+        assertArrayEquals(EXPECTED_BYTES, result);
     }
 }

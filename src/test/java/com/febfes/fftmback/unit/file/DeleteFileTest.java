@@ -15,12 +15,10 @@ import java.util.Optional;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class DeleteFileTest {
+class DeleteFileTest {
 
     private static final Long FIRST_ID = 1L;
     private static final String FILE_URN = "test-file-urn";
-    private static final String ID_FOR_URN = "123";
-    private static final String FILE_PATH = "test-file-path";
 
     @Mock
     private FileRepository fileRepository;

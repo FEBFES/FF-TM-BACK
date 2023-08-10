@@ -76,7 +76,7 @@ class AuthenticateUserTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(passwordEncoder.encode(user.getPassword())).thenReturn(USER_ENCODED_PASS);
         when(jwtService.generateToken(any(UserEntity.class))).thenReturn(JWT_TOKEN);
-        when(refreshTokenService.getOrCreateRefreshToken(anyLong())).thenReturn(refreshToken);
+        when(refreshTokenService.getRefreshTokenByUserId(anyLong())).thenReturn(refreshToken);
 
         // Call the registerUser method
         authenticationService.registerUser(user);
@@ -94,7 +94,7 @@ class AuthenticateUserTest {
         verify(userRepository).findByUsername(anyString());
         verify(passwordEncoder).encode(anyString());
         verify(jwtService).generateToken(any(UserEntity.class));
-        verify(refreshTokenService).getOrCreateRefreshToken(anyLong());
+        verify(refreshTokenService).getRefreshTokenByUserId(anyLong());
     }
 
 }
