@@ -2,7 +2,6 @@ package com.febfes.fftmback.repository;
 
 import com.febfes.fftmback.domain.dao.FileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,7 +15,4 @@ public interface FileRepository extends JpaRepository<FileEntity, Long> {
     List<FileEntity> findAllByEntityIdAndEntityType(Long entityId, String entityType);
 
     boolean existsByEntityIdAndEntityType(Long entityId, String entityType);
-
-    @Modifying
-    void deleteByEntityIdAndEntityType(Long entityId, String entityType);
 }

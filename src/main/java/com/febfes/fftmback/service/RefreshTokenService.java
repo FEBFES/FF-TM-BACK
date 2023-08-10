@@ -14,4 +14,6 @@ public interface RefreshTokenService {
     RefreshTokenEntity createRefreshToken(Long userId);
 
     TokenDto refreshToken(String token);
+
+    RefreshTokenEntity getRefreshTokenByUserId(Long userId);
 }

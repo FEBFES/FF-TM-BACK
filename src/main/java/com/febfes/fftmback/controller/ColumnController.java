@@ -47,14 +47,15 @@ public class ColumnController {
 
     @Operation(summary = "Edit column by its columnId")
     @ApiEdit(path = "{projectId}/columns/{columnId}")
-    public void editColumn(
+    public ColumnDto editColumn(
             @ParameterObject ColumnParameters pathVars,
             @RequestBody ColumnDto columnDto
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER_PLUS);
-        columnService.editColumn(
+        TaskColumnEntity updatedColumn = columnService.editColumn(
                 ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, pathVars.columnId(), pathVars.projectId())
         );
+        return ColumnMapper.INSTANCE.columnToColumnDto(updatedColumn);
     }
 
     @Operation(summary = "Delete column by its columnId")

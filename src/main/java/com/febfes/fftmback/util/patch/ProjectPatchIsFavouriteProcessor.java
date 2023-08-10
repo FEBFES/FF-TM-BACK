@@ -25,12 +25,13 @@ public class ProjectPatchIsFavouriteProcessor extends ProjectPatchFieldProcessor
             Long ownerId,
             PatchDto patchDto
     ) {
-        if (!patchDto.key().equals(FIELD_NAME)) {
+        if (!FIELD_NAME.equals(patchDto.key())) {
             callNextProcessor(projectId, ownerId, patchDto);
             return;
         }
 
-        if (PatchOperation.getByCode(patchDto.op()).equals(PatchOperation.UPDATE)) {
+        PatchOperation operation = PatchOperation.getByCode(patchDto.op());
+        if (PatchOperation.UPDATE.equals(operation)) {
             Boolean isFavourite = (Boolean) patchDto.value();
             if (isFavourite) {
                 projectService.addProjectToFavourite(projectId, ownerId);
