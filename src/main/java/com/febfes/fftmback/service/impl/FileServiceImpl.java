@@ -87,7 +87,7 @@ public class FileServiceImpl implements FileService {
         FileEntity fileEntity = fileBuilder.build();
         try {
             file.transferTo(new File(fileEntity.getFilePath()));
-            // TODO: i'm talking about this (look upper)
+            // TODO: I'm talking about this (look upper)
             if (!EntityType.USER_PIC.equals(entityType) || !repository.existsByEntityIdAndEntityType(entityId, entityType.name())) {
                 repository.save(fileEntity);
             }
