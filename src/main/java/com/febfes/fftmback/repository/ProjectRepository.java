@@ -25,7 +25,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
                     "INNER JOIN TaskColumnEntity TC ON TC.id = :columnId AND TC.projectId = :projectId " +
                     "WHERE P.id = :projectId"
     )
-    Boolean doesProjectEntityContainColumn(Long projectId, Long columnId);
+    boolean doesProjectEntityContainColumn(Long projectId, Long columnId);
 
     @Modifying
     @Query(
