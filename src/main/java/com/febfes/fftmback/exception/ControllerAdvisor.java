@@ -96,6 +96,18 @@ public class ControllerAdvisor {
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
+    @ExceptionHandler(ProjectColumnException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @Hidden
+    public ApiErrorDto handleProjectColumnException(
+            ProjectColumnException ex,
+            HttpServletRequest httpRequest
+    ) {
+        ex.printStackTrace();
+        return createResponseBodyForExceptions(HttpStatus.CONFLICT, ProjectColumnException.class.getSimpleName(),
+                ex.getMessage(), httpRequest.getRequestURI());
+    }
+
     @ExceptionHandler(RoleCheckException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @Hidden

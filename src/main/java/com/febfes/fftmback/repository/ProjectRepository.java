@@ -16,9 +16,16 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
     @Query(
             nativeQuery = true,
-            value = "SELECT COUNT(*) > 0  FROM favourite_project WHERE project_id = :projectId AND user_id = :userId"
+            value = "SELECT COUNT(*) > 0 FROM favourite_project WHERE project_id = :projectId AND user_id = :userId"
     )
     Boolean isProjectFavourite(Long projectId, Long userId);
+
+    @Query(
+            value = "SELECT COUNT(*) > 0 FROM ProjectEntity P " +
+                    "INNER JOIN TaskColumnEntity TC ON TC.id = :columnId AND TC.projectId = :projectId " +
+                    "WHERE P.id = :projectId"
+    )
+    boolean doesProjectEntityContainColumn(Long projectId, Long columnId);
 
     @Modifying
     @Query(

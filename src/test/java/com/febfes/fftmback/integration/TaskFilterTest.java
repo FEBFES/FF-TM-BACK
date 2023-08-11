@@ -111,7 +111,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId2)
-                        .columnId(1L)
+                        .columnId(5L)
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
