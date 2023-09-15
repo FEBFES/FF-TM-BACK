@@ -1,7 +1,7 @@
 package com.febfes.fftmback.dto;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 public record OneProjectDto(
         Long id,
@@ -9,7 +9,7 @@ public record OneProjectDto(
         String description,
         Date createDate,
         Boolean isFavourite,
-        Set<UserDto> members,
+        List<MemberDto> members,
         RoleDto userRoleOnProject
 ) {
 }

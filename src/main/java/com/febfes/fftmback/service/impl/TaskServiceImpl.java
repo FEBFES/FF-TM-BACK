@@ -6,6 +6,8 @@ import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.ProjectColumnException;
+import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.TaskService;
@@ -34,6 +36,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskViewRepository taskViewRepository;
     private final UserService userService;
     private final TaskTypeService taskTypeService;
+    private final ProjectRepository projectRepository;
 
     @Override
     public List<TaskView> getTasks(
@@ -71,8 +74,13 @@ public class TaskServiceImpl implements TaskService {
             String username
     ) {
         task.setOwnerId(userService.getUserIdByUsername(username));
+        Long projectId = task.getProjectId();
+        Long columnId = task.getColumnId();
         if (nonNull(task.getTaskType())) {
-            fillTaskType(task, task.getTaskType().getName(), task.getProjectId());
+            fillTaskType(task, task.getTaskType().getName(), projectId);
+        }
+        if (!projectRepository.doesProjectEntityContainColumn(projectId, columnId)) {
+            throw new ProjectColumnException(projectId, columnId);
         }
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);

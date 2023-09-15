@@ -8,7 +8,7 @@ public interface ColumnService {
 
     TaskColumnEntity createColumn(TaskColumnEntity column);
 
-    void editColumn(TaskColumnEntity columnDto);
+    TaskColumnEntity editColumn(TaskColumnEntity columnDto);
 
     void deleteColumn(Long id);
 

@@ -75,4 +75,22 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         log.info("Refresh token with id={} refreshed", updatedRefreshTokenEntity.getId());
         return new TokenDto(accessToken, updatedRefreshTokenEntity.getToken());
     }
+
+    @Override
+    public RefreshTokenEntity getRefreshTokenByUserId(Long userId) {
+        try {
+            RefreshTokenEntity existedRefreshToken = getByUserId(userId);
+            if (DateUtils.isDateBeforeCurrentDate(existedRefreshToken.getExpiryDate())) {
+                RefreshTokenEntity updatedRefreshToken = updateRefreshToken(existedRefreshToken);
+                log.info("User with id={} authenticated with updated refresh token", userId);
+                return updatedRefreshToken;
+            }
+            log.info("User with id={} authenticated with existed non expired refresh token", userId);
+            return existedRefreshToken;
+        } catch (EntityNotFoundException ignored) {
+            log.info("There is no refresh token in db for user with id={}", userId);
+        }
+
+        return createRefreshToken(userId);
+    }
 }
