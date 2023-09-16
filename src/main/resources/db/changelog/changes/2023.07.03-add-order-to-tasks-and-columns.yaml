@@ -1,6 +1,35 @@
 databaseChangeLog:
   - changeSet:
-      id: 0
-      author: admin
+      id: 1
+      author: IvanShish
       changes:
-        -
+        - createTable:
+            tableName: entity_order
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: index
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_user_id
+            baseTableName: entity_order
+            baseColumnNames: user_id
+            referencedTableName: user_entity
+            referencedColumnNames: id
+            onDelete: CASCADE

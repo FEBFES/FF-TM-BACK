@@ -1,6 +1,7 @@
 package com.febfes.fftmback.domain.dao;
 
 import com.febfes.fftmback.domain.common.TaskPriority;
+import com.febfes.fftmback.domain.dao.abstracts.BaseView;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

@@ -37,7 +37,7 @@ class DeleteFileTest {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setId(FIRST_ID);
         fileEntity.setFileUrn(FILE_URN);
-        fileEntity.setEntityType(EntityType.USER_PIC.name());
+        fileEntity.setEntityType(EntityType.USER_PIC);
         fileEntity.setFilePath("/path/to/file");
         when(fileRepository.findById(FIRST_ID)).thenReturn(Optional.of(fileEntity));
 

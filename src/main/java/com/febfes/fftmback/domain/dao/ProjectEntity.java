@@ -1,5 +1,6 @@
 package com.febfes.fftmback.domain.dao;
 
+import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -28,6 +29,7 @@ public class ProjectEntity extends BaseEntity {
     @JoinColumn(name = "project_id")
     private List<TaskColumnEntity> taskColumnEntityList;
     //TODO problem when project was deleted
+    // TODO: rename to columns
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "project_id")

@@ -1,8 +1,8 @@
 package com.febfes.fftmback.domain.dao;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.febfes.fftmback.domain.common.EntityType;
+import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +30,8 @@ public class FileEntity extends BaseEntity {
     private String name;
 
     @Column(name = "entity_type")
-    private String entityType;
+    @Enumerated(EnumType.STRING)
+    private EntityType entityType;
 
     @Column(name = "content_type")
     private String contentType;

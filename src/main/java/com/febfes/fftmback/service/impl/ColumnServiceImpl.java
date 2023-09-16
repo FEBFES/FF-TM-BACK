@@ -1,11 +1,9 @@
 package com.febfes.fftmback.service.impl;
 
-import com.febfes.fftmback.domain.dao.OrderedEntities.ColumnOrder;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +20,7 @@ import java.util.stream.Collectors;
 public class ColumnServiceImpl implements ColumnService {
 
     private final ColumnRepository columnRepository;
-    private final OrderService<ColumnOrder> orderService;
+//    private final OrderService<EntityOrder> orderService;
 
     private static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
 
