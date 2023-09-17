@@ -2,7 +2,7 @@
 
 --changeset auto-views:view-v_task runOnChange:true ignore:true
 
-create or replace view public.v_task
+create or replace view v_task
 as
 select t.id                            as "id"
      , t.create_date                   as "createDate"
@@ -19,5 +19,5 @@ select t.id                            as "id"
         where fe.entity_id = t.id
           and fe.entity_type = 'TASK') as "filesCounter"
      , t.update_date                   as "updateDate"
-from public.task t
+from task t
 ;

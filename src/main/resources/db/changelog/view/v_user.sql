@@ -2,7 +2,7 @@
 
 --changeset auto-views:view-v_user runOnChange:true ignore:true
 
-create or replace view public.v_user
+create or replace view v_user
 as
 select u.id                                as "id"
      , u.create_date                       as "createDate"
@@ -16,5 +16,5 @@ select u.id                                as "id"
         from file_entity fe
         where fe.user_id = u.id
           and fe.entity_type = 'USER_PIC') as "userPicId"
-from public.user_entity u
+from user_entity u
 ;
