@@ -51,9 +51,6 @@ class ProjectControllerTest extends BasicTestClass {
     private UserService userService;
 
     @Autowired
-    private DtoBuilders dtoBuilders;
-
-    @Autowired
     private TransactionTemplate txTemplate;
 
     @BeforeEach
@@ -94,7 +91,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfProjectTest() {
-        ProjectDto projectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
+        ProjectDto projectDto = DtoBuilders.createProjectDto(PROJECT_NAME);
 
         Response createResponse = createNewProject(projectDto);
         createResponse.then()
@@ -118,7 +115,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfProjectTest() {
-        ProjectDto projectDto = dtoBuilders.createProjectDto(null, PROJECT_DESCRIPTION);
+        ProjectDto projectDto = DtoBuilders.createProjectDto(null, PROJECT_DESCRIPTION);
 
         createNewProject(projectDto).then()
                 .statusCode(HttpStatus.SC_UNPROCESSABLE_ENTITY);
@@ -129,7 +126,7 @@ class ProjectControllerTest extends BasicTestClass {
         Long createdProjectId = createNewProject(PROJECT_NAME);
 
         String newProjectName = PROJECT_NAME + "edit";
-        ProjectDto editProjectDto = dtoBuilders.createProjectDto(newProjectName);
+        ProjectDto editProjectDto = DtoBuilders.createProjectDto(newProjectName);
 
         ProjectDto updatedProjectDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -149,7 +146,7 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void failedEditOfProjectTest() {
         String wrongProjectId = "54731584";
-        ProjectDto editProjectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
+        ProjectDto editProjectDto = DtoBuilders.createProjectDto(PROJECT_NAME);
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -363,7 +360,7 @@ class ProjectControllerTest extends BasicTestClass {
     }
 
     private Long createNewProject(String projectName) {
-        ProjectDto createProjectDto = dtoBuilders.createProjectDto(projectName);
+        ProjectDto createProjectDto = DtoBuilders.createProjectDto(projectName);
         Response createResponse = createNewProject(createProjectDto);
         return createResponse.jsonPath().getLong("id");
     }

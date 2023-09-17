@@ -4,12 +4,13 @@ import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.TaskDto;
+import lombok.experimental.UtilityClass;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
 
-@Service
+@UtilityClass
 @Profile("test")
 public class DtoBuilders {
+
     public ProjectDto createProjectDto(String name) {
         return ProjectDto.builder()
                 .name(name)

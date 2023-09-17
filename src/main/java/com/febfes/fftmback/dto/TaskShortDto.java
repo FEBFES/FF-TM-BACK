@@ -16,7 +16,7 @@ public record TaskShortDto(
         Long filesCounter,
         UserDto owner,
         UserDto assignee,
-
-        Date updateDate
+        Date updateDate,
+        Integer order
 ) {
 }

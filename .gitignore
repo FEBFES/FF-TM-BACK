@@ -36,5 +36,5 @@ build/
 ### scripts ###
 deploy.sh
 
-./userPics
-./files
+.userPics
+.files

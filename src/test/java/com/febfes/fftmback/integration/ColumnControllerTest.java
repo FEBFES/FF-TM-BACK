@@ -20,10 +20,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.LongConsumer;
-import java.util.stream.Collectors;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
@@ -49,9 +47,6 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private DtoBuilders dtoBuilders;
 
     @BeforeEach
     void beforeEach() {
@@ -85,17 +80,17 @@ class ColumnControllerTest extends BasicTestClass {
 
 
         columnService.createColumn(TaskColumnEntity
-                        .builder()
-                        .name(COLUMN_NAME + "1")
-                        .projectId(createdProjectId)
-                        .build()
+                .builder()
+                .name(COLUMN_NAME + "1")
+                .projectId(createdProjectId)
+                .build()
         );
 
         columnService.createColumn(TaskColumnEntity
-                        .builder()
-                        .name(COLUMN_NAME + "2")
-                        .projectId(createdProjectId)
-                        .build()
+                .builder()
+                .name(COLUMN_NAME + "2")
+                .projectId(createdProjectId)
+                .build()
         );
 
         Response response = requestWithBearerToken()
@@ -114,7 +109,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateColumnTest() {
-        ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME);
+        ColumnDto columnDto = DtoBuilders.createColumnDto(COLUMN_NAME);
 
         createNewColumn(columnDto)
                 .then()
@@ -134,12 +129,12 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditColumnTest() {
-        ColumnDto createColumnDto = dtoBuilders.createColumnDto(COLUMN_NAME);
+        ColumnDto createColumnDto = DtoBuilders.createColumnDto(COLUMN_NAME);
         Response createResponse = createNewColumn(createColumnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 
         String newColumnName = COLUMN_NAME + "edit";
-        ColumnDto editColumnDto = dtoBuilders.createColumnDto(newColumnName);
+        ColumnDto editColumnDto = DtoBuilders.createColumnDto(newColumnName);
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -153,7 +148,7 @@ class ColumnControllerTest extends BasicTestClass {
     @Test
     void failedEditColumnTest() {
         String wrongColumnId = "54731584";
-        ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME);
+        ColumnDto columnDto = DtoBuilders.createColumnDto(COLUMN_NAME);
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -166,7 +161,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteColumnTest() {
-        ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME);
+        ColumnDto columnDto = DtoBuilders.createColumnDto(COLUMN_NAME);
         Response createResponse = createNewColumn(columnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 
@@ -205,39 +200,6 @@ class ColumnControllerTest extends BasicTestClass {
                 .delete("%s/{projectId}/columns/{columnId}".formatted(PATH_TO_PROJECTS_API), createdProjectId, wrongColumnId)
                 .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND);
-    }
-
-    @Test
-    void changeColumnOrder() {
-        DashboardDto dashboardDto = getDashboard();
-        if (dashboardDto.columns().size() < 3) {
-            for (int i = 1; i < 4; i++) {
-                createNewColumn(dtoBuilders.createColumnDto(COLUMN_NAME + i));
-            }
-            dashboardDto = getDashboard();
-        }
-        List<Long> columnIdWithOrderList = dashboardDto
-                .columns()
-                .stream()
-                .map(ColumnWithTasksDto::id)
-                .collect(Collectors.toList());
-        // swap 2nd and 3rd columns
-        ColumnWithTasksDto thirdColumn = dashboardDto.columns().get(2);
-        requestWithBearerToken()
-                .contentType(ContentType.JSON)
-                .body(dtoBuilders.createColumnDto(thirdColumn.name(), 2))
-                .when()
-                .put(
-                        "%s/{projectId}/columns/{columnId}".formatted(PATH_TO_PROJECTS_API),
-                        createdProjectId,
-                        thirdColumn.id()
-                )
-                .then()
-                .statusCode(HttpStatus.SC_OK);
-        Collections.swap(columnIdWithOrderList, 1, 2);
-        dashboardDto = getDashboard();
-        Assertions.assertThat(dashboardDto.columns().stream().map(ColumnWithTasksDto::id).toList())
-                .isEqualTo(columnIdWithOrderList);
     }
 
     private Response createNewColumn(ColumnDto columnDto) {

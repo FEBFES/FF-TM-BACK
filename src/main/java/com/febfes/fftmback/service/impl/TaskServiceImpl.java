@@ -4,7 +4,6 @@ import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
-import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.ProjectColumnException;
 import com.febfes.fftmback.repository.ProjectRepository;
@@ -12,6 +11,8 @@ import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
+import com.febfes.fftmback.service.order.OrderService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.febfes.fftmback.domain.common.specification.TaskSpec.byColumnId;
 import static com.febfes.fftmback.service.order.OrderServiceImpl.ORDER_FIELD_NAME;
@@ -29,6 +29,7 @@ import static java.util.Objects.nonNull;
 
 @Service
 @Slf4j
+@Transactional
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
@@ -40,6 +41,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskViewRepository taskViewRepository;
     private final TaskTypeService taskTypeService;
     private final ProjectRepository projectRepository;
+    private final OrderService<TaskEntity> orderService;
 
     @Override
     public List<TaskView> getTasks(
@@ -74,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskView createTask(
+    public Long createTask(
             TaskEntity task,
             Long userId
     ) {
@@ -87,40 +89,36 @@ public class TaskServiceImpl implements TaskService {
         if (!projectRepository.doesProjectEntityContainColumn(projectId, columnId)) {
             throw new ProjectColumnException(projectId, columnId);
         }
+        task.setEntityOrder(orderService.getNewOrder(task));
         TaskEntity savedTask = taskRepository.save(task);
         log.info("Saved task: {}", savedTask);
-        return getTaskById(savedTask.getId());
+        return savedTask.getId();
     }
 
     @Override
-    public TaskView updateTask(
-            Long id,
-            Long projectId,
-            Long columnId,
-            EditTaskDto editTaskDto
-    ) {
+    public void updateTask(TaskEntity editTask) {
+        Long id = editTask.getId();
         TaskEntity task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
-        task.setName(editTaskDto.name());
-        task.setDescription(editTaskDto.description());
-        task.setColumnId(columnId);
-        task.setProjectId(projectId);
-        task.setPriority(editTaskDto.priority());
-        task.setAssigneeId(editTaskDto.assigneeId());
-        fillTaskType(task, editTaskDto.type(), projectId);
+        task.setName(editTask.getName());
+        task.setDescription(editTask.getDescription());
+        task.setColumnId(editTask.getColumnId());
+        task.setProjectId(editTask.getProjectId());
+        task.setPriority(editTask.getPriority());
+        task.setAssigneeId(editTask.getAssigneeId());
+        fillTaskType(task, editTask.getTaskType().getName(), editTask.getProjectId());
         taskRepository.save(task);
+        orderService.editOrder(task, editTask.getEntityOrder());
         log.info("Updated task: {}", task);
-        return getTaskById(id);
     }
 
     @Override
     public void deleteTask(Long id) {
-        if (taskRepository.existsById(id)) {
-            taskRepository.deleteById(id);
-            log.info("Task with id={} deleted", id);
-        } else {
-            throw new EntityNotFoundException(TaskEntity.ENTITY_NAME, id);
-        }
+        TaskEntity task = taskRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
+        taskRepository.deleteById(id);
+        orderService.removeEntity(task);
+        log.info("Task with id={} deleted", id);
     }
 
     private void fillTaskType(TaskEntity task, String typeName, Long projectId) {
@@ -128,19 +126,13 @@ public class TaskServiceImpl implements TaskService {
             task.setTaskType(null);
             return;
         }
-        Optional<TaskTypeEntity> taskTypeEntity = taskTypeService
-                .getTaskTypeByNameAndProjectId(typeName, task.getProjectId());
-        if (taskTypeEntity.isPresent()) {
-            task.setTaskType(taskTypeEntity.get());
-        } else {
-            TaskTypeEntity newTaskType = taskTypeService.createTaskType(
-                    TaskTypeEntity.builder()
-                            .name(typeName)
-                            .projectId(projectId)
-                            .build()
-            );
-            task.setTaskType(newTaskType);
-        }
 
+        task.setTaskType(taskTypeService.getTaskTypeByNameAndProjectId(typeName, task.getProjectId())
+                .orElseGet(() -> taskTypeService.createTaskType(
+                        TaskTypeEntity.builder()
+                                .name(typeName)
+                                .projectId(projectId)
+                                .build()
+                )));
     }
 }

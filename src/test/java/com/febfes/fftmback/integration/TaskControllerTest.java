@@ -60,9 +60,6 @@ class TaskControllerTest extends BasicTestClass {
     private AuthenticationService authenticationService;
 
     @Autowired
-    private DtoBuilders dtoBuilders;
-
-    @Autowired
     private TaskTypeService taskTypeService;
 
     @Autowired
@@ -92,10 +89,10 @@ class TaskControllerTest extends BasicTestClass {
         createdProjectId = projectEntity.getId();
 
         TaskColumnEntity columnEntity = columnService.createColumn(TaskColumnEntity
-                        .builder()
-                        .name(COLUMN_NAME)
-                        .projectId(createdProjectId)
-                        .build()
+                .builder()
+                .name(COLUMN_NAME)
+                .projectId(createdProjectId)
+                .build()
         );
         createdColumnId = columnEntity.getId();
     }
@@ -142,8 +139,8 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulCreateOfTaskTest() {
-        TaskDto taskDto = dtoBuilders.createTaskDto(TASK_NAME);
+    void successfulCreateTaskTest() {
+        TaskDto taskDto = DtoBuilders.createTaskDto(TASK_NAME);
 
         createNewTask(taskDto)
                 .then()
@@ -152,7 +149,7 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     @Test
-    void failedCreateOfTaskTest() {
+    void failedCreateTaskTest() {
         TaskDto taskDto = TaskDto.builder().build();
 
         createNewTask(taskDto)
@@ -161,8 +158,8 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulEditOfTaskTest() {
-        TaskDto createTaskDto = dtoBuilders.createTaskDto(TASK_NAME);
+    void successfulEditTaskTest() {
+        TaskDto createTaskDto = DtoBuilders.createTaskDto(TASK_NAME);
         Response createResponse = createNewTask(createTaskDto);
         long createdTaskId = createResponse.jsonPath().getLong("id");
 
@@ -170,7 +167,7 @@ class TaskControllerTest extends BasicTestClass {
                 .username(USER_USERNAME + "1").encryptedPassword(USER_PASSWORD).build());
         Long newUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
         String newTaskName = TASK_NAME + "edit";
-        EditTaskDto editTaskDto = new EditTaskDto(newTaskName, "newDescription", newUserId, TaskPriority.HIGH, "bug");
+        EditTaskDto editTaskDto = new EditTaskDto(newTaskName, "newDescription", newUserId, TaskPriority.HIGH, "bug", 1);
 
         TaskShortDto taskShortDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -193,12 +190,13 @@ class TaskControllerTest extends BasicTestClass {
         Assertions.assertNotNull(taskShortDto.createDate());
         Assertions.assertNotNull(taskShortDto.updateDate());
         Assertions.assertNotEquals(taskShortDto.createDate(), taskShortDto.updateDate());
+        Assertions.assertEquals(editTaskDto.order(), taskShortDto.order());
     }
 
     @Test
     void failedEditOfTaskTest() {
         String wrongTaskId = "54731584";
-        TaskDto createTaskDto = dtoBuilders.createTaskDto(TASK_NAME);
+        TaskDto createTaskDto = DtoBuilders.createTaskDto(TASK_NAME);
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -212,7 +210,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfTaskTest() {
-        TaskDto createTaskDto = dtoBuilders.createTaskDto(TASK_NAME);
+        TaskDto createTaskDto = DtoBuilders.createTaskDto(TASK_NAME);
         Response createResponse = createNewTask(createTaskDto);
         long createdTaskId = createResponse.jsonPath().getLong("id");
 
@@ -246,7 +244,7 @@ class TaskControllerTest extends BasicTestClass {
                 .projectId(createdProjectId)
                 .build()
         );
-        TaskDto taskDto = dtoBuilders.createTaskDtoWithType(TASK_NAME, TASK_TYPE);
+        TaskDto taskDto = DtoBuilders.createTaskDtoWithType(TASK_NAME, TASK_TYPE);
         createNewTask(taskDto)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
@@ -255,7 +253,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void createTaskWithPriorityTest() {
-        TaskDto taskDto = dtoBuilders.createTaskDtoWithPriority(TASK_NAME, TaskPriority.LOW.name().toLowerCase());
+        TaskDto taskDto = DtoBuilders.createTaskDtoWithPriority(TASK_NAME, TaskPriority.LOW.name().toLowerCase());
         createNewTask(taskDto)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
@@ -265,7 +263,7 @@ class TaskControllerTest extends BasicTestClass {
     @Test
     void createTaskWithWrongColumnIdTest() {
         long wrongColumnId = 20L;
-        TaskDto taskDto = dtoBuilders.createTaskDtoWithPriority(TASK_NAME, TaskPriority.LOW.name().toLowerCase());
+        TaskDto taskDto = DtoBuilders.createTaskDtoWithPriority(TASK_NAME, TaskPriority.LOW.name().toLowerCase());
         ApiErrorDto errorDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(taskDto)
@@ -320,7 +318,6 @@ class TaskControllerTest extends BasicTestClass {
         Assertions.assertEquals(0, newTaskFiles.size());
     }
 
-
     private Response createNewTask(TaskDto taskDto) {
         return requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -331,7 +328,7 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     private TaskView createNewTask(String taskName) {
-        return taskService.createTask(
+        Long taskId = taskService.createTask(
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
@@ -341,6 +338,7 @@ class TaskControllerTest extends BasicTestClass {
                         .build(),
                 createdUserId
         );
+        return taskService.getTaskById(taskId);
     }
 
     private RequestSpecification requestWithBearerToken() {

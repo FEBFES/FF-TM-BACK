@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset auto-views:view-v_task runOnChange:true ignore:true
+--changeset auto-views:view-v_task runOnChange:true
 
 create or replace view v_task
 as
@@ -19,5 +19,6 @@ select t.id                            as "id"
         where fe.entity_id = t.id
           and fe.entity_type = 'TASK') as "filesCounter"
      , t.update_date                   as "updateDate"
+     , t.entity_order                  as "entityOrder"
 from task t
 ;
