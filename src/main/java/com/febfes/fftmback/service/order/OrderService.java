@@ -2,30 +2,30 @@ package com.febfes.fftmback.service.order;
 
 import com.febfes.fftmback.domain.dao.abstracts.OrderedEntity;
 
-import java.util.List;
-
 
 public interface OrderService<T extends OrderedEntity> {
 
     /**
-     * todo
+     * Gets new entity order for entity. In the end of array.
      *
-     * @return
+     * @param entity entity that is needed to get order to.
+     * @return new order value.
      */
-    List<T> sortEntities(List<T> orderedEntitieList);
+    Integer getNewOrder(T entity);
 
     /**
-     * This function adds entity to the end of array
+     * When remove an entity, we need also to change the order of further records.
+     * This function must be called after deletion of entity
+     *
+     * @param entity removed entity
      */
-    void addEntity(T entity, Long userId);
+    void removeEntity(T entity);
 
     /**
+     * When we change order of entity, we need also to change the order of further records.
      *
+     * @param entity   entity to update
+     * @param newOrder new order for entity
      */
-    void removeEntity(T entity, Long userId);
-
-    /**
-     *
-     */
-    void editIndex(T entity, Integer newIndex, Long userId);
+    void editOrder(T entity, Integer newOrder);
 }

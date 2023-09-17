@@ -1,20 +1,23 @@
 package com.febfes.fftmback.domain.dao.abstracts;
 
-import com.febfes.fftmback.domain.common.EntityType;
+import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @SuperBuilder
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @ToString
 public abstract class OrderedEntity extends BaseEntity {
 
-    public abstract EntityType getEntityType();
+    @Column(name = "entity_order")
+    private Integer entityOrder;
+
+    public abstract String getColumnToFindOrder();
+
+    public abstract Object getValueToFindOrder();
 }

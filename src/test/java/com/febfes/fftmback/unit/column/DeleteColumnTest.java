@@ -20,7 +20,6 @@ class DeleteColumnTest {
 
     private static final Long FIRST_ID = 1L;
     private static final Long SECOND_ID = 2L;
-    private static final Long THIRD_ID = 3L;
     private static final String COLUMN_NAME = "Test Column";
 
     @Mock
@@ -48,11 +47,12 @@ class DeleteColumnTest {
         when(columnRepository.findById(FIRST_ID)).thenReturn(Optional.of(columnEntity));
 
         // Call the deleteColumn method
-        columnService.deleteColumn(FIRST_ID, 1L);
+        columnService.deleteColumn(FIRST_ID);
 
         // Verify that the column repository was called with the correct parameters
-//        verify(columnRepository).updateChildColumn(THIRD_ID, FIRST_ID, SECOND_ID);
         verify(columnRepository).delete(columnEntity);
+
+        verify(orderService).removeEntity(any());
     }
 
     @Test
@@ -61,10 +61,11 @@ class DeleteColumnTest {
         when(columnRepository.findById(FIRST_ID)).thenReturn(Optional.empty());
 
         // Call the deleteColumn method with a non-existent column ID
-        assertThrows(EntityNotFoundException.class, () -> columnService.deleteColumn(FIRST_ID, 1L));
+        assertThrows(EntityNotFoundException.class, () -> columnService.deleteColumn(FIRST_ID));
 
         // Verify that the column repository was not called
-//        verify(columnRepository, never()).updateChildColumn(anyLong(), anyLong(), anyLong());
         verify(columnRepository, never()).delete(any(TaskColumnEntity.class));
+
+        verify(orderService, never()).removeEntity(any());
     }
 }

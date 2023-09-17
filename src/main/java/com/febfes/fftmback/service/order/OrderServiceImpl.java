@@ -1,15 +1,14 @@
 package com.febfes.fftmback.service.order;
 
-import com.febfes.fftmback.domain.dao.EntityOrder;
 import com.febfes.fftmback.domain.dao.abstracts.OrderedEntity;
-import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.repository.EntityOrderRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 import static java.util.Objects.isNull;
 
@@ -17,58 +16,51 @@ import static java.util.Objects.isNull;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Setter
 public class OrderServiceImpl<T extends OrderedEntity> implements OrderService<T> {
 
-    private final EntityOrderRepository entityOrderRepository;
+    @PersistenceContext
+    private EntityManager em;
+
+    private static final String ORDER_FIELD_NAME = "entityOrder";
 
     @Override
-    public List<T> sortEntities(List<T> entities) {
-//        Map<Long, T> childIdToOrderedEntity = orderedEntitieList.stream()
-//                .collect(Collectors.toMap(OrderedEntity::getChildEntityId, Function.identity()));
-//        List<T> result = new ArrayList<>();
-//        // last element has childEntityId == null
-//        Long currentEntityId = null;
-//        // todo
-//        for (int i = childIdToOrderedEntity.size(); i > 0; i--) {
-//            T entity = childIdToOrderedEntity.get(currentEntityId);
-//            entity.setEntityOrder(i);
-//            result.add(entity);
-//            currentEntityId = entity.getId();
-//        }
-//        Collections.reverse(result);
-//        return result;
-        return null;
+    public Integer getNewOrder(T entity) {
+        Query selectMaxOrderQuery = em.createQuery(String.format(
+                "SELECT COALESCE((SELECT MAX(e.%s) FROM %s e WHERE e.%s = ?1), 0) + 1",
+                ORDER_FIELD_NAME, entity.getClass().getSimpleName(), entity.getColumnToFindOrder()));
+        return Integer.parseInt(selectMaxOrderQuery
+                .setParameter(1, entity.getValueToFindOrder())
+                .getSingleResult().toString());
     }
 
     @Override
-    public void addEntity(T entity, Long userId) {
-        entityOrderRepository.addTop(userId, entity.getEntityType().name(), entity.getId());
+    public void removeEntity(T entity) {
+        Query updateFurtherRecordsWhenDeleteQuery = em.createQuery(String.format(
+                "UPDATE %1$s e SET e.%2$s = e.%2$s - 1 WHERE e.%2$s > ?1 AND e.%3$s = ?2",
+                entity.getClass().getSimpleName(), ORDER_FIELD_NAME, entity.getColumnToFindOrder()));
+        updateFurtherRecordsWhenDeleteQuery
+                .setParameter(1, entity.getEntityOrder())
+                .setParameter(2, entity.getValueToFindOrder())
+                .executeUpdate();
     }
 
     @Override
-    public void removeEntity(T entity, Long userId) {
-        EntityOrder entityOrder = getEntityOrder(entity, userId);
-        entityOrderRepository.delete(entityOrder);
-        entityOrderRepository.updateFurtherRecordsWhenDelete(entityOrder);
-    }
-
-    @Override
-    public void editIndex(T entity, Integer newIndex, Long userId) {
-        EntityOrder entityOrder = getEntityOrder(entity, userId);
-
-        Integer currentIndex = entityOrder.getIndex();
-        if (isNull(newIndex) || newIndex.equals(currentIndex)) {
+    public void editOrder(T entity, Integer newOrder) {
+        Integer currentOrder = entity.getEntityOrder();
+        if (isNull(newOrder) || newOrder.equals(currentOrder)) {
             return;
         }
-        entityOrder.setIndex(newIndex);
-        entityOrderRepository.save(entityOrder);
-        entityOrderRepository.updateFurtherRecords(entityOrder, currentIndex);
-    }
 
-    private EntityOrder getEntityOrder(T entity, Long userId) {
-        return entityOrderRepository
-                .findByEntityIdAndEntityTypeAndUserId(entity.getId(), entity.getEntityType(), userId)
-                .orElseThrow(() -> new EntityNotFoundException(EntityOrder.ENTITY_NAME, entity.getId()));
+        Query updateFurtherRecordsQuery = em.createQuery(String.format(
+                "UPDATE %1$s e SET e.%2$s = e.%2$s + 1 WHERE e.%2$s >= ?1 AND e.%2$s < ?2 AND e.%3$s = ?3",
+                entity.getClass().getSimpleName(), ORDER_FIELD_NAME, entity.getColumnToFindOrder()));
+        updateFurtherRecordsQuery
+                .setParameter(1, newOrder)
+                .setParameter(2, currentOrder)
+                .setParameter(3, entity.getValueToFindOrder())
+                .executeUpdate();
+        entity.setEntityOrder(newOrder);
     }
 
 

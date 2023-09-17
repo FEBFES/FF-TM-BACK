@@ -20,7 +20,7 @@ public interface ProjectService {
 
     void deleteProject(Long id);
 
-    DashboardDto getDashboard(Long id, Long userId, TaskSpec taskSpec);
+    DashboardDto getDashboard(Long id, TaskSpec taskSpec);
 
     void editProjectPartially(Long id, Long ownerId, List<PatchDto> patchDtoList);
 

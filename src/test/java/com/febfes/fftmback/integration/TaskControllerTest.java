@@ -95,8 +95,7 @@ class TaskControllerTest extends BasicTestClass {
                         .builder()
                         .name(COLUMN_NAME)
                         .projectId(createdProjectId)
-                        .build(),
-                createdUserId
+                        .build()
         );
         createdColumnId = columnEntity.getId();
     }

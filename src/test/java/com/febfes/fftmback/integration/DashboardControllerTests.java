@@ -66,8 +66,7 @@ class DashboardControllerTests extends BasicTestClass {
                         .builder()
                         .name(COLUMN_NAME)
                         .projectId(projectEntity.getId())
-                        .build(),
-                createdUserId
+                        .build()
         );
         taskService.createTask(
                 TaskEntity

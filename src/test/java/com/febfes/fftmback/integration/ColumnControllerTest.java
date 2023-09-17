@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
@@ -88,16 +89,14 @@ class ColumnControllerTest extends BasicTestClass {
                         .builder()
                         .name(COLUMN_NAME + "1")
                         .projectId(createdProjectId)
-                        .build(),
-                createdUserId
+                        .build()
         );
 
         columnService.createColumn(TaskColumnEntity
                         .builder()
                         .name(COLUMN_NAME + "2")
                         .projectId(createdProjectId)
-                        .build(),
-                createdUserId
+                        .build()
         );
 
         Response response = requestWithBearerToken()
@@ -115,7 +114,7 @@ class ColumnControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulCreateOfColumnTest() {
+    void successfulCreateColumnTest() {
         ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME);
 
         createNewColumn(columnDto)
@@ -125,7 +124,7 @@ class ColumnControllerTest extends BasicTestClass {
     }
 
     @Test
-    void failedCreateOfColumnTest() {
+    void failedCreateColumnTest() {
         ColumnDto columnDto = ColumnDto.builder()
                 .build();
 
@@ -135,7 +134,7 @@ class ColumnControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulEditOfColumnTest() {
+    void successfulEditColumnTest() {
         ColumnDto createColumnDto = dtoBuilders.createColumnDto(COLUMN_NAME);
         Response createResponse = createNewColumn(createColumnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
@@ -153,7 +152,7 @@ class ColumnControllerTest extends BasicTestClass {
     }
 
     @Test
-    void failedEditOfColumnTest() {
+    void failedEditColumnTest() {
         String wrongColumnId = "54731584";
         ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME);
 
@@ -167,21 +166,38 @@ class ColumnControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulDeleteOfColumnTest() {
+    void successfulDeleteColumnTest() {
         ColumnDto columnDto = dtoBuilders.createColumnDto(COLUMN_NAME);
         Response createResponse = createNewColumn(columnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 
-        requestWithBearerToken()
+        List<ColumnWithTasksDto> columnsBeforeDelete = getDashboard().columns();
+        LongConsumer deleteFoo = (columnId) -> requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
-                .delete("%s/{projectId}/columns/{columnId}".formatted(PATH_TO_PROJECTS_API), createdProjectId, createdColumnId)
+                .delete("%s/{projectId}/columns/{columnId}".formatted(PATH_TO_PROJECTS_API), createdProjectId, columnId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
+        deleteFoo.accept(createdColumnId);
+
+        List<ColumnWithTasksDto> columnsAfterDelete = getDashboard().columns();
+        Assertions.assertThat(columnsBeforeDelete.size() - 1)
+                .isEqualTo(columnsAfterDelete.size());
+        if (columnsAfterDelete.size() > 0) {
+            ColumnWithTasksDto firstColumn = columnsAfterDelete.get(0);
+            deleteFoo.accept(firstColumn.id());
+            List<ColumnWithTasksDto> columnsAfterSecondDelete = getDashboard().columns();
+            Assertions.assertThat(columnsAfterDelete.size() - 1)
+                    .isEqualTo(columnsAfterSecondDelete.size());
+            for (int i = 0; i < columnsAfterSecondDelete.size(); i++) {
+                Assertions.assertThat(i + 1)
+                        .isEqualTo(columnsAfterSecondDelete.get(i).order());
+            }
+        }
     }
 
     @Test
-    void failedDeleteOfColumnTest() {
+    void failedDeleteColumnTest() {
         String wrongColumnId = "54731584";
 
         requestWithBearerToken()

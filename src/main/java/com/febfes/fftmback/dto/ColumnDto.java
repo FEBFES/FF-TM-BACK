@@ -18,7 +18,7 @@ public record ColumnDto(
         Date createDate,
 
         @Schema(description = "Column order on the board. Starts at 1")
-        Integer index,
+        Integer order,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Long projectId

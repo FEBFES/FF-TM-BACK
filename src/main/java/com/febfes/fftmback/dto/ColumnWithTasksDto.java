@@ -5,7 +5,7 @@ import java.util.List;
 public record ColumnWithTasksDto(
         Long id,
         String name,
-        Integer index,
+        Integer order,
         List<TaskShortDto> tasks
 ) {
 

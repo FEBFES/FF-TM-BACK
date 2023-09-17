@@ -2,47 +2,22 @@ databaseChangeLog:
   - changeSet:
       id: 1
       author: IvanShish
+      comment: "Add order to tasks and columns"
       changes:
-        - createTable:
-            tableName: entity_order
+        - renameColumn:
+            newColumnName: entity_order
+            oldColumnName: column_order
+            tableName: task_column
+        - addColumn:
+            tableName: task
             columns:
               - column:
-                  name: id
-                  type: bigint
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: index
-                  type: integer
+                  name: entity_order
+                  type: int
                   constraints:
                     nullable: false
-              - column:
-                  name: user_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-              - column:
-                  name: entity_type
-                  type: varchar(50)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: entity_id
-                  type: bigint
-        - addForeignKeyConstraint:
-            constraintName: fk_user_id
-            baseTableName: entity_order
-            baseColumnNames: user_id
-            referencedTableName: user_entity
-            referencedColumnNames: id
-            onDelete: CASCADE
-#        TODO: перед этим действием нам нужно создать соответствующие записи по тому, в каком порядке располагаются колонки в таблицу entity_order
         - dropColumn:
             tableName: task_column
             columns:
               - column:
                   name: child_task_column_id
-              - column:
-                  name: column_order

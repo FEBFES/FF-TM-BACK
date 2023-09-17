@@ -1,6 +1,5 @@
 package com.febfes.fftmback.domain.dao;
 
-import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.abstracts.OrderedEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,7 +31,12 @@ public class TaskColumnEntity extends OrderedEntity {
     private List<TaskView> taskList;
 
     @Override
-    public EntityType getEntityType() {
-        return EntityType.COLUMN;
+    public String getColumnToFindOrder() {
+        return "projectId";
+    }
+
+    @Override
+    public Object getValueToFindOrder() {
+        return projectId;
     }
 }

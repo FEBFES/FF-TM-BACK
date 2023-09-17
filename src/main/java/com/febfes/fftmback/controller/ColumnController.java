@@ -7,7 +7,6 @@ import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.config.auth.RoleCheckerComponent;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
 import com.febfes.fftmback.mapper.ColumnMapper;
@@ -18,7 +17,6 @@ import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,13 +35,12 @@ public class ColumnController {
     @Operation(summary = "Create new column in a project with given id")
     @ApiCreate(path = "{projectId}/columns")
     public ColumnDto crateNewColumn(
-            @AuthenticationPrincipal UserEntity user,
             @PathVariable Long projectId,
             @RequestBody @Valid ColumnDto columnDto
     ) {
         roleCheckerComponent.checkIfHasRole(projectId, RoleName.MEMBER_PLUS);
         TaskColumnEntity newColumn = columnService.createColumn(
-                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId), user.getId()
+                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId)
         );
         return ColumnMapper.INSTANCE.columnToColumnDto(newColumn);
     }
@@ -51,19 +48,18 @@ public class ColumnController {
     @Operation(summary = "Edit column by its columnId")
     @ApiEdit(path = "{projectId}/columns/{columnId}")
     public ColumnDto editColumn(
-            @AuthenticationPrincipal UserEntity user,
             @ParameterObject ColumnParameters pathVars,
             @RequestBody ColumnDto columnDto
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER_PLUS);
-        TaskColumnEntity updatedColumn = columnService.editColumn(columnDto, pathVars.columnId(), user.getId());
+        TaskColumnEntity updatedColumn = columnService.editColumn(columnDto, pathVars.columnId());
         return ColumnMapper.INSTANCE.columnToColumnDto(updatedColumn);
     }
 
     @Operation(summary = "Delete column by its columnId")
     @ApiDelete(path = "{projectId}/columns/{columnId}")
-    public void deleteColumn(@AuthenticationPrincipal UserEntity user, @ParameterObject ColumnParameters pathVars) {
+    public void deleteColumn(@ParameterObject ColumnParameters pathVars) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER_PLUS);
-        columnService.deleteColumn(pathVars.columnId(), user.getId());
+        columnService.deleteColumn(pathVars.columnId());
     }
 }

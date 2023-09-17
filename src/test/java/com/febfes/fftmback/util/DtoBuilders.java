@@ -29,10 +29,10 @@ public class DtoBuilders {
                 .build();
     }
 
-    public ColumnDto createColumnDto(String name, Integer index) {
+    public ColumnDto createColumnDto(String name, Integer order) {
         return ColumnDto.builder()
                 .name(name)
-                .index(index)
+                .order(order)
                 .build();
     }
 

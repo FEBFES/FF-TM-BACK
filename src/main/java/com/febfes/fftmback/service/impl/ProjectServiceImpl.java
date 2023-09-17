@@ -58,7 +58,7 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectEntity projectEntity = projectRepository.save(project);
         log.info("Saved project: {}", projectEntity);
         Long projectId = projectEntity.getId();
-        columnService.createDefaultColumnsForProject(projectId, userId);
+        columnService.createDefaultColumnsForProject(projectId);
         taskTypeService.createDefaultTaskTypesForProject(projectId);
         // by default, the owner will also be a member of the project
         addOrChangeProjectMemberRole(project.getId(), userId, RoleName.OWNER);
@@ -114,8 +114,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public DashboardDto getDashboard(Long id, Long userId, TaskSpec taskSpec) {
-        List<ColumnWithTasksDto> columnsWithTasks = columnService.getOrderedColumns(id, userId)
+    public DashboardDto getDashboard(Long id, TaskSpec taskSpec) {
+        List<ColumnWithTasksDto> columnsWithTasks = columnService.getOrderedColumns(id)
                 .stream()
                 .map(column -> {
                     List<TaskView> filteredTasks = taskService.getTasks(column.getId(), taskSpec);
