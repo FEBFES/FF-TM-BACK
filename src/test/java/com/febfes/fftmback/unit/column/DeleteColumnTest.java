@@ -4,6 +4,7 @@ import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.impl.ColumnServiceImpl;
+import com.febfes.fftmback.service.order.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,6 +26,9 @@ class DeleteColumnTest {
     @Mock
     private ColumnRepository columnRepository;
 
+    @Mock
+    private OrderService<TaskColumnEntity> orderService;
+
     @InjectMocks
     private ColumnServiceImpl columnService;
 
@@ -40,16 +44,14 @@ class DeleteColumnTest {
         columnEntity.setId(FIRST_ID);
         columnEntity.setName(COLUMN_NAME);
         columnEntity.setProjectId(SECOND_ID);
-        columnEntity.setChildTaskColumnId(THIRD_ID);
 
-        // Mock the column repository to return the mock column entity
         when(columnRepository.findById(FIRST_ID)).thenReturn(Optional.of(columnEntity));
 
         // Call the deleteColumn method
-        columnService.deleteColumn(FIRST_ID);
+        columnService.deleteColumn(FIRST_ID, 1L);
 
         // Verify that the column repository was called with the correct parameters
-        verify(columnRepository).updateChildColumn(THIRD_ID, FIRST_ID, SECOND_ID);
+//        verify(columnRepository).updateChildColumn(THIRD_ID, FIRST_ID, SECOND_ID);
         verify(columnRepository).delete(columnEntity);
     }
 
@@ -59,10 +61,10 @@ class DeleteColumnTest {
         when(columnRepository.findById(FIRST_ID)).thenReturn(Optional.empty());
 
         // Call the deleteColumn method with a non-existent column ID
-        assertThrows(EntityNotFoundException.class, () -> columnService.deleteColumn(FIRST_ID));
+        assertThrows(EntityNotFoundException.class, () -> columnService.deleteColumn(FIRST_ID, 1L));
 
         // Verify that the column repository was not called
-        verify(columnRepository, never()).updateChildColumn(anyLong(), anyLong(), anyLong());
+//        verify(columnRepository, never()).updateChildColumn(anyLong(), anyLong(), anyLong());
         verify(columnRepository, never()).delete(any(TaskColumnEntity.class));
     }
 }

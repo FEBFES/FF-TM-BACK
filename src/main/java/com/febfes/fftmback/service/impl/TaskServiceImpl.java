@@ -12,7 +12,6 @@ import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
-import com.febfes.fftmback.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +33,6 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskViewRepository taskViewRepository;
-    private final UserService userService;
     private final TaskTypeService taskTypeService;
     private final ProjectRepository projectRepository;
 
@@ -71,9 +69,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskView createTask(
             TaskEntity task,
-            String username
+            Long userId
     ) {
-        task.setOwnerId(userService.getUserIdByUsername(username));
+        task.setOwnerId(userId);
         Long projectId = task.getProjectId();
         Long columnId = task.getColumnId();
         if (nonNull(task.getTaskType())) {

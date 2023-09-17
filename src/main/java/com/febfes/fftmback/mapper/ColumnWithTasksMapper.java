@@ -1,7 +1,7 @@
 package com.febfes.fftmback.mapper;
 
-import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
+import com.febfes.fftmback.domain.projection.ColumnProjection;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,6 +14,9 @@ public interface ColumnWithTasksMapper {
 
     ColumnWithTasksMapper INSTANCE = Mappers.getMapper(ColumnWithTasksMapper.class);
 
+//    @Mapping(target = "tasks", source = "taskList")
+//    ColumnWithTasksDto columnToColumnWithTasksDto(TaskColumnEntity columnEntity, List<TaskView> taskList);
+
     @Mapping(target = "tasks", source = "taskList")
-    ColumnWithTasksDto columnToColumnWithTasksDto(TaskColumnEntity columnEntity, List<TaskView> taskList);
+    ColumnWithTasksDto columnToColumnWithTasksDto(ColumnProjection columnEntity, List<TaskView> taskList);
 }

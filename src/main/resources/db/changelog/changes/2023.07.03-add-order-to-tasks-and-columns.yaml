@@ -9,7 +9,9 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
+                  autoIncrement: true
                   constraints:
+                    primaryKey: true
                     nullable: false
               - column:
                   name: index
@@ -26,6 +28,9 @@ databaseChangeLog:
                   type: varchar(50)
                   constraints:
                     nullable: false
+              - column:
+                  name: entity_id
+                  type: bigint
         - addForeignKeyConstraint:
             constraintName: fk_user_id
             baseTableName: entity_order
@@ -33,3 +38,11 @@ databaseChangeLog:
             referencedTableName: user_entity
             referencedColumnNames: id
             onDelete: CASCADE
+#        TODO: перед этим действием нам нужно создать соответствующие записи по тому, в каком порядке располагаются колонки в таблицу entity_order
+        - dropColumn:
+            tableName: task_column
+            columns:
+              - column:
+                  name: child_task_column_id
+              - column:
+                  name: column_order

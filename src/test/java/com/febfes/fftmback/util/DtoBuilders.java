@@ -29,10 +29,10 @@ public class DtoBuilders {
                 .build();
     }
 
-    public ColumnDto createColumnDto(String name, Long childTaskColumnId) {
+    public ColumnDto createColumnDto(String name, Integer index) {
         return ColumnDto.builder()
                 .name(name)
-                .childTaskColumnId(childTaskColumnId)
+                .index(index)
                 .build();
     }
 

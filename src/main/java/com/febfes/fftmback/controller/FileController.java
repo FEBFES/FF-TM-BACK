@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,8 +64,11 @@ public class FileController {
             path = "task/{taskId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public List<TaskFileDto> saveTaskFiles(@PathVariable Long taskId, @RequestParam("files") MultipartFile[] files) {
-        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public List<TaskFileDto> saveTaskFiles(
+            @AuthenticationPrincipal UserEntity user,
+            @PathVariable Long taskId,
+            @RequestParam("files") MultipartFile[] files
+    ) {
         List<TaskFileDto> response = new ArrayList<>();
         Arrays.stream(files).forEach(file -> {
             FileEntity savedFile = fileService.saveFile(user.getId(), taskId, EntityType.TASK, file);

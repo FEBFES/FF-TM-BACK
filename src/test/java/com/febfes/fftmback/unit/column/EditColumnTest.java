@@ -1,6 +1,7 @@
 package com.febfes.fftmback.unit.column;
 
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
+import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.impl.ColumnServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 class EditColumnTest {
@@ -40,19 +40,17 @@ class EditColumnTest {
         column.setId(FIRST_ID);
         column.setName(COLUMN_NAME);
         column.setProjectId(FIRST_ID);
-        column.setChildTaskColumnId(SECOND_ID);
 
         // Mock the column repository
         when(columnRepository.findById(column.getId())).thenReturn(Optional.of(column));
         when(columnRepository.save(column)).thenReturn(column);
 
         // Call the editColumn method
-        column.setName(COLUMN_NAME_2);
-        column.setChildTaskColumnId(null);
-        TaskColumnEntity updatedColumn = columnService.editColumn(column);
+        ColumnDto columnDto = new ColumnDto(column.getId(), COLUMN_NAME_2, column.getCreateDate(), 2, FIRST_ID);
+        TaskColumnEntity updatedColumn = columnService.editColumn(columnDto, FIRST_ID, FIRST_ID);
 
         // Verify that the column was updated
         assertEquals(COLUMN_NAME_2, updatedColumn.getName());
-        assertNull(updatedColumn.getChildTaskColumnId());
+//        assertNull(updatedColumn.getChildTaskColumnId());
     }
 }

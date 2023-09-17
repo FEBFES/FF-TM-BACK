@@ -38,7 +38,7 @@ class TaskControllerTest extends BasicTestClass {
 
     private Long createdProjectId;
     private Long createdColumnId;
-    private String createdUsername;
+    private Long createdUserId;
     private String token;
 
     @TempDir
@@ -83,19 +83,20 @@ class TaskControllerTest extends BasicTestClass {
         token = authenticationService.authenticateUser(
                 UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).accessToken();
-        createdUsername = USER_USERNAME;
 
+        createdUserId = userService.getUserIdByUsername(USER_USERNAME);
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
-                createdUsername
+                createdUserId
         );
         createdProjectId = projectEntity.getId();
 
         TaskColumnEntity columnEntity = columnService.createColumn(TaskColumnEntity
-                .builder()
-                .name(COLUMN_NAME)
-                .projectId(createdProjectId)
-                .build()
+                        .builder()
+                        .name(COLUMN_NAME)
+                        .projectId(createdProjectId)
+                        .build(),
+                createdUserId
         );
         createdColumnId = columnEntity.getId();
     }
@@ -339,7 +340,7 @@ class TaskControllerTest extends BasicTestClass {
                         .name(taskName)
                         .description("1")
                         .build(),
-                createdUsername
+                createdUserId
         );
     }
 
@@ -363,7 +364,7 @@ class TaskControllerTest extends BasicTestClass {
                 .as(new TypeRef<>() {
                 });
         Assertions.assertEquals(1, savedFiles.size());
-        Assertions.assertEquals(userService.getUserIdByUsername(createdUsername), savedFiles.get(0).userId());
+        Assertions.assertEquals(createdUserId, savedFiles.get(0).userId());
         Assertions.assertEquals(taskFileName, savedFiles.get(0).name());
     }
 }

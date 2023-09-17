@@ -38,7 +38,6 @@ class ProjectControllerTest extends BasicTestClass {
     public static final String PROJECT_NAME = "Project name";
     public static final String PROJECT_DESCRIPTION = "Project description";
 
-    private String createdUsername;
     private Long createdUserId;
     private String token;
 
@@ -65,19 +64,18 @@ class ProjectControllerTest extends BasicTestClass {
         token = authenticationService.authenticateUser(
                 UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).accessToken();
-        createdUsername = USER_USERNAME;
-        createdUserId = userService.getUserIdByUsername(createdUsername);
+        createdUserId = userService.getUserIdByUsername(USER_USERNAME);
     }
 
     @Test
     void successfulGetProjectsTest() {
         projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME + "1").build(),
-                createdUsername
+                createdUserId
         );
         projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME + "2").build(),
-                createdUsername
+                createdUserId
         );
 
         Response response = requestWithBearerToken()
@@ -328,7 +326,7 @@ class ProjectControllerTest extends BasicTestClass {
         Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
         projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME + "1").build(),
-                userService.getUserById(secondCreatedUserId).getUsername()
+                secondCreatedUserId
         );
 
         String tokenForSecondUser = authenticationService.authenticateUser(

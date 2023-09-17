@@ -17,16 +17,22 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "entity_order")
 public class EntityOrder {
 
+    public static final String ENTITY_NAME = "Entity order";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "index")
-    Integer index;
+    Integer index;		// starts with 1
 
     @Column(name = "user_id")
     Long userId;
 
     @Column(name = "entity_type")
+    @Enumerated(EnumType.STRING)
     private EntityType entityType;
+
+    @Column(name = "entity_id")
+    Long entityId;
 }

@@ -9,6 +9,7 @@ import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -34,6 +35,7 @@ class ColumnControllerTest extends BasicTestClass {
     public static final String COLUMN_NAME = "Column name";
 
     private Long createdProjectId;
+    private Long createdUserId;
     private String token;
 
     @Autowired
@@ -44,6 +46,9 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Autowired
     private AuthenticationService authenticationService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private DtoBuilders dtoBuilders;
@@ -57,9 +62,10 @@ class ColumnControllerTest extends BasicTestClass {
                 UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).accessToken();
 
+        createdUserId = userService.getUserIdByUsername(USER_USERNAME);
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
-                USER_USERNAME
+                createdUserId
         );
         createdProjectId = projectEntity.getId();
     }
@@ -79,17 +85,19 @@ class ColumnControllerTest extends BasicTestClass {
 
 
         columnService.createColumn(TaskColumnEntity
-                .builder()
-                .name(COLUMN_NAME + "1")
-                .projectId(createdProjectId)
-                .build()
+                        .builder()
+                        .name(COLUMN_NAME + "1")
+                        .projectId(createdProjectId)
+                        .build(),
+                createdUserId
         );
 
         columnService.createColumn(TaskColumnEntity
-                .builder()
-                .name(COLUMN_NAME + "2")
-                .projectId(createdProjectId)
-                .build()
+                        .builder()
+                        .name(COLUMN_NAME + "2")
+                        .projectId(createdProjectId)
+                        .build(),
+                createdUserId
         );
 
         Response response = requestWithBearerToken()
@@ -198,11 +206,11 @@ class ColumnControllerTest extends BasicTestClass {
                 .stream()
                 .map(ColumnWithTasksDto::id)
                 .collect(Collectors.toList());
-        //swap 2 and 3 columns
+        // swap 2nd and 3rd columns
         ColumnWithTasksDto thirdColumn = dashboardDto.columns().get(2);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
-                .body(dtoBuilders.createColumnDto(thirdColumn.name(), columnIdWithOrderList.get(1)))
+                .body(dtoBuilders.createColumnDto(thirdColumn.name(), 2))
                 .when()
                 .put(
                         "%s/{projectId}/columns/{columnId}".formatted(PATH_TO_PROJECTS_API),

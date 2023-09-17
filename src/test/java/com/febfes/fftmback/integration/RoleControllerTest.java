@@ -54,9 +54,10 @@ public class RoleControllerTest extends BasicTestClass {
                 UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).accessToken();
 
+        Long createdUserId = userService.getUserIdByUsername(USER_USERNAME);
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
-                USER_USERNAME
+                createdUserId
         );
         createdProjectId = projectEntity.getId();
     }

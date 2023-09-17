@@ -18,11 +18,9 @@ public record ColumnDto(
         Date createDate,
 
         @Schema(description = "Column order on the board. Starts at 1")
-        Integer columnOrder,
+        Integer index,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-        Long projectId,
-
-        Long childTaskColumnId
+        Long projectId
 ) {
 }

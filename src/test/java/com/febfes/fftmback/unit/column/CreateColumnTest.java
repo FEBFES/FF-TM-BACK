@@ -11,9 +11,9 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class CreateColumnTest {
 
@@ -38,23 +38,22 @@ class CreateColumnTest {
         TaskColumnEntity column = new TaskColumnEntity();
         column.setName(COLUMN_NAME);
         column.setProjectId(FIRST_ID);
-        column.setChildTaskColumnId(SECOND_ID);
 
         // Mock the columnRepository to return the saved column
         when(columnRepository.save(column)).thenReturn(column);
 
         // Call the createColumn method
-        TaskColumnEntity savedColumn = columnService.createColumn(column);
+        TaskColumnEntity savedColumn = columnService.createColumn(column, FIRST_ID);
 
         // Verify that the columnRepository was called with the correct argument
         verify(columnRepository).save(column);
 
         // Verify that the columnRepository was called to update the child column
-        verify(columnRepository).updateChildColumn(
-                savedColumn.getId(),
-                savedColumn.getChildTaskColumnId(),
-                savedColumn.getProjectId()
-        );
+//        verify(columnRepository).updateChildColumn(
+//                savedColumn.getId(),
+//                savedColumn.getChildTaskColumnId(),
+//                savedColumn.getProjectId()
+//        );
 
         // Verify that the saved column is returned
         assertEquals(column, savedColumn);
@@ -66,7 +65,6 @@ class CreateColumnTest {
         TaskColumnEntity column = new TaskColumnEntity();
         column.setName(COLUMN_NAME);
         column.setProjectId(FIRST_ID);
-        column.setChildTaskColumnId(SECOND_ID);
 
         // Mock the columnRepository to throw an exception
         given(columnRepository.save(column)).willAnswer(invocation -> {
@@ -74,16 +72,16 @@ class CreateColumnTest {
         });
 
         // Call the createColumn method
-        assertThrows(Exception.class, () -> columnService.createColumn(column));
+        assertThrows(Exception.class, () -> columnService.createColumn(column, SECOND_ID));
 
         // Verify that the columnRepository was called with the correct argument
         verify(columnRepository).save(column);
 
         // Verify that the columnRepository was not called to update the child column
-        verify(columnRepository, never()).updateChildColumn(
-                anyLong(),
-                anyLong(),
-                anyLong()
-        );
+//        verify(columnRepository, never()).updateChildColumn(
+//                anyLong(),
+//                anyLong(),
+//                anyLong()
+//        );
     }
 }

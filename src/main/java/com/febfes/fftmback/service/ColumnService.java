@@ -1,21 +1,23 @@
 package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
+import com.febfes.fftmback.domain.projection.ColumnProjection;
+import com.febfes.fftmback.dto.ColumnDto;
 
 import java.util.List;
 
 public interface ColumnService {
 
-    TaskColumnEntity createColumn(TaskColumnEntity column);
+    TaskColumnEntity createColumn(TaskColumnEntity column, Long userId);
 
-    TaskColumnEntity editColumn(TaskColumnEntity columnDto);
+    TaskColumnEntity editColumn(ColumnDto columnDto, Long columnId, Long userId);
 
-    void deleteColumn(Long id);
+    void deleteColumn(Long id, Long userId);
 
-    void createDefaultColumnsForProject(Long projectId);
+    void createDefaultColumnsForProject(Long projectId, Long userId);
 
     /**
      * Return project's columns with order
      */
-    List<TaskColumnEntity> getOrderedColumns(Long projectId);
+    List<ColumnProjection> getOrderedColumns(Long projectId, Long userId);
 }

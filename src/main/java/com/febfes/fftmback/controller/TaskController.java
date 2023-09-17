@@ -7,6 +7,7 @@ import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.TaskShortDto;
@@ -21,8 +22,7 @@ import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,14 +66,14 @@ public class TaskController {
     @Operation(summary = "Create new task")
     @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
     public TaskShortDto createTask(
+            @AuthenticationPrincipal UserEntity user,
             @ParameterObject ColumnParameters pathVars,
             @RequestBody @Valid EditTaskDto taskDto
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         TaskView task = taskService.createTask(
                 TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), taskDto),
-                authentication.getName()
+                user.getId()
         );
         return TaskMapper.INSTANCE.taskViewToTaskShortDto(task);
     }

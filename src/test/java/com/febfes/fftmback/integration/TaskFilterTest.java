@@ -39,7 +39,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
         authenticationService.registerUser(
                 UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         );
-        String createdUsername = userService.loadUserByUsername(USER_USERNAME).getUsername();
+        Long createdUserId = userService.getUserIdByUsername(USER_USERNAME);
 
         authenticationService.registerUser(UserEntity
                 .builder()
@@ -48,17 +48,17 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 .encryptedPassword(USER_PASSWORD)
                 .build()
         );
-        String createdUsername2 = userService.loadUserByUsername("new" + USER_USERNAME).getUsername();
+        Long createdUserId2 = userService.getUserIdByUsername("new" + USER_USERNAME);
 
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
-                createdUsername
+                createdUserId
         );
         Long createdProjectId = projectEntity.getId();
 
         ProjectEntity projectEntity2 = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
-                createdUsername2
+                createdUserId2
         );
         Long createdProjectId2 = projectEntity2.getId();
 
@@ -71,7 +71,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .description("123")
                         .priority(TaskPriority.LOW)
                         .build(),
-                createdUsername
+                createdUserId
         );
 
         taskService.createTask(
@@ -82,7 +82,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME + "2")
                         .description("12345")
                         .build(),
-                createdUsername
+                createdUserId
         );
 
         taskService.createTask(
@@ -93,7 +93,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME)
                         .description("12345")
                         .build(),
-                createdUsername
+                createdUserId
         );
 
         taskService.createTask(
@@ -104,7 +104,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
-                createdUsername2
+                createdUserId2
         );
 
         taskService.createTask(
@@ -115,7 +115,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
-                createdUsername2
+                createdUserId2
         );
 
         /*
