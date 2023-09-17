@@ -22,7 +22,7 @@ public class OrderServiceImpl<T extends OrderedEntity> implements OrderService<T
     @PersistenceContext
     private EntityManager em;
 
-    private static final String ORDER_FIELD_NAME = "entityOrder";
+    public static final String ORDER_FIELD_NAME = "entityOrder";
 
     @Override
     public Integer getNewOrder(T entity) {

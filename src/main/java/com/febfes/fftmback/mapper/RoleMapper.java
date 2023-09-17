@@ -5,6 +5,7 @@ import com.febfes.fftmback.dto.RoleDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+// TODO: delete? it's isn't used anywhere
 @Mapper
 public interface RoleMapper {
 

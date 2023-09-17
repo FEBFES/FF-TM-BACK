@@ -36,7 +36,6 @@ class ColumnControllerTest extends BasicTestClass {
     public static final String COLUMN_NAME = "Column name";
 
     private Long createdProjectId;
-    private Long createdUserId;
     private String token;
 
     @Autowired
@@ -63,7 +62,7 @@ class ColumnControllerTest extends BasicTestClass {
                 UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).accessToken();
 
-        createdUserId = userService.getUserIdByUsername(USER_USERNAME);
+        Long createdUserId = userService.getUserIdByUsername(USER_USERNAME);
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUserId

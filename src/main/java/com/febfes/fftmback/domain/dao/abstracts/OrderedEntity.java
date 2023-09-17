@@ -19,5 +19,6 @@ public abstract class OrderedEntity extends BaseEntity {
 
     public abstract String getColumnToFindOrder();
 
+    // TODO: maybe we can use reflection api to get value from column using getColumnToFindOrder method?
     public abstract Object getValueToFindOrder();
 }

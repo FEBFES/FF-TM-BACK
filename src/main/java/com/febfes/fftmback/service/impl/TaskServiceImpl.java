@@ -16,12 +16,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.febfes.fftmback.domain.common.specification.TaskSpec.byColumnId;
+import static com.febfes.fftmback.service.order.OrderServiceImpl.ORDER_FIELD_NAME;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -29,7 +31,10 @@ import static java.util.Objects.nonNull;
 @Slf4j
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
+
     private static final String RECEIVED_TASKS_SIZE_LOG = "Received tasks size: {}";
+    private static final int DEFAULT_PAGE = 0;
+    private static final int DEFAULT_LIMIT = 1000;
 
     private final TaskRepository taskRepository;
     private final TaskViewRepository taskViewRepository;
@@ -43,7 +48,7 @@ public class TaskServiceImpl implements TaskService {
             Long columnId,
             TaskSpec taskSpec
     ) {
-        Pageable pageableRequest = PageRequest.of(page, limit);
+        Pageable pageableRequest = PageRequest.of(page, limit, Sort.by(ORDER_FIELD_NAME));
         List<TaskView> tasks = taskViewRepository.findAll(taskSpec.and(byColumnId(columnId)), pageableRequest)
                 .getContent();
         log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
@@ -55,7 +60,9 @@ public class TaskServiceImpl implements TaskService {
             Long columnId,
             TaskSpec taskSpec
     ) {
-        List<TaskView> tasks = taskViewRepository.findAll(taskSpec.and(byColumnId(columnId)));
+        Pageable pageableRequest = PageRequest.of(DEFAULT_PAGE, DEFAULT_LIMIT, Sort.by(ORDER_FIELD_NAME));
+        List<TaskView> tasks = taskViewRepository.findAll(taskSpec.and(byColumnId(columnId)), pageableRequest)
+                .getContent();
         log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
         return tasks;
     }

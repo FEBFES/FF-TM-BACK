@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+// TODO: delete? it's isn't used anywhere
 @Mapper(uses = ColumnWithTasksMapper.class)
 public interface DashboardMapper {
 

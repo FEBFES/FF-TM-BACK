@@ -12,5 +12,6 @@ select t.id                            as "id",
         from file_entity fe
         where fe.entity_id = t.id
           and fe.entity_type = 'TASK') as "filesCounter",
-       t.update_date                   as "updateDate"
+       t.update_date                   as "updateDate",
+       t.entity_order                  as "entityOrder"
 from public.task t
