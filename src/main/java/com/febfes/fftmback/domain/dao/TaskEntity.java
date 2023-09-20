@@ -61,9 +61,4 @@ public class TaskEntity extends OrderedEntity {
     public String getColumnToFindOrder() {
         return "columnId";
     }
-
-    @Override
-    public Object getValueToFindOrder() {
-        return columnId;
-    }
 }

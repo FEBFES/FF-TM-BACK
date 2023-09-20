@@ -122,8 +122,8 @@ class EntityOrderTest extends BasicTestClass {
     void removeTaskOrderTest() {
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         List<TaskView> tasks = taskService.getTasks(createdColumnId, emptyTaskSpec);
-        Assertions.assertThat(tasks.size())
-                .isGreaterThan(1);
+        Assertions.assertThat(tasks)
+                .hasSizeGreaterThan(1);
         TaskView taskToDelete = tasks.get(1);
         taskService.deleteTask(taskToDelete.getId());
 
@@ -153,8 +153,8 @@ class EntityOrderTest extends BasicTestClass {
                 .map(ColumnWithTasksDto::id)
                 .collect(Collectors.toList());
         // swap 2nd and 3rd columns
-        Assertions.assertThat(columns.size())
-                .isGreaterThan(2);
+        Assertions.assertThat(columns)
+                .hasSizeGreaterThan(2);
         ColumnWithTasksDto thirdColumn = columns.get(2);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -175,8 +175,8 @@ class EntityOrderTest extends BasicTestClass {
     @Test
     void removeColumnOrderTest() {
         List<ColumnWithTasksDto> columns = getDashboard().columns();
-        Assertions.assertThat(columns.size())
-                .isGreaterThan(1);
+        Assertions.assertThat(columns)
+                .hasSizeGreaterThan(1);
         Long columnIdToDelete = columns.get(1).id();
         columnService.deleteColumn(columnIdToDelete);
 

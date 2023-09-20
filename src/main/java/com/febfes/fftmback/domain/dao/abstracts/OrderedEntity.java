@@ -5,6 +5,8 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.lang.reflect.Field;
+
 @MappedSuperclass
 @SuperBuilder
 @AllArgsConstructor
@@ -17,8 +19,22 @@ public abstract class OrderedEntity extends BaseEntity {
     @Column(name = "entity_order")
     private Integer entityOrder;
 
+    /**
+     * This method is used in OrderService. Field name that returned in this method will be used to
+     * find entity order
+     *
+     * @return field name
+     */
     public abstract String getColumnToFindOrder();
 
-    // TODO: maybe we can use reflection api to get value from column using getColumnToFindOrder method?
-    public abstract Object getValueToFindOrder();
+    public Object getValueToFindOrder() {
+        try {
+            Field field = getClass().getDeclaredField(getColumnToFindOrder());
+            field.setAccessible(true);
+            return field.get(this);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
