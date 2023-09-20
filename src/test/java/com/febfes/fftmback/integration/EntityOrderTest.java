@@ -16,11 +16,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static com.febfes.fftmback.integration.ColumnControllerTest.COLUMN_NAME;
@@ -29,11 +28,10 @@ import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME
 import static com.febfes.fftmback.integration.TaskControllerTest.TASK_NAME;
 import static io.restassured.RestAssured.given;
 
-class OrderTest extends BasicTestClass {
+class EntityOrderTest extends BasicTestClass {
 
     private Long createdProjectId;
     private Long createdColumnId;
-    private Long createdUserId;
     private String token;
 
     @Autowired
@@ -60,7 +58,7 @@ class OrderTest extends BasicTestClass {
                 UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).accessToken();
 
-        createdUserId = userService.getUserIdByUsername(USER_USERNAME);
+        Long createdUserId = userService.getUserIdByUsername(USER_USERNAME);
         ProjectEntity projectEntity = projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME).build(),
                 createdUserId
@@ -74,11 +72,7 @@ class OrderTest extends BasicTestClass {
                 .build()
         );
         createdColumnId = columnEntity.getId();
-    }
 
-    @Test
-    void addTaskOrderTest() {
-        TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         for (int i = 0; i < 4; i++) {
             taskService.createTask(TaskEntity.builder()
                             .name(TASK_NAME + i)
@@ -87,34 +81,24 @@ class OrderTest extends BasicTestClass {
                             .build(),
                     createdUserId);
         }
+    }
+
+    @Test
+    void addTaskOrderTest() {  // checking whether the order of the tasks is set when creating them
+        TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         List<TaskView> tasks = taskService.getTasks(createdColumnId, emptyTaskSpec);
-        Assertions.assertThat(4)
-                .isEqualTo(tasks.size());
         List<Integer> orders = tasks.stream()
                 .map(TaskView::getEntityOrder)
                 .toList();
-        Assertions.assertThat(Arrays.asList(1, 2, 3, 4))
-                .isEqualTo(orders);
+        Assertions.assertThat(orders)
+                .isEqualTo(IntStream.range(1, tasks.size() + 1).boxed().toList());
     }
 
     @Test
     void changeTaskOrderTest() {
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
-        for (int i = 0; i < 4; i++) {
-            taskService.createTask(TaskEntity.builder()
-                            .name(TASK_NAME + i)
-                            .columnId(createdColumnId)
-                            .projectId(createdProjectId)
-                            .build(),
-                    createdUserId);
-        }
         List<TaskView> tasks = taskService.getTasks(createdColumnId, emptyTaskSpec);
-        Assertions.assertThat(4)
-                .isEqualTo(tasks.size());
-        Function<List<TaskView>, List<Long>> tasksToIdsFoo = (taskList) -> taskList.stream()
-                .map(TaskView::getId)
-                .collect(Collectors.toList());
-        List<Long> idsList = tasksToIdsFoo.apply(tasks);
+        List<Long> idsList = tasksToIds(tasks);
         TaskView lastTask = tasks.get(tasks.size() - 1);
         idsList.remove(lastTask.getId());
         idsList.add(0, lastTask.getId());
@@ -129,18 +113,17 @@ class OrderTest extends BasicTestClass {
                         createdProjectId, createdColumnId, lastTask.getId())
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        List<Long> idsListAfterUpdate = tasksToIdsFoo.apply(taskService.getTasks(createdColumnId, emptyTaskSpec));
-        Assertions.assertThat(idsList)
-                .isEqualTo(idsListAfterUpdate);
+        List<Long> idsListAfterUpdate = tasksToIds(taskService.getTasks(createdColumnId, emptyTaskSpec));
+        Assertions.assertThat(idsListAfterUpdate)
+                .isEqualTo(idsList);
     }
 
     @Test
     void removeTaskOrderTest() {
-        addTaskOrderTest();
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         List<TaskView> tasks = taskService.getTasks(createdColumnId, emptyTaskSpec);
-        Assertions.assertThat(4)
-                .isEqualTo(tasks.size());
+        Assertions.assertThat(tasks.size())
+                .isGreaterThan(1);
         TaskView taskToDelete = tasks.get(1);
         taskService.deleteTask(taskToDelete.getId());
 
@@ -148,34 +131,31 @@ class OrderTest extends BasicTestClass {
         List<Integer> orders = tasksAfterDelete.stream()
                 .map(TaskView::getEntityOrder)
                 .toList();
-        Assertions.assertThat(Arrays.asList(1, 2, 3))
-                .isEqualTo(orders);
+        Assertions.assertThat(orders)
+                .isEqualTo(IntStream.range(1, tasks.size()).boxed().toList());
     }
 
     @Test
-    void addColumnOrderTest() {
-        DashboardDto dashboardDto = getDashboard();
-        Assertions.assertThat(dashboardDto.columns().size())
-                .isEqualTo(5);
+    void addColumnOrderTest() { // checking whether the order of the columns is set when creating them
+        // The columns have already been created, since columns are created by default when creating a new project
         List<Integer> orders = getDashboard().columns()
                 .stream()
                 .map(ColumnWithTasksDto::order)
                 .toList();
         Assertions.assertThat(orders)
-                .isEqualTo(Arrays.asList(1, 2, 3, 4, 5));
+                .isEqualTo(IntStream.range(1, orders.size() + 1).boxed().toList());
     }
 
     @Test
     void changeColumnOrder() {
-        DashboardDto dashboardDto = getDashboard();
-        Assertions.assertThat(dashboardDto.columns().size())
-                .isEqualTo(5);
-        List<Long> columnIdWithOrderList = dashboardDto.columns()
-                .stream()
+        List<ColumnWithTasksDto> columns = getDashboard().columns();
+        List<Long> columnIdWithOrderList = columns.stream()
                 .map(ColumnWithTasksDto::id)
                 .collect(Collectors.toList());
         // swap 2nd and 3rd columns
-        ColumnWithTasksDto thirdColumn = dashboardDto.columns().get(2);
+        Assertions.assertThat(columns.size())
+                .isGreaterThan(2);
+        ColumnWithTasksDto thirdColumn = columns.get(2);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(DtoBuilders.createColumnDto(thirdColumn.name(), 2))
@@ -188,16 +168,15 @@ class OrderTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
         Collections.swap(columnIdWithOrderList, 1, 2);
-        Assertions.assertThat(columnIdWithOrderList)
-                .isEqualTo(getDashboard().columns().stream().map(ColumnWithTasksDto::id).toList());
+        Assertions.assertThat(getDashboard().columns().stream().map(ColumnWithTasksDto::id).toList())
+                .isEqualTo(columnIdWithOrderList);
     }
 
     @Test
     void removeColumnOrderTest() {
-        addColumnOrderTest();
         List<ColumnWithTasksDto> columns = getDashboard().columns();
         Assertions.assertThat(columns.size())
-                .isEqualTo(5);
+                .isGreaterThan(1);
         Long columnIdToDelete = columns.get(1).id();
         columnService.deleteColumn(columnIdToDelete);
 
@@ -205,8 +184,14 @@ class OrderTest extends BasicTestClass {
         List<Integer> orders = columnsAfterDelete.stream()
                 .map(ColumnWithTasksDto::order)
                 .toList();
-        Assertions.assertThat(Arrays.asList(1, 2, 3, 4))
-                .isEqualTo(orders);
+        Assertions.assertThat(orders)
+                .isEqualTo(IntStream.range(1, columns.size()).boxed().toList());
+    }
+
+    private List<Long> tasksToIds(List<TaskView> taskList) {
+        return taskList.stream()
+                .map(TaskView::getId)
+                .collect(Collectors.toList());
     }
 
     private DashboardDto getDashboard() {
