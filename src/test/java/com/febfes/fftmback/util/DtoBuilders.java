@@ -1,6 +1,7 @@
 package com.febfes.fftmback.util;
 
 import com.febfes.fftmback.domain.common.TaskPriority;
+import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.TaskDto;
@@ -58,5 +59,9 @@ public class DtoBuilders {
                 .filesCounter(0L)
                 .priority(TaskPriority.valueOf(priority.toUpperCase()))
                 .build();
+    }
+
+    public TaskEntity createTaskEntity(Long projectId, Long columnId, String taskName) {
+        return TaskEntity.builder().projectId(projectId).columnId(columnId).name(taskName).build();
     }
 }
