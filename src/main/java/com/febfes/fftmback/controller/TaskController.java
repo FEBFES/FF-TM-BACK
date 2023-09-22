@@ -6,7 +6,9 @@ import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.FileEntity;
+import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.TaskShortDto;
@@ -21,8 +23,7 @@ import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,16 +67,16 @@ public class TaskController {
     @Operation(summary = "Create new task")
     @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
     public TaskShortDto createTask(
+            @AuthenticationPrincipal UserEntity user,
             @ParameterObject ColumnParameters pathVars,
-            @RequestBody @Valid EditTaskDto taskDto
+            @RequestBody @Valid EditTaskDto editTaskDto
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        TaskView task = taskService.createTask(
-                TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), taskDto),
-                authentication.getName()
+        Long createdTaskId = taskService.createTask(
+                TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto),
+                user.getId()
         );
-        return TaskMapper.INSTANCE.taskViewToTaskShortDto(task);
+        return TaskMapper.INSTANCE.taskViewToTaskShortDto(taskService.getTaskById(createdTaskId));
     }
 
     @Operation(summary = "Edit task by its id")
@@ -85,8 +86,10 @@ public class TaskController {
             @RequestBody EditTaskDto editTaskDto
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
-        TaskView task = taskService.updateTask(pathVars.taskId(), pathVars.projectId(), pathVars.columnId(), editTaskDto);
-        return TaskMapper.INSTANCE.taskViewToTaskShortDto(task);
+        TaskEntity editTask = TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto);
+        editTask.setId(pathVars.taskId());
+        taskService.updateTask(editTask);
+        return TaskMapper.INSTANCE.taskViewToTaskShortDto(taskService.getTaskById(pathVars.taskId()));
     }
 
     @Operation(summary = "Delete task by its id")

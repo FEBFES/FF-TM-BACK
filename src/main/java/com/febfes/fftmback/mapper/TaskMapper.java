@@ -22,8 +22,10 @@ public interface TaskMapper {
     TaskDto taskViewToTaskDto(TaskView task, List<FileEntity> files);
 
     @Mapping(target = "type", source = "task.taskType.name")
+    @Mapping(target = "order", source = "task.entityOrder")
     TaskShortDto taskViewToTaskShortDto(TaskView task);
 
     @Mapping(target = "taskType.name", source = "taskDto.type")
+    @Mapping(target = "entityOrder", source = "taskDto.order")
     TaskEntity taskDtoToTask(Long projectId, Long columnId, EditTaskDto taskDto);
 }

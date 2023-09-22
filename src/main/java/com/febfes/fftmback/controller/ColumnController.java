@@ -52,9 +52,7 @@ public class ColumnController {
             @RequestBody ColumnDto columnDto
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER_PLUS);
-        TaskColumnEntity updatedColumn = columnService.editColumn(
-                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, pathVars.columnId(), pathVars.projectId())
-        );
+        TaskColumnEntity updatedColumn = columnService.editColumn(columnDto, pathVars.columnId());
         return ColumnMapper.INSTANCE.columnToColumnDto(updatedColumn);
     }
 

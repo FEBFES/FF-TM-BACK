@@ -14,6 +14,8 @@ public record EditTaskDto(
 
         TaskPriority priority,
 
-        String type
+        String type,
+
+        Integer order
 ) {
 }

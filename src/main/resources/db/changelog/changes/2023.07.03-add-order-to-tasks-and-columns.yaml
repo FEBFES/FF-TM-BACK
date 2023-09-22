@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: IvanShish
+      comment: "Add order to tasks and columns"
+      changes:
+        - renameColumn:
+            newColumnName: entity_order
+            oldColumnName: column_order
+            tableName: task_column
+        - addColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: entity_order
+                  type: int
+                  defaultValue: "1"
+                  constraints:
+                    nullable: false
+        - dropColumn:
+            tableName: task_column
+            columns:
+              - column:
+                  name: child_task_column_id

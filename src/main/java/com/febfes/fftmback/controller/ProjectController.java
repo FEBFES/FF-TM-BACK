@@ -22,8 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,18 +41,18 @@ public class ProjectController {
 
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
-    public List<ProjectDto> getProjectsForUser() {
-        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = user.getId();
-        return projectService.getProjectsForUser(userId);
+    public List<ProjectDto> getProjectsForUser(@AuthenticationPrincipal UserEntity user) {
+        return projectService.getProjectsForUser(user.getId());
     }
 
     @Operation(summary = "Create new project")
     @ApiCreate
-    public ProjectDto createNewProject(@RequestBody @Valid ProjectDto projectDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ProjectDto createNewProject(
+            @AuthenticationPrincipal UserEntity user,
+            @RequestBody @Valid ProjectDto projectDto
+    ) {
         ProjectEntity project = projectService.createProject(
-                ProjectMapper.INSTANCE.projectDtoToProject(projectDto), authentication.getName()
+                ProjectMapper.INSTANCE.projectDtoToProject(projectDto), user.getId()
         );
         return ProjectMapper.INSTANCE.projectToProjectDto(project);
     }
@@ -61,8 +60,7 @@ public class ProjectController {
     @Operation(summary = "Get project by its id")
     @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
-    public OneProjectDto getProject(@PathVariable Long id) {
-        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public OneProjectDto getProject(@AuthenticationPrincipal UserEntity user, @PathVariable Long id) {
         return projectService.getProjectForUser(id, user.getId());
     }
 
@@ -86,10 +84,10 @@ public class ProjectController {
     @Operation(summary = "Edit project partially")
     @ApiPatch(path = "{id}")
     public void editProjectPartially(
+            @AuthenticationPrincipal UserEntity user,
             @PathVariable Long id,
             @RequestBody List<PatchDto> patchDtoList
     ) {
-        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         projectService.editProjectPartially(id, user.getId(), patchDtoList);
     }
 

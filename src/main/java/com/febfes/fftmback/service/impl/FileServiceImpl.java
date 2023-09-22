@@ -41,7 +41,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<FileEntity> getFilesByEntityId(Long entityId, EntityType entityType) {
-        return repository.findAllByEntityIdAndEntityType(entityId, entityType.name());
+        return repository.findAllByEntityIdAndEntityType(entityId, entityType);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class FileServiceImpl implements FileService {
                 .userId(userId)
                 .entityId(entityId)
                 .name(file.getOriginalFilename())
-                .entityType(entityType.name())
+                .entityType(entityType)
                 .contentType(file.getContentType());
         if (EntityType.USER_PIC.equals(entityType)) {
             fileBuilder.fileUrn(String.format(FileUtils.USER_PIC_URN, userId))
@@ -88,7 +88,7 @@ public class FileServiceImpl implements FileService {
         try {
             file.transferTo(new File(fileEntity.getFilePath()));
             // TODO: I'm talking about this (look upper)
-            if (!EntityType.USER_PIC.equals(entityType) || !repository.existsByEntityIdAndEntityType(entityId, entityType.name())) {
+            if (!EntityType.USER_PIC.equals(entityType) || !repository.existsByEntityIdAndEntityType(entityId, entityType)) {
                 repository.save(fileEntity);
             }
         } catch (IOException e) {

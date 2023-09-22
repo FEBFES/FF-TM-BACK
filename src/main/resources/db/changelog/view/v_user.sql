@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset auto-views:view-v_user runOnChange:true ignore:true
+--changeset auto-views:view-v_user runOnChange:true
 
 create or replace view v_user
 as

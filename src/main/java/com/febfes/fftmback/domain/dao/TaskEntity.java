@@ -2,6 +2,7 @@ package com.febfes.fftmback.domain.dao;
 
 
 import com.febfes.fftmback.domain.common.TaskPriority;
+import com.febfes.fftmback.domain.dao.abstracts.OrderedEntity;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +22,7 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class TaskEntity extends BaseEntity {
+public class TaskEntity extends OrderedEntity {
 
     public static final String ENTITY_NAME = "Task";
 
@@ -55,4 +56,9 @@ public class TaskEntity extends BaseEntity {
     @Column(name = "update_date")
     @UpdateTimestamp
     private Date updateDate;
+
+    @Override
+    public String getColumnToFindOrder() {
+        return "columnId";
+    }
 }

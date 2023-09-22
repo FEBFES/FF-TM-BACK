@@ -1,15 +1,17 @@
 package com.febfes.fftmback.util;
 
 import com.febfes.fftmback.domain.common.TaskPriority;
+import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.TaskDto;
+import lombok.experimental.UtilityClass;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
 
-@Service
+@UtilityClass
 @Profile("test")
 public class DtoBuilders {
+
     public ProjectDto createProjectDto(String name) {
         return ProjectDto.builder()
                 .name(name)
@@ -29,10 +31,10 @@ public class DtoBuilders {
                 .build();
     }
 
-    public ColumnDto createColumnDto(String name, Long childTaskColumnId) {
+    public ColumnDto createColumnDto(String name, Integer order) {
         return ColumnDto.builder()
                 .name(name)
-                .childTaskColumnId(childTaskColumnId)
+                .order(order)
                 .build();
     }
 
@@ -57,5 +59,9 @@ public class DtoBuilders {
                 .filesCounter(0L)
                 .priority(TaskPriority.valueOf(priority.toUpperCase()))
                 .build();
+    }
+
+    public TaskEntity createTaskEntity(Long projectId, Long columnId, String taskName) {
+        return TaskEntity.builder().projectId(projectId).columnId(columnId).name(taskName).build();
     }
 }

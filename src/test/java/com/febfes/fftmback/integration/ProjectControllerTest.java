@@ -38,7 +38,6 @@ class ProjectControllerTest extends BasicTestClass {
     public static final String PROJECT_NAME = "Project name";
     public static final String PROJECT_DESCRIPTION = "Project description";
 
-    private String createdUsername;
     private Long createdUserId;
     private String token;
 
@@ -52,9 +51,6 @@ class ProjectControllerTest extends BasicTestClass {
     private UserService userService;
 
     @Autowired
-    private DtoBuilders dtoBuilders;
-
-    @Autowired
     private TransactionTemplate txTemplate;
 
     @BeforeEach
@@ -65,19 +61,18 @@ class ProjectControllerTest extends BasicTestClass {
         token = authenticationService.authenticateUser(
                 UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
         ).accessToken();
-        createdUsername = USER_USERNAME;
-        createdUserId = userService.getUserIdByUsername(createdUsername);
+        createdUserId = userService.getUserIdByUsername(USER_USERNAME);
     }
 
     @Test
     void successfulGetProjectsTest() {
         projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME + "1").build(),
-                createdUsername
+                createdUserId
         );
         projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME + "2").build(),
-                createdUsername
+                createdUserId
         );
 
         Response response = requestWithBearerToken()
@@ -96,7 +91,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfProjectTest() {
-        ProjectDto projectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
+        ProjectDto projectDto = DtoBuilders.createProjectDto(PROJECT_NAME);
 
         Response createResponse = createNewProject(projectDto);
         createResponse.then()
@@ -120,7 +115,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void failedCreateOfProjectTest() {
-        ProjectDto projectDto = dtoBuilders.createProjectDto(null, PROJECT_DESCRIPTION);
+        ProjectDto projectDto = DtoBuilders.createProjectDto(null, PROJECT_DESCRIPTION);
 
         createNewProject(projectDto).then()
                 .statusCode(HttpStatus.SC_UNPROCESSABLE_ENTITY);
@@ -131,7 +126,7 @@ class ProjectControllerTest extends BasicTestClass {
         Long createdProjectId = createNewProject(PROJECT_NAME);
 
         String newProjectName = PROJECT_NAME + "edit";
-        ProjectDto editProjectDto = dtoBuilders.createProjectDto(newProjectName);
+        ProjectDto editProjectDto = DtoBuilders.createProjectDto(newProjectName);
 
         ProjectDto updatedProjectDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -151,7 +146,7 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void failedEditOfProjectTest() {
         String wrongProjectId = "54731584";
-        ProjectDto editProjectDto = dtoBuilders.createProjectDto(PROJECT_NAME);
+        ProjectDto editProjectDto = DtoBuilders.createProjectDto(PROJECT_NAME);
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -328,7 +323,7 @@ class ProjectControllerTest extends BasicTestClass {
         Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
         projectService.createProject(
                 ProjectEntity.builder().name(PROJECT_NAME + "1").build(),
-                userService.getUserById(secondCreatedUserId).getUsername()
+                secondCreatedUserId
         );
 
         String tokenForSecondUser = authenticationService.authenticateUser(
@@ -365,7 +360,7 @@ class ProjectControllerTest extends BasicTestClass {
     }
 
     private Long createNewProject(String projectName) {
-        ProjectDto createProjectDto = dtoBuilders.createProjectDto(projectName);
+        ProjectDto createProjectDto = DtoBuilders.createProjectDto(projectName);
         Response createResponse = createNewProject(createProjectDto);
         return createResponse.jsonPath().getLong("id");
     }

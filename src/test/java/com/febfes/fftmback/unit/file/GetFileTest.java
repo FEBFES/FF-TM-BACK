@@ -68,12 +68,12 @@ class GetFileTest {
         // Arrange
         FileEntity fileEntity1 = new FileEntity();
         fileEntity1.setEntityId(FIRST_ID);
-        fileEntity1.setEntityType(EntityType.TASK.name());
+        fileEntity1.setEntityType(EntityType.TASK);
         FileEntity fileEntity2 = new FileEntity();
         fileEntity2.setEntityId(FIRST_ID);
-        fileEntity2.setEntityType(EntityType.TASK.name());
+        fileEntity2.setEntityType(EntityType.TASK);
 
-        when(fileRepository.findAllByEntityIdAndEntityType(FIRST_ID, EntityType.TASK.name()))
+        when(fileRepository.findAllByEntityIdAndEntityType(FIRST_ID, EntityType.TASK))
                 .thenReturn(Arrays.asList(fileEntity1, fileEntity2));
 
         // Act
@@ -102,7 +102,7 @@ class GetFileTest {
         fileEntity.setId(FIRST_ID);
         fileEntity.setFileUrn(String.format(FileUtils.USER_PIC_URN, Long.parseLong(ID_FOR_URN)));
         fileEntity.setFilePath(FILE_PATH);
-        fileEntity.setEntityType(EntityType.USER_PIC.name());
+        fileEntity.setEntityType(EntityType.USER_PIC);
 
         when(fileRepository.findByFileUrn(fileEntity.getFileUrn())).thenReturn(Optional.of(fileEntity));
 

@@ -1,6 +1,7 @@
 package com.febfes.fftmback.domain.dao;
 
 import com.febfes.fftmback.domain.common.TaskPriority;
+import com.febfes.fftmback.domain.dao.abstracts.OrderedView;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -16,7 +17,7 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class TaskView extends BaseView {
+public class TaskView extends OrderedView {
 
     @Column(name = "\"name\"")
     private String name;

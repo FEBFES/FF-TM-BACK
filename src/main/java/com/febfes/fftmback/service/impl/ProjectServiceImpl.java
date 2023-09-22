@@ -52,17 +52,16 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectEntity createProject(
             ProjectEntity project,
-            String username
+            Long userId
     ) {
-        Long ownerId = userService.getUserIdByUsername(username);
-        project.setOwnerId(ownerId);
+        project.setOwnerId(userId);
         ProjectEntity projectEntity = projectRepository.save(project);
         log.info("Saved project: {}", projectEntity);
         Long projectId = projectEntity.getId();
         columnService.createDefaultColumnsForProject(projectId);
         taskTypeService.createDefaultTaskTypesForProject(projectId);
         // by default, the owner will also be a member of the project
-        addOrChangeProjectMemberRole(project.getId(), ownerId, RoleName.OWNER);
+        addOrChangeProjectMemberRole(project.getId(), userId, RoleName.OWNER);
         return projectEntity;
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProjectService {
 
-    ProjectEntity createProject(ProjectEntity project, String username);
+    ProjectEntity createProject(ProjectEntity project, Long userId);
 
     List<ProjectDto> getProjectsForUser(Long userId);
 
