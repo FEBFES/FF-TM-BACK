@@ -22,11 +22,14 @@ import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.List;
+
+import static com.febfes.fftmback.util.CaseUtils.camelToSnake;
 
 @Slf4j
 @Service
@@ -66,8 +69,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectDto> getProjectsForUser(Long userId) {
-        List<ProjectProjection> userProjects = projectRepository.getUserProjects(userId);
+    public List<ProjectDto> getProjectsForUser(Long userId, List<Sort.Order> sort) {
+        List<Sort.Order> snakeCaseSort = sort.stream()
+                .map(s -> new Sort.Order(s.getDirection(), camelToSnake(s.getProperty())))
+                .toList();
+        List<ProjectProjection> userProjects = projectRepository.getUserProjects(
+                userId, Sort.by(snakeCaseSort));
         log.info("Received {} projects for user with id={}", userProjects.size(), userId);
         return userProjects.stream()
                 .map(ProjectMapper.INSTANCE::projectProjectionToProjectDto)

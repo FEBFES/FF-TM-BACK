@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.febfes.fftmback.util.SortUtils.getOrderFromParams;
+
 @RestController
 @RequestMapping("v1/projects")
 @RequiredArgsConstructor
@@ -41,8 +43,11 @@ public class ProjectController {
 
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
-    public List<ProjectDto> getProjectsForUser(@AuthenticationPrincipal UserEntity user) {
-        return projectService.getProjectsForUser(user.getId());
+    public List<ProjectDto> getProjectsForUser(
+            @SortParam @RequestParam(defaultValue = "-createDate") String[] sort,
+            @AuthenticationPrincipal UserEntity user
+    ) {
+        return projectService.getProjectsForUser(user.getId(), getOrderFromParams(sort));
     }
 
     @Operation(summary = "Create new project")

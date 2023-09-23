@@ -34,8 +34,6 @@ import static java.util.Objects.nonNull;
 public class TaskServiceImpl implements TaskService {
 
     private static final String RECEIVED_TASKS_SIZE_LOG = "Received tasks size: {}";
-    private static final int DEFAULT_PAGE = 0;
-    private static final int DEFAULT_LIMIT = 1000;
 
     private final TaskRepository taskRepository;
     private final TaskViewRepository taskViewRepository;
@@ -62,9 +60,7 @@ public class TaskServiceImpl implements TaskService {
             Long columnId,
             TaskSpec taskSpec
     ) {
-        Pageable pageableRequest = PageRequest.of(DEFAULT_PAGE, DEFAULT_LIMIT, Sort.by(ORDER_FIELD_NAME));
-        List<TaskView> tasks = taskViewRepository.findAll(taskSpec.and(byColumnId(columnId)), pageableRequest)
-                .getContent();
+        List<TaskView> tasks = taskViewRepository.findAll(taskSpec.and(byColumnId(columnId)), Sort.by(ORDER_FIELD_NAME));
         log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
         return tasks;
     }
