@@ -3,6 +3,7 @@ package com.febfes.fftmback.service;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.*;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface ProjectService {
 
     ProjectEntity createProject(ProjectEntity project, Long userId);
 
-    List<ProjectDto> getProjectsForUser(Long userId);
+    List<ProjectDto> getProjectsForUser(Long userId, List<Sort.Order> sort);
 
     ProjectEntity getProject(Long id);
 

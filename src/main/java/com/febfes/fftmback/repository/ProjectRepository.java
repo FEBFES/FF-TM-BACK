@@ -3,6 +3,7 @@ package com.febfes.fftmback.repository;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.projection.ProjectProjection;
 import com.febfes.fftmback.domain.projection.ProjectWithMembersProjection;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -61,7 +62,8 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
                     FROM project P
                     		LEFT JOIN favourite_project FP ON P.id = FP.project_id AND FP.user_id = :userId
                     		INNER JOIN user_project UP ON UP.project_id = P.id AND UP.user_id = :userId
+                    ORDER BY "isFavourite" desc, ?#{#sort}
                     """
     )
-    List<ProjectProjection> getUserProjects(Long userId);
+    List<ProjectProjection> getUserProjects(Long userId, Sort sort);
 }

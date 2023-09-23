@@ -25,6 +25,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -196,7 +197,7 @@ class ProjectControllerTest extends BasicTestClass {
         OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.isFavourite())
                 .isTrue();
-        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId);
+        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId, new ArrayList<>());
         Optional<ProjectDto> userProject = userProjects.stream().findFirst();
         Assertions.assertThat(userProject)
                 .isNotEmpty();
@@ -219,7 +220,7 @@ class ProjectControllerTest extends BasicTestClass {
         OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.isFavourite())
                 .isFalse();
-        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId);
+        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId, new ArrayList<>());
         Optional<ProjectDto> userProject = userProjects.stream().findFirst();
         Assertions.assertThat(userProject)
                 .isNotEmpty();
@@ -267,9 +268,11 @@ class ProjectControllerTest extends BasicTestClass {
                 List<MemberDto> members = userService.getProjectMembersWithRole(createdProjectId);
                 // as owner is also a member
                 Assertions.assertThat(members).hasSize(3);
-                List<ProjectDto> secondUserProjects = projectService.getProjectsForUser(secondCreatedUserId);
+                List<ProjectDto> secondUserProjects =
+                        projectService.getProjectsForUser(secondCreatedUserId, new ArrayList<>());
                 Assertions.assertThat(secondUserProjects).hasSize(1);
-                List<ProjectDto> thirdUserProjects = projectService.getProjectsForUser(thirdCreatedUserId);
+                List<ProjectDto> thirdUserProjects =
+                        projectService.getProjectsForUser(thirdCreatedUserId, new ArrayList<>());
                 Assertions.assertThat(thirdUserProjects).hasSize(1);
             }
         });
@@ -279,7 +282,7 @@ class ProjectControllerTest extends BasicTestClass {
     void successfulRemoveMemberTest() {
         successfulAddNewMembersTest();
         Long secondCreatedUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
-        Optional<ProjectDto> userProject = projectService.getProjectsForUser(createdUserId).stream().findFirst();
+        Optional<ProjectDto> userProject = projectService.getProjectsForUser(createdUserId, new ArrayList<>()).stream().findFirst();
         Assertions.assertThat(userProject)
                 .isNotEmpty();
         Long createdProjectId = userProject.get().id();
@@ -292,14 +295,14 @@ class ProjectControllerTest extends BasicTestClass {
 
         List<MemberDto> members = userService.getProjectMembersWithRole(createdProjectId);
         Assertions.assertThat(members).hasSize(2);
-        List<ProjectDto> secondMemberProjects = projectService.getProjectsForUser(secondCreatedUserId);
+        List<ProjectDto> secondMemberProjects = projectService.getProjectsForUser(secondCreatedUserId, new ArrayList<>());
         Assertions.assertThat(secondMemberProjects).isEmpty();
     }
 
     @Test
     void successfulGetMembersTest() {
         successfulAddNewMembersTest();
-        Long createdProjectId = projectService.getProjectsForUser(createdUserId).get(0).id();
+        Long createdProjectId = projectService.getProjectsForUser(createdUserId, new ArrayList<>()).get(0).id();
         List<MemberDto> projectMembers = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
@@ -357,6 +360,36 @@ class ProjectControllerTest extends BasicTestClass {
                 .as(OneProjectDto.class);
         Assertions.assertThat(oneProjectDto.userRoleOnProject().name())
                 .isEqualTo(RoleName.OWNER);
+    }
+
+    @Test
+    void successfulGetProjectsWithSort() {
+        projectService.createProject(
+                ProjectEntity.builder().name(PROJECT_NAME + "1").build(),
+                createdUserId
+        );
+        projectService.createProject(
+                ProjectEntity.builder().name(PROJECT_NAME + "2").build(),
+                createdUserId
+        );
+
+        List<ProjectDto> projects = requestWithBearerToken()
+                .contentType(ContentType.JSON)
+                .when()
+                .get(PATH_TO_PROJECTS_API + "?sort=-id&sort=+name")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response()
+                .as(new TypeRef<>() {
+                });
+
+        Assertions.assertThat(projects)
+                .hasSize(2);
+        Assertions.assertThat(projects.get(0).name())
+                .isEqualTo(PROJECT_NAME + "2");
+        Assertions.assertThat(projects.get(1).name())
+                .isEqualTo(PROJECT_NAME + "1");
     }
 
     private Long createNewProject(String projectName) {
