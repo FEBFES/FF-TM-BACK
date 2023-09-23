@@ -11,6 +11,7 @@ import java.io.Serial;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 @Entity
 @Table(name = "user_entity")
@@ -52,7 +53,7 @@ public class UserEntity extends BaseEntity implements UserDetails {
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
     @MapKeyColumn(name = "project_id")
     @Builder.Default
-    private HashMap<Long, RoleEntity> projectRoles = new HashMap<>();	// HashMap implements Serializable
+    private Map<Long, RoleEntity> projectRoles = new HashMap<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
