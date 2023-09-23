@@ -20,6 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ControllerAdvisor {
+    
+    private static final String LOG_MSG = "Handled %s.";
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -28,8 +30,8 @@ public class ControllerAdvisor {
             EntityNotFoundException ex,
             HttpServletRequest httpRequest
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.NOT_FOUND, EntityNotFoundException.class.getSimpleName(),
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createResponseBodyForExceptions(HttpStatus.NOT_FOUND, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
@@ -40,8 +42,8 @@ public class ControllerAdvisor {
             EntityAlreadyExistsException ex,
             HttpServletRequest httpRequest
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.CONFLICT, EntityAlreadyExistsException.class.getSimpleName(),
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createResponseBodyForExceptions(HttpStatus.CONFLICT, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
@@ -55,8 +57,8 @@ public class ControllerAdvisor {
         List<String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .toList();
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.UNPROCESSABLE_ENTITY, MethodArgumentNotValidException.class.getSimpleName(),
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createResponseBodyForExceptions(HttpStatus.UNPROCESSABLE_ENTITY, ex.getClass().getSimpleName(),
                 errors.toString(), httpRequest.getRequestURI());
     }
 
@@ -67,8 +69,8 @@ public class ControllerAdvisor {
             ExpiredJwtException ex,
             HttpServletRequest httpRequest
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, ExpiredJwtException.class.getSimpleName(),
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
@@ -79,8 +81,8 @@ public class ControllerAdvisor {
             TokenExpiredException ex,
             HttpServletRequest httpRequest
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, TokenExpiredException.class.getSimpleName(),
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
@@ -91,8 +93,8 @@ public class ControllerAdvisor {
             ProjectOwnerException ex,
             HttpServletRequest httpRequest
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.CONFLICT, ProjectOwnerException.class.getSimpleName(),
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createResponseBodyForExceptions(HttpStatus.CONFLICT, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
@@ -103,8 +105,8 @@ public class ControllerAdvisor {
             ProjectColumnException ex,
             HttpServletRequest httpRequest
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.CONFLICT, ProjectColumnException.class.getSimpleName(),
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createResponseBodyForExceptions(HttpStatus.CONFLICT, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
@@ -115,8 +117,8 @@ public class ControllerAdvisor {
             RoleCheckException ex,
             HttpServletRequest httpRequest
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.FORBIDDEN, RoleCheckException.class.getSimpleName(),
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createResponseBodyForExceptions(HttpStatus.FORBIDDEN, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
 
@@ -127,7 +129,7 @@ public class ControllerAdvisor {
             Exception ex,
             HttpServletRequest httpRequest
     ) {
-        ex.printStackTrace();
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
         return createResponseBodyForExceptions(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getSimpleName(),
                 ex.getMessage(), httpRequest.getRequestURI());
     }
