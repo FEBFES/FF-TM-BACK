@@ -11,5 +11,5 @@ public abstract class ProjectPatchFieldProcessor {
 
     protected ProjectPatchFieldProcessor nextProcessor;
 
-    abstract public void patchField(Long projectId, Long ownerId, PatchDto patchDto);
+    public abstract void patchField(Long projectId, Long ownerId, PatchDto patchDto);
 }

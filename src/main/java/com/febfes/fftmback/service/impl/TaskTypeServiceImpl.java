@@ -15,7 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TaskTypeServiceImpl implements TaskTypeService {
 
-    public final List<String> DEFAULT_TASK_TYPES = List.of("bug", "feature", "research", "question");
+    public static final List<String> DEFAULT_TASK_TYPES = List.of("bug", "feature", "research", "question");
 
 
     private final TaskTypeRepository taskTypeRepository;

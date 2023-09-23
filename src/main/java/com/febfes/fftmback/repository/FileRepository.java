@@ -13,7 +13,7 @@ public interface FileRepository extends JpaRepository<FileEntity, Long> {
 
     Optional<FileEntity> findByFileUrn(String fileUrn);
 
-    List<FileEntity> findAllByEntityIdAndEntityType(Long entityId, EntityType entityType);
+    Optional<FileEntity> findFirstByEntityIdAndEntityType(Long entityId, EntityType entityType);
 
-    boolean existsByEntityIdAndEntityType(Long entityId, EntityType entityType);
+    List<FileEntity> findAllByEntityIdAndEntityType(Long entityId, EntityType entityType);
 }

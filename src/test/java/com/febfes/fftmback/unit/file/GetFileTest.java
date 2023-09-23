@@ -7,20 +7,20 @@ import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.impl.FileServiceImpl;
 import com.febfes.fftmback.util.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class GetFileTest {
@@ -29,6 +29,8 @@ class GetFileTest {
     private static final String FILE_URN = "test-file-urn";
     private static final String ID_FOR_URN = "123";
     private static final String FILE_PATH = "test-file-path";
+    private static final String USER_FILE_URN = String.format(FileUtils.USER_PIC_URN, Long.parseLong(ID_FOR_URN));
+    private static final String TASK_FILE_URN = String.format(FileUtils.TASK_FILE_URN, Long.parseLong(ID_FOR_URN));
     private static final byte[] EXPECTED_BYTES = "test content".getBytes();
 
     @Mock
@@ -95,24 +97,35 @@ class GetFileTest {
     }
 
     @Test
-    @Disabled("need to mock static method")
     void testGetFileContent() throws IOException {
         // Arrange
         FileEntity fileEntity = new FileEntity();
         fileEntity.setId(FIRST_ID);
-        fileEntity.setFileUrn(String.format(FileUtils.USER_PIC_URN, Long.parseLong(ID_FOR_URN)));
+        fileEntity.setFileUrn(USER_FILE_URN);
         fileEntity.setFilePath(FILE_PATH);
         fileEntity.setEntityType(EntityType.USER_PIC);
 
-        when(fileRepository.findByFileUrn(fileEntity.getFileUrn())).thenReturn(Optional.of(fileEntity));
+        when(fileRepository.findByFileUrn(USER_FILE_URN)).thenReturn(Optional.of(fileEntity));
+        when(fileRepository.findByFileUrn(TASK_FILE_URN)).thenReturn(Optional.of(fileEntity));
+        File mockedUserPicFile = mock(File.class);
+        Path mockedUserPicPath = mock(Path.class);
+        when(mockedUserPicFile.toPath()).thenReturn(mockedUserPicPath);
+        when(mockedUserPicPath.toString()).thenReturn(FILE_PATH);
 
         // static method
-        when(Files.readAllBytes(new File(fileEntity.getFilePath()).toPath())).thenReturn(EXPECTED_BYTES);
+        try (MockedStatic<Files> mockedFiles = Mockito.mockStatic(Files.class)) {
+            mockedFiles.when(() -> Files.readAllBytes(any())).thenReturn(EXPECTED_BYTES);
 
-        // Act
-        byte[] result = fileService.getFileContent(ID_FOR_URN, EntityType.USER_PIC);
+            // Act
+            byte[] userPicResult = fileService.getFileContent(ID_FOR_URN, EntityType.USER_PIC);
+            byte[] taskResult = fileService.getFileContent(ID_FOR_URN, EntityType.TASK);
 
-        // Assert
-        assertArrayEquals(EXPECTED_BYTES, result);
+            // Assert
+            assertArrayEquals(EXPECTED_BYTES, userPicResult);
+            assertArrayEquals(EXPECTED_BYTES, taskResult);
+
+            // Testing with invalid entity type
+            assertThrows(IllegalArgumentException.class, () -> fileService.getFileContent(ID_FOR_URN, null));
+        }
     }
 }
