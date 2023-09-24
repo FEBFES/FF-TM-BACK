@@ -30,7 +30,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleEntity getRoleByName(RoleName roleName) {
-        return roleRepository.findByName(roleName.name())
+        return roleRepository.findByName(roleName)
                 .orElseThrow(() -> new EntityNotFoundException(RoleEntity.ENTITY_NAME, "name", roleName.name()));
     }
 

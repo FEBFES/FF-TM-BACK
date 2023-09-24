@@ -1,9 +1,8 @@
 package com.febfes.fftmback.domain.dao;
 
+import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -21,7 +20,8 @@ public class RoleEntity extends BaseEntity {
     public static final String ENTITY_NAME = "Role";
 
     @Column(name = "name")
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private RoleName name;
 
     @Column(name = "description")
     private String description;

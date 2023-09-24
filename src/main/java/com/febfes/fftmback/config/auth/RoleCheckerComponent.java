@@ -43,8 +43,7 @@ public class RoleCheckerComponent {
                 .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, projectId));
         Set<RoleName> belowNecessary = ROLE_HIERARCHY.tailSet(roleName);
         RoleEntity userRole = user.getProjectRoles().get(project.getId());
-        RoleName userRoleName = RoleName.valueOf(userRole.getName());
-        return belowNecessary.contains(userRoleName);
+        return belowNecessary.contains(userRole.getName());
     }
 
     public void checkIfHasRole(Long projectId, RoleName roleName) {
