@@ -1,24 +1,25 @@
 package com.febfes.fftmback.config.auth;
 
 import com.febfes.fftmback.domain.common.RoleName;
-import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.RoleCheckException;
-import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.NavigableSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
 @Component
+@AllArgsConstructor
 public class RoleCheckerComponent {
 
-    private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
 
     private static final NavigableSet<RoleName> ROLE_HIERARCHY = new TreeSet<>((o1, o2) -> {
@@ -30,32 +31,38 @@ public class RoleCheckerComponent {
         return 0;
     });
 
-    public RoleCheckerComponent(ProjectRepository projectRepository, UserRepository userRepository) {
-        this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
+    @PostConstruct
+    private void postConstruct() {
         ROLE_HIERARCHY.add(RoleName.OWNER);
         ROLE_HIERARCHY.add(RoleName.MEMBER_PLUS);
         ROLE_HIERARCHY.add(RoleName.MEMBER);
     }
 
-    private boolean hasRole(UserEntity user, Long projectId, RoleName roleName) {
-        ProjectEntity project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, projectId));
-        Set<RoleName> belowNecessary = ROLE_HIERARCHY.tailSet(roleName);
-        RoleEntity userRole = user.getProjectRoles().get(project.getId());
-        return belowNecessary.contains(userRole.getName());
-    }
-
     public void checkIfHasRole(Long projectId, RoleName roleName) {
         UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!hasRole(user, projectId, roleName)) {
-            throw new RoleCheckException(roleName.name());
+        RoleEntity userRole = getUserRole(user, projectId);
+        if (!hasRole(userRole, roleName)) {
+            throw new RoleCheckException(roleName, userRole.getName());
         }
     }
 
-    public boolean userHasRole(Long projectId, Long userId, RoleName roleName) {
-        UserEntity user = userRepository.findById(userId)
+    public void checkIfUserIsOwner(Long projectId, Long userId) {
+        UserEntity userToCheck = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, userId));
-        return hasRole(user, projectId, roleName);
+        UserEntity loggedUser = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        RoleEntity loggedUserRole = getUserRole(loggedUser, projectId);
+        if (hasRole(getUserRole(userToCheck, projectId), RoleName.OWNER)) {
+            throw new RoleCheckException(RoleName.OWNER, loggedUserRole.getName());
+        }
+    }
+
+    private RoleEntity getUserRole(UserEntity user, Long projectId) {
+        return Optional.ofNullable(user.getProjectRoles().get(projectId))
+                .orElseThrow(() -> new EntityNotFoundException(RoleEntity.ENTITY_NAME, "projectId", projectId.toString()));
+    }
+
+    private boolean hasRole(RoleEntity userRole, RoleName roleName) {
+        Set<RoleName> belowNecessary = ROLE_HIERARCHY.tailSet(roleName);
+        return belowNecessary.contains(userRole.getName());
     }
 }

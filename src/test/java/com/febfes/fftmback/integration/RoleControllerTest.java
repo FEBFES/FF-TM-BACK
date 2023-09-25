@@ -130,7 +130,7 @@ public class RoleControllerTest extends BasicTestClass {
                 UserEntity user = userService.getUserById(userId);
                 RoleEntity role = user.getProjectRoles().get(createdProjectId);
                 Assertions.assertThat(role.getName())
-                        .isEqualTo(expectedUserRoleName.name());
+                        .isEqualTo(expectedUserRoleName);
             }
         });
     }

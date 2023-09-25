@@ -7,6 +7,7 @@ import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.auth.GetAuthDto;
+import com.febfes.fftmback.dto.error.ErrorType;
 import com.febfes.fftmback.exception.EntityAlreadyExistsException;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.TokenExpiredException;
@@ -50,8 +51,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void registerUser(UserEntity user) {
-        if (userRepository.existsByEmailOrUsername(user.getEmail(), user.getUsername())) {
-            throw new EntityAlreadyExistsException(UserEntity.ENTITY_NAME);
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new EntityAlreadyExistsException(UserEntity.ENTITY_NAME,
+                    "email", user.getEmail(), ErrorType.AUTH);
+        }
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new EntityAlreadyExistsException(UserEntity.ENTITY_NAME,
+                    "username", user.getUsername(), ErrorType.AUTH);
         }
         user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         user.setDisplayName(isNull(user.getDisplayName()) ? generateDisplayName() : user.getDisplayName());
@@ -61,14 +67,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public GetAuthDto authenticateUser(UserEntity user) {
+        UserEntity receivedUser = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME,
+                        "username", user.getUsername(), ErrorType.AUTH));
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getUsername(),
                         user.getPassword()
                 )
         );
-        UserEntity receivedUser = userRepository.findByUsername(user.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, "username", user.getUsername()));
         Long userId = receivedUser.getId();
 
         String jwtToken = jwtService.generateToken(receivedUser);

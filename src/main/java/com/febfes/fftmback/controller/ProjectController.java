@@ -10,7 +10,6 @@ import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
@@ -126,10 +125,8 @@ public class ProjectController {
     @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
     @ApiResponse(responseCode = "409", description = "Only owner can remove a member", content = @Content)
     public MemberDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
+        roleCheckerComponent.checkIfUserIsOwner(id, memberId);
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        if (roleCheckerComponent.userHasRole(id, memberId, RoleName.OWNER)) {
-            throw new ProjectOwnerException();
-        }
         return projectService.removeMember(id, memberId);
     }
 }
