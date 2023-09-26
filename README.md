@@ -1,6 +1,6 @@
 # FEBFES TASK MANAGER BACK
 
-Spring Boot 3 + Java 17
+Spring Boot 3 + Java 17. Monolith app
 
 ## Running locally (IntelliJ IDEA):
 
@@ -48,19 +48,22 @@ Swagger is available at: http://localhost:8090/api/swagger-ui/index.html#/
 
 ### Adding new migrations
 
-Create new .yaml file in [changelog](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fchanges)
+Create new .yaml file in [changes](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fchanges)
 
-#### New migrations naming 
+#### New migration naming 
 
-The migration name is generated like this: `<year>.<month>.<sequence_number>-<short_description>.yaml`
+The migration name should be like this: `<year>.<month>.<sequence_number>-<short_description>.yaml`
 
-Example: 2023.03.01-create-task-table.yaml. Year and month of creation are 2023 and 3 (March). Sequence number is 1, because it's the first migration in march. Short description: created new table for tasks.
+Example: 2023.03.01-create-task-table.yaml. Year and month of 
+creation are 2023 and 3 (March). Sequence number is 1, because 
+it's the first migration in March. Short description: created 
+new table for tasks.
 
+#### View changes
+
+If changes are made in the view, or a new view is created, a 
+new file must be created in the folder [view](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fview) for this
 
 ### Rollback migrations
 
-You need to specify database url, username and password in [liquibase.properties](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fliquibase.properties). 
-
-Roll one changeset back:
-
-`./mvnw liquibase:rollback -Dliquibase.rollbackCount=1`
+Not currently supported
