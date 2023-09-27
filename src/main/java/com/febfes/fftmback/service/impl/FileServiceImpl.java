@@ -89,21 +89,23 @@ public class FileServiceImpl implements FileService {
             Long entityId,
             EntityType entityType
     ) {
-        Optional<FileEntity> firstFile = repository.findFirstByEntityIdAndEntityType(entityId, entityType);
         try {
             file.transferTo(new File(fileEntity.getFilePath()));
         } catch (IOException e) {
             throw new SaveFileException(file.getName());
         }
-        if (EntityType.USER_PIC.equals(entityType) && firstFile.isPresent()) {
-            // We create only one FileEntity if entityType=USER_PIC
-            fileEntity.setId(firstFile.get().getId());
-        }
+        repository.findFirstByEntityIdAndEntityType(entityId, entityType)
+                .ifPresent(firstFile -> {
+                    if (EntityType.USER_PIC.equals(entityType)) {
+                        // We create only one FileEntity if entityType=USER_PIC
+                        fileEntity.setId(firstFile.getId());
+                    }
+                });
         repository.save(fileEntity);
     }
 
     private String getIdForPath(EntityType entityType, Long userId, String uuid) {
-        Optional<String> idForPath = Optional.ofNullable(entityType)
+        return Optional.ofNullable(entityType)
                 .map(type -> {
                     if (EntityType.USER_PIC.equals(type)) {
                         return userId.toString();
@@ -111,15 +113,12 @@ public class FileServiceImpl implements FileService {
                         return uuid;
                     }
                     return null;
-                });
-        if (idForPath.isEmpty()) {
-            throw new IllegalArgumentException("ID for URN cannot be null or empty");
-        }
-        return idForPath.get();
+                })
+                .orElseThrow(() -> new IllegalArgumentException("ID for URN cannot be null or empty"));
     }
 
     private String getFileUrn(EntityType entityType, String idForUrn) {
-        Optional<String> fileUrn = Optional.ofNullable(entityType)
+        return Optional.ofNullable(entityType)
                 .map(type -> {
                     if (EntityType.USER_PIC.equals(type)) {
                         return String.format(FileUtils.USER_PIC_URN, Long.parseLong(idForUrn));
@@ -127,15 +126,12 @@ public class FileServiceImpl implements FileService {
                         return String.format(FileUtils.TASK_FILE_URN, idForUrn);
                     }
                     return null;
-                });
-        if (fileUrn.isEmpty()) {
-            throw new IllegalArgumentException("File URN cannot be null or empty");
-        }
-        return fileUrn.get();
+                })
+                .orElseThrow(() -> new IllegalArgumentException("File URN cannot be null or empty"));
     }
 
     private String getFilePath(EntityType entityType, MultipartFile file, String idForPath) {
-        Optional<String> filePath = Optional.ofNullable(entityType)
+        return Optional.ofNullable(entityType)
                 .map(type -> {
                     if (EntityType.USER_PIC.equals(type)) {
                         return "%s%s.%s".formatted(userPicFolder,
@@ -145,10 +141,7 @@ public class FileServiceImpl implements FileService {
                                 idForPath, FileUtils.getExtension(file.getOriginalFilename()));
                     }
                     return null;
-                });
-        if (filePath.isEmpty()) {
-            throw new IllegalArgumentException("File path cannot be null or empty");
-        }
-        return filePath.get();
+                })
+                .orElseThrow(() -> new IllegalArgumentException("File path cannot be null or empty"));
     }
 }
