@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.febfes.fftmback.dto.error.AuthError.createBaseError;
@@ -58,7 +59,7 @@ public class ControllerAdvisor {
         Map<String, ?> errorMap = ex.getBindingResult().getFieldErrors().stream().findFirst()
                 .map(err -> createBaseError(err.getObjectName(), err.getField(),
                         isNull(err.getRejectedValue()) ? null : err.getRejectedValue().toString(), errorType))
-                .orElse(null);
+                .orElse(new HashMap<>());
         log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
         return new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), StatusError.ARGUMENT_NOT_VALID,
                 errorType, DateUtils.getCurrentDate(), ex.getMessage(), errorMap);

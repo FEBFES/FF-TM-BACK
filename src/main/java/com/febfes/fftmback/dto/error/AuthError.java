@@ -2,10 +2,13 @@ package com.febfes.fftmback.dto.error;
 
 import com.febfes.fftmback.util.JsonUtils;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @AllArgsConstructor
+@Getter
 public class AuthError {
 
     private String entity;
@@ -21,7 +24,7 @@ public class AuthError {
         if (ErrorType.AUTH.equals(errorType)) {
             return JsonUtils.convertObjectToMap(new AuthError(entity, fieldName, fieldValue));
         }
-        return null;
+        return new HashMap<>();
     }
 
     public static Map<String, ?> createBaseError(
