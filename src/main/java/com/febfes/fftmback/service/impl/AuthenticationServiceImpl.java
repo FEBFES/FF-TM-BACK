@@ -9,7 +9,7 @@ import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.auth.GetAuthDto;
 import com.febfes.fftmback.dto.error.ErrorType;
 import com.febfes.fftmback.exception.EntityAlreadyExistsException;
-import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.exception.TokenExpiredException;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.AuthenticationService;
@@ -68,8 +68,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public GetAuthDto authenticateUser(UserEntity user) {
         UserEntity receivedUser = userRepository.findByUsername(user.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME,
-                        "username", user.getUsername(), ErrorType.AUTH));
+                .orElseThrow(Exceptions.userNotFound(user.getUsername()));
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getUsername(),

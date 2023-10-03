@@ -11,6 +11,7 @@ import com.febfes.fftmback.domain.projection.ProjectProjection;
 import com.febfes.fftmback.domain.projection.ProjectWithMembersProjection;
 import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.mapper.ColumnWithTasksMapper;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
@@ -84,7 +85,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectEntity getProject(Long id) {
         ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
+                .orElseThrow(Exceptions.projectNotFound(id));
         log.info("Received project {} by id={}", projectEntity, id);
         return projectEntity;
     }
@@ -92,7 +93,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public OneProjectDto getProjectForUser(Long id, Long userId) {
         ProjectWithMembersProjection project = projectRepository.getProjectByIdAndUserId(id, userId)
-                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
+                .orElseThrow(Exceptions.projectNotFound(id));
         log.info("Received project by id={} and userId={}", id, userId);
         List<MemberDto> members = userService.getProjectMembersWithRole(id);
         return ProjectMapper.INSTANCE.projectWithMembersProjectionToOneProjectDto(project, members);
@@ -101,7 +102,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectDto editProject(Long id, ProjectEntity project) {
         ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id));
+                .orElseThrow(Exceptions.projectNotFound(id));
         projectEntity.setName(project.getName());
         projectEntity.setDescription(project.getDescription());
         projectRepository.save(projectEntity);
@@ -186,8 +187,7 @@ public class ProjectServiceImpl implements ProjectService {
             field.setAccessible(true);
             ReflectionUtils.setField(field, projectEntity, patchDto.value());
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            log.info("Can't find field \"{}\" in Project entity", patchDto.key());
+            log.info(String.format("Can't find field \"%s\" in Project entity", patchDto.key()), e);
         }
     }
 

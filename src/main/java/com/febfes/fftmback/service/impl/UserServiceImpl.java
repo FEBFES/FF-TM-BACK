@@ -5,7 +5,7 @@ import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.domain.projection.MemberProjection;
 import com.febfes.fftmback.dto.MemberDto;
-import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.repository.UserViewRepository;
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, "username", username));
+                .orElseThrow(Exceptions.userNotFound(username));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity getUserById(Long id) {
         UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id));
+                .orElseThrow(Exceptions.userNotFoundById(id));
         log.info("Received user {} by id={}", userEntity, id);
         return userEntity;
     }
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserView getUserViewById(Long id) {
         UserView user = userViewRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id));
+                .orElseThrow(Exceptions.userNotFoundById(id));
         log.info("Received user {} by id={}", user, id);
         return user;
     }
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(UserEntity user, Long id) {
         UserEntity userToUpdate = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id));
+                .orElseThrow(Exceptions.userNotFoundById(id));
         userToUpdate.setFirstName(user.getFirstName());
         userToUpdate.setLastName(user.getLastName());
         userToUpdate.setDisplayName(user.getDisplayName());
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public MemberDto getProjectMemberWithRole(Long projectId, Long memberId) {
         MemberProjection member = userViewRepository.getProjectMemberWithRole(projectId, memberId)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, memberId));
+                .orElseThrow(Exceptions.userNotFoundById(memberId));
         return UserMapper.INSTANCE.memberProjectionToMemberDto(member);
     }
 

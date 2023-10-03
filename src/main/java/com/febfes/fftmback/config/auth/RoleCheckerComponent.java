@@ -3,7 +3,7 @@ package com.febfes.fftmback.config.auth;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.exception.RoleCheckException;
 import com.febfes.fftmback.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -48,7 +48,7 @@ public class RoleCheckerComponent {
 
     public void checkIfUserIsOwner(Long projectId, Long userId) {
         UserEntity userToCheck = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, userId));
+                .orElseThrow(Exceptions.userNotFoundById(userId));
         UserEntity loggedUser = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         RoleEntity loggedUserRole = getUserRole(loggedUser, projectId);
         if (hasRole(getUserRole(userToCheck, projectId), RoleName.OWNER)) {
@@ -58,7 +58,7 @@ public class RoleCheckerComponent {
 
     private RoleEntity getUserRole(UserEntity user, Long projectId) {
         return Optional.ofNullable(user.getProjectRoles().get(projectId))
-                .orElseThrow(() -> new EntityNotFoundException(RoleEntity.ENTITY_NAME, "projectId", projectId.toString()));
+                .orElseThrow(Exceptions.roleNotFoundByProjectId(projectId));
     }
 
     private boolean hasRole(RoleEntity userRole, RoleName roleName) {

@@ -2,7 +2,7 @@ package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
-import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.exception.SaveFileException;
 import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.FileService;
@@ -37,7 +37,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileEntity getFile(String fileUrn) {
         return repository.findByFileUrn(fileUrn)
-                .orElseThrow(() -> new EntityNotFoundException(FileEntity.ENTITY_NAME, "file urn", fileUrn));
+                .orElseThrow(Exceptions.fileNotFound(fileUrn));
     }
 
     @Override

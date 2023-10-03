@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
+import java.lang.constant.Constable;
 import java.util.Map;
 
 @UtilityClass
@@ -33,8 +34,8 @@ public class JsonUtils {
     }
 
     @SneakyThrows
-    public static <T> Map<String, ?> convertObjectToMap(T value) {
-        return objectMapper.convertValue(value, new TypeReference<Map<String, Object>>() {
+    public static <T> Map<String, Constable> convertObjectToMap(T value) {
+        return objectMapper.convertValue(value, new TypeReference<>() {
         });
     }
 }
