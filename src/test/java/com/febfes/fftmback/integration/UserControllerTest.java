@@ -28,6 +28,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -140,7 +141,7 @@ class UserControllerTest extends BasicTestClass {
     }
 
     @Test
-    void successfulGetUserPicTest() {
+    void successfulGetUserPicTest() throws IOException {
         Long userId = userService.getUserIdByUsername(createdUsername);
         MultipartFile file = new MockMultipartFile("image.jpg", "image", "jpg", new byte[]{1});
         fileService.saveFile(userId, userId, EntityType.USER_PIC, file);

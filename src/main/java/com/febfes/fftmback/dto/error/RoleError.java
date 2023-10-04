@@ -5,7 +5,6 @@ import com.febfes.fftmback.util.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.lang.constant.Constable;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -15,7 +14,7 @@ public class RoleError {
     private RoleName expected;
     private RoleName actual;
 
-    public static Map<String, Constable> createBaseError(
+    public static Map<String, ?> createBaseError(
             RoleName expected,
             RoleName actual
     ) {
