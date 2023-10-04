@@ -108,7 +108,7 @@ public class ControllerAdvisor {
         return createExceptionResponseBody(HttpStatus.CONFLICT, ex);
     }
 
-    @ExceptionHandler({Exception.class, SaveFileException.class})
+    @ExceptionHandler({Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @Hidden
     public ErrorDto handleGlobalException(

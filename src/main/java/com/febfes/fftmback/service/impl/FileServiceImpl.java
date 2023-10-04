@@ -3,7 +3,6 @@ package com.febfes.fftmback.service.impl;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.exception.Exceptions;
-import com.febfes.fftmback.exception.SaveFileException;
 import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.util.FileUtils;
@@ -59,7 +58,7 @@ public class FileServiceImpl implements FileService {
             Long entityId,
             EntityType entityType,
             MultipartFile file
-    ) {
+    ) throws IOException {
         String uuid = UUID.randomUUID().toString();
         String idForPath = getIdForPath(entityType, userId, uuid);
         FileEntity fileEntity = FileEntity.builder()
@@ -88,12 +87,8 @@ public class FileServiceImpl implements FileService {
             MultipartFile file,
             Long entityId,
             EntityType entityType
-    ) {
-        try {
-            file.transferTo(new File(fileEntity.getFilePath()));
-        } catch (IOException e) {
-            throw new SaveFileException(file.getName());
-        }
+    ) throws IOException {
+        file.transferTo(new File(fileEntity.getFilePath()));
         repository.findFirstByEntityIdAndEntityType(entityId, entityType)
                 .ifPresent(firstFile -> {
                     if (EntityType.USER_PIC.equals(entityType)) {

@@ -15,7 +15,7 @@ public interface FileService {
 
     byte[] getFileContent(String idForUrn, EntityType entityType) throws IOException;
 
-    FileEntity saveFile(Long userId, Long entityId, EntityType entityType, MultipartFile file);
+    FileEntity saveFile(Long userId, Long entityId, EntityType entityType, MultipartFile file) throws IOException;
 
     void deleteFileById(Long fileId);
 }
