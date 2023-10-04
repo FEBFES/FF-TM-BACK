@@ -14,7 +14,7 @@ public class RoleCheckException extends CustomException {
     private static final long serialVersionUID = -1371235813489427594L;
 
     public RoleCheckException(RoleName expected, RoleName actual) {
-        super("Required role for this action is %s".formatted(expected.name()), ErrorType.ROLE, StatusError.ROLE_CHECK);
-        this.setBaseError(createBaseError(expected, actual));
+        super("Required role for this action is %s".formatted(expected.name()), ErrorType.ROLE, StatusError.ROLE_CHECK,
+                createBaseError(expected, actual));
     }
 }

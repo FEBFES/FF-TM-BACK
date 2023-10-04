@@ -20,7 +20,7 @@ public class EntityAlreadyExistsException extends CustomException {
             String fieldValue,
             ErrorType errorType
     ) {
-        super("%s with %s=%s already exists".formatted(entity, fieldName, fieldValue), errorType, STATUS_ERROR);
-        this.setBaseError(createBaseError(entity, fieldName, fieldValue, errorType));
+        super("%s with %s=%s already exists".formatted(entity, fieldName, fieldValue), errorType, STATUS_ERROR,
+                createBaseError(entity, fieldName, fieldValue, errorType));
     }
 }

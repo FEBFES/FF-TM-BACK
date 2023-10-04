@@ -33,7 +33,7 @@ public class JsonUtils {
     }
 
     @SneakyThrows
-    public static <T> Map<String, ?> convertObjectToMap(T value) {
+    public static <T> Map<String, Object> convertObjectToMap(T value) {
         return objectMapper.convertValue(value, new TypeReference<>() {
         });
     }

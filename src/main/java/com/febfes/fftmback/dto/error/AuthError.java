@@ -4,7 +4,7 @@ import com.febfes.fftmback.util.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -15,7 +15,7 @@ public class AuthError {
     private String fieldName;
     private String value;
 
-    public static Map<String, ?> createBaseError(
+    public static Map<String, Object> createBaseError(
             String entity,
             String fieldName,
             String fieldValue,
@@ -24,10 +24,10 @@ public class AuthError {
         if (ErrorType.AUTH.equals(errorType)) {
             return JsonUtils.convertObjectToMap(new AuthError(entity, fieldName, fieldValue));
         }
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
-    public static Map<String, ?> createBaseError(
+    public static Map<String, Object> createBaseError(
             String entity,
             Long id,
             ErrorType errorType

@@ -25,15 +25,6 @@ public class EntityNotFoundException extends CustomException {
 
     public EntityNotFoundException(
             String entity,
-            Long id,
-            ErrorType errorType
-    ) {
-        super("%s with id=%d not found".formatted(entity, id), errorType, STATUS_ERROR);
-        this.setBaseError(createBaseError(entity, id, errorType));
-    }
-
-    public EntityNotFoundException(
-            String entity,
             String fieldName,
             String fieldValue
     ) {
@@ -46,7 +37,7 @@ public class EntityNotFoundException extends CustomException {
             String fieldValue,
             ErrorType errorType
     ) {
-        super("%s with %s=%s not found".formatted(entity, fieldName, fieldValue), errorType, STATUS_ERROR);
-        this.setBaseError(createBaseError(entity, fieldName, fieldValue, errorType));
+        super("%s with %s=%s not found".formatted(entity, fieldName, fieldValue), errorType, STATUS_ERROR,
+                createBaseError(entity, fieldName, fieldValue, errorType));
     }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serial;
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
@@ -15,13 +16,26 @@ public abstract class CustomException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 4326928128726471694L;
 
-    private ErrorType errorType;
-    private StatusError statusError;
-    private Map<String, ?> baseError;
+    private final ErrorType errorType;
+    private final StatusError statusError;
+    private final transient Map<String, Object> baseError;
 
-    public CustomException(String message, ErrorType errorType, StatusError statusError) {
+    protected CustomException(String message, ErrorType errorType, StatusError statusError) {
         super(message);
         this.errorType = errorType;
         this.statusError = statusError;
+        this.baseError = new HashMap<>();
+    }
+
+    public CustomException(
+            String message,
+            ErrorType errorType,
+            StatusError statusError,
+            Map<String, Object> baseError
+    ) {
+        super(message);
+        this.errorType = errorType;
+        this.statusError = statusError;
+        this.baseError = baseError;
     }
 }

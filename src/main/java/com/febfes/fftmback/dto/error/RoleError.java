@@ -14,7 +14,7 @@ public class RoleError {
     private RoleName expected;
     private RoleName actual;
 
-    public static Map<String, ?> createBaseError(
+    public static Map<String, Object> createBaseError(
             RoleName expected,
             RoleName actual
     ) {
