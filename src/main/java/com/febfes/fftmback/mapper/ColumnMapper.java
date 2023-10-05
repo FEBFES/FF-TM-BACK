@@ -16,8 +16,4 @@ public interface ColumnMapper {
     @Mapping(target = "projectId", source = "projectId")
     TaskColumnEntity columnDtoToColumn(ColumnDto columnDto, Long projectId);
 
-    @Mapping(target = "id", source = "columnId")
-    @Mapping(target = "projectId", source = "projectId")
-    TaskColumnEntity columnDtoToColumn(ColumnDto columnDto, Long columnId, Long projectId);
-
 }

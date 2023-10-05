@@ -3,7 +3,11 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.dao.*;
-import com.febfes.fftmback.dto.*;
+import com.febfes.fftmback.dto.EditTaskDto;
+import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.dto.TaskFileDto;
+import com.febfes.fftmback.dto.TaskShortDto;
+import com.febfes.fftmback.dto.error.ErrorDto;
 import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -264,7 +268,7 @@ class TaskControllerTest extends BasicTestClass {
     void createTaskWithWrongColumnIdTest() {
         long wrongColumnId = 20L;
         TaskDto taskDto = DtoBuilders.createTaskDtoWithPriority(TASK_NAME, TaskPriority.LOW.name().toLowerCase());
-        ApiErrorDto errorDto = requestWithBearerToken()
+        ErrorDto errorDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(taskDto)
                 .when()
@@ -274,7 +278,7 @@ class TaskControllerTest extends BasicTestClass {
                 .statusCode(HttpStatus.SC_CONFLICT)
                 .extract()
                 .response()
-                .as(ApiErrorDto.class);
+                .as(ErrorDto.class);
         Assertions.assertEquals(
                 "Project with id=%d doesn't contain column with id=%d".formatted(createdProjectId, wrongColumnId),
                 errorDto.message()

@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,7 @@ import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
 @RequiredArgsConstructor
 @ProtectedApi
 @Tag(name = "File")
+@Slf4j
 public class FileController {
 
     private final @NonNull FileService fileService;
@@ -44,7 +46,7 @@ public class FileController {
     public UserPicDto saveUserPic(
             @PathVariable Long userId,
             @RequestParam("image") MultipartFile userPic
-    ) {
+    ) throws IOException {
         FileEntity file = fileService.saveFile(userId, userId, EntityType.USER_PIC, userPic);
         return FileMapper.INSTANCE.fileToUserPicDto(file);
     }
@@ -71,8 +73,12 @@ public class FileController {
     ) {
         List<TaskFileDto> response = new ArrayList<>();
         Arrays.stream(files).forEach(file -> {
-            FileEntity savedFile = fileService.saveFile(user.getId(), taskId, EntityType.TASK, file);
-            response.add(FileMapper.INSTANCE.fileToTaskFileDto(savedFile));
+            try {
+                FileEntity savedFile = fileService.saveFile(user.getId(), taskId, EntityType.TASK, file);
+                response.add(FileMapper.INSTANCE.fileToTaskFileDto(savedFile));
+            } catch (IOException e) {
+               log.error(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
+            }
         });
         return response;
     }

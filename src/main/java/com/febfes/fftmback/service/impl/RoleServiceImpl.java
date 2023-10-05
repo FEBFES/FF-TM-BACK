@@ -3,7 +3,7 @@ package com.febfes.fftmback.service.impl;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.repository.RoleRepository;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.RoleService;
@@ -30,8 +30,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleEntity getRoleByName(RoleName roleName) {
-        return roleRepository.findByName(roleName.name())
-                .orElseThrow(() -> new EntityNotFoundException(RoleEntity.ENTITY_NAME, "name", roleName.name()));
+        return roleRepository.findByName(roleName)
+                .orElseThrow(Exceptions.roleNotFound(roleName));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void changeUserRoleOnProject(Long projectId, Long userId, RoleName roleName) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, userId));
+                .orElseThrow(Exceptions.userNotFoundById(userId));
         changeUserRoleOnProject(projectId, user, roleName);
     }
 

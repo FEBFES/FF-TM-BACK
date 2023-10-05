@@ -4,7 +4,7 @@ import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
-import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.exception.ProjectColumnException;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.TaskRepository;
@@ -68,7 +68,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskView getTaskById(Long id) {
         return taskViewRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
+                .orElseThrow(Exceptions.taskNotFound(id));
     }
 
     @Override
@@ -95,7 +95,7 @@ public class TaskServiceImpl implements TaskService {
     public void updateTask(TaskEntity editTask) {
         Long id = editTask.getId();
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
+                .orElseThrow(Exceptions.taskNotFound(id));
         task.setName(editTask.getName());
         task.setDescription(editTask.getDescription());
         task.setColumnId(editTask.getColumnId());
@@ -111,7 +111,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void deleteTask(Long id) {
         TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id));
+                .orElseThrow(Exceptions.taskNotFound(id));
         taskRepository.deleteById(id);
         orderService.removeEntity(task);
         log.info("Task with id={} deleted", id);

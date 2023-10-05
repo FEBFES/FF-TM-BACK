@@ -2,8 +2,7 @@ package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
-import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.exception.SaveFileException;
+import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.util.FileUtils;
@@ -18,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -36,7 +36,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileEntity getFile(String fileUrn) {
         return repository.findByFileUrn(fileUrn)
-                .orElseThrow(() -> new EntityNotFoundException(FileEntity.ENTITY_NAME, "file urn", fileUrn));
+                .orElseThrow(Exceptions.fileNotFound(fileUrn));
     }
 
     @Override
@@ -46,13 +46,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public byte[] getFileContent(String idForUrn, EntityType entityType) throws IOException {
-        String fileUrn = "";
-        if (EntityType.USER_PIC.equals(entityType)) {
-            fileUrn = String.format(FileUtils.USER_PIC_URN, Long.parseLong(idForUrn));
-        } else if (EntityType.TASK.equals(entityType)) {
-            fileUrn = String.format(FileUtils.TASK_FILE_URN, idForUrn);
-        }
-        FileEntity fileEntity = getFile(fileUrn);
+        FileEntity fileEntity = getFile(getFileUrn(entityType, idForUrn));
         String filePath = fileEntity.getFilePath();
         log.info("Received file entity: {}", fileEntity);
         return Files.readAllBytes(new File(filePath).toPath());
@@ -64,36 +58,19 @@ public class FileServiceImpl implements FileService {
             Long entityId,
             EntityType entityType,
             MultipartFile file
-    ) {
+    ) throws IOException {
         String uuid = UUID.randomUUID().toString();
-        // TODO: need some optimization (because we find in repository if it exists and only then we save)
-        FileEntity.FileEntityBuilder<?, ?> fileBuilder = FileEntity.builder()
+        String idForPath = getIdForPath(entityType, userId, uuid);
+        FileEntity fileEntity = FileEntity.builder()
                 .userId(userId)
                 .entityId(entityId)
                 .name(file.getOriginalFilename())
                 .entityType(entityType)
-                .contentType(file.getContentType());
-        if (EntityType.USER_PIC.equals(entityType)) {
-            fileBuilder.fileUrn(String.format(FileUtils.USER_PIC_URN, userId))
-                    .filePath(
-                            "%s%d.%s".formatted(userPicFolder, userId, FileUtils.getExtension(file.getOriginalFilename()))
-                    );
-        } else if (EntityType.TASK.equals(entityType)) {
-            fileBuilder.fileUrn(String.format(FileUtils.TASK_FILE_URN, uuid))
-                    .filePath(
-                            "%s%s.%s".formatted(filesFolder, uuid, FileUtils.getExtension(file.getOriginalFilename()))
-                    );
-        }
-        FileEntity fileEntity = fileBuilder.build();
-        try {
-            file.transferTo(new File(fileEntity.getFilePath()));
-            // TODO: I'm talking about this (look upper)
-            if (!EntityType.USER_PIC.equals(entityType) || !repository.existsByEntityIdAndEntityType(entityId, entityType)) {
-                repository.save(fileEntity);
-            }
-        } catch (IOException e) {
-            throw new SaveFileException(file.getName());
-        }
+                .contentType(file.getContentType())
+                .fileUrn(getFileUrn(entityType, idForPath))
+                .filePath(getFilePath(entityType, file, idForPath))
+                .build();
+        fileProcess(fileEntity, file, entityId, entityType);
         log.info("File saved by user with id={}", userId);
         return fileEntity;
     }
@@ -103,5 +80,63 @@ public class FileServiceImpl implements FileService {
     public void deleteFileById(Long id) {
         repository.deleteById(id);
         log.info("Deleted file with id={}", id);
+    }
+
+    private void fileProcess(
+            FileEntity fileEntity,
+            MultipartFile file,
+            Long entityId,
+            EntityType entityType
+    ) throws IOException {
+        file.transferTo(new File(fileEntity.getFilePath()));
+        repository.findFirstByEntityIdAndEntityType(entityId, entityType)
+                .ifPresent(firstFile -> {
+                    if (EntityType.USER_PIC.equals(entityType)) {
+                        // We create only one FileEntity if entityType=USER_PIC
+                        fileEntity.setId(firstFile.getId());
+                    }
+                });
+        repository.save(fileEntity);
+    }
+
+    private String getIdForPath(EntityType entityType, Long userId, String uuid) {
+        return Optional.ofNullable(entityType)
+                .map(type -> {
+                    if (EntityType.USER_PIC.equals(type)) {
+                        return userId.toString();
+                    } else if (EntityType.TASK.equals(type)) {
+                        return uuid;
+                    }
+                    return null;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("ID for URN cannot be null or empty"));
+    }
+
+    private String getFileUrn(EntityType entityType, String idForUrn) {
+        return Optional.ofNullable(entityType)
+                .map(type -> {
+                    if (EntityType.USER_PIC.equals(type)) {
+                        return String.format(FileUtils.USER_PIC_URN, Long.parseLong(idForUrn));
+                    } else if (EntityType.TASK.equals(type)) {
+                        return String.format(FileUtils.TASK_FILE_URN, idForUrn);
+                    }
+                    return null;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("File URN cannot be null or empty"));
+    }
+
+    private String getFilePath(EntityType entityType, MultipartFile file, String idForPath) {
+        return Optional.ofNullable(entityType)
+                .map(type -> {
+                    if (EntityType.USER_PIC.equals(type)) {
+                        return "%s%s.%s".formatted(userPicFolder,
+                                idForPath, FileUtils.getExtension(file.getOriginalFilename()));
+                    } else if (EntityType.TASK.equals(type)) {
+                        return "%s%s.%s".formatted(filesFolder,
+                                idForPath, FileUtils.getExtension(file.getOriginalFilename()));
+                    }
+                    return null;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("File path cannot be null or empty"));
     }
 }

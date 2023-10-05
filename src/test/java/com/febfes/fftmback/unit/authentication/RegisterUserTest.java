@@ -42,7 +42,8 @@ class RegisterUserTest {
         user.setEncryptedPassword("password");
 
         // Mock the userRepository to return false when checking for existing email or username
-        when(userRepository.existsByEmailOrUsername(user.getEmail(), user.getUsername())).thenReturn(false);
+        when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
+        when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
 
         // Mock the passwordEncoder to return a hashed password
         when(passwordEncoder.encode(user.getPassword())).thenReturn("hashedpassword");
@@ -63,7 +64,7 @@ class RegisterUserTest {
         user.setEncryptedPassword("password");
 
         // Mock the userRepository to return true when checking for existing email or username
-        when(userRepository.existsByEmailOrUsername(user.getEmail(), user.getUsername())).thenReturn(true);
+        when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
 
         assertThrows(EntityAlreadyExistsException.class, () -> authenticationService.registerUser(user));
     }

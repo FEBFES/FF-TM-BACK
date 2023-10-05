@@ -6,18 +6,13 @@ import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.exception.ProjectOwnerException;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskTypeService;
-import com.febfes.fftmback.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.NonNull;
@@ -38,7 +33,6 @@ public class ProjectController {
 
     private final @NonNull ProjectService projectService;
     private final @NonNull TaskTypeService taskTypeService;
-    private final @NonNull UserService userService;
     private final @NonNull RoleCheckerComponent roleCheckerComponent;
 
     @Operation(summary = "Get all projects for authenticated user")
@@ -104,32 +98,5 @@ public class ProjectController {
                 .stream()
                 .map(TaskTypeEntity::getName)
                 .toList();
-    }
-
-    @Operation(summary = "Get project members")
-    @ApiGet(path = "{id}/members")
-    public List<MemberDto> getProjectMembers(@PathVariable Long id) {
-        return userService.getProjectMembersWithRole(id);
-    }
-
-    @Operation(summary = "Add new members to the project")
-    @PostMapping(path = "{id}/members")
-    @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
-    @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
-    public List<MemberDto> addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
-        roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        return projectService.addNewMembers(id, memberIds);
-    }
-
-    @Operation(summary = "Delete member from project")
-    @DeleteMapping(path = "{id}/members/{memberId}")
-    @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
-    @ApiResponse(responseCode = "409", description = "Only owner can remove a member", content = @Content)
-    public MemberDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
-        roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        if (roleCheckerComponent.userHasRole(id, memberId, RoleName.OWNER)) {
-            throw new ProjectOwnerException();
-        }
-        return projectService.removeMember(id, memberId);
     }
 }

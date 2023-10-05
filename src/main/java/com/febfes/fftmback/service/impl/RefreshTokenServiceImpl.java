@@ -4,6 +4,7 @@ import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.repository.RefreshTokenRepository;
 import com.febfes.fftmback.service.RefreshTokenService;
 import com.febfes.fftmback.service.UserService;
@@ -32,7 +33,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshTokenEntity getByToken(String token) {
         RefreshTokenEntity refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new EntityNotFoundException(RefreshTokenEntity.ENTITY_NAME, "token", token));
+                .orElseThrow(Exceptions.refreshTokenNotFound(token));
         log.info("Received refresh token {} by token={}", refreshToken, token);
         return refreshToken;
     }
@@ -40,7 +41,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshTokenEntity getByUserId(Long userId) {
         RefreshTokenEntity refreshToken = refreshTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException(RefreshTokenEntity.ENTITY_NAME, "userId", userId.toString()));
+                .orElseThrow(Exceptions.refreshTokenNotFoundByUserId(userId));
         log.info("Received refresh token {} by user id={}", refreshToken, userId);
         return refreshToken;
     }

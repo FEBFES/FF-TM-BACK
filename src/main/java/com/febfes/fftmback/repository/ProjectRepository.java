@@ -45,7 +45,14 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     @Query(
             nativeQuery = true,
             value = """
-                    SELECT P.*, (FP.user_id is not null) AS "isFavourite", R.name AS "roleName", R.description AS "roleDescription"
+                    SELECT P.id,
+                           P.create_date            AS "createDate",
+                           P.name                   AS "name",
+                           P.description            AS "description",
+                           P.owner_id               AS "ownerId",
+                           (FP.user_id is not null) AS "isFavourite",
+                           R.name AS "roleName",
+                           R.description AS "roleDescription"
                     FROM project P
                     		LEFT JOIN favourite_project FP ON P.id = FP.project_id AND FP.user_id = :userId
                     		LEFT JOIN project_user_role PUR ON P.id = PUR.project_id AND PUR.user_id = :userId
@@ -58,7 +65,12 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     @Query(
             nativeQuery = true,
             value = """
-                    SELECT P.*, (FP.user_id is not null) AS "isFavourite"
+                    SELECT P.id,
+                           P.create_date            AS "createDate",
+                           P.name                   AS "name",
+                           P.description            AS "description",
+                           P.owner_id               AS "ownerId",
+                           (FP.user_id is not null) AS "isFavourite"
                     FROM project P
                     		LEFT JOIN favourite_project FP ON P.id = FP.project_id AND FP.user_id = :userId
                     		INNER JOIN user_project UP ON UP.project_id = P.id AND UP.user_id = :userId

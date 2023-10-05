@@ -33,7 +33,7 @@ public class ProjectPatchIsFavouriteProcessor extends ProjectPatchFieldProcessor
         PatchOperation operation = PatchOperation.getByCode(patchDto.op());
         if (PatchOperation.UPDATE.equals(operation)) {
             Boolean isFavourite = (Boolean) patchDto.value();
-            if (isFavourite) {
+            if (Boolean.TRUE.equals(isFavourite)) {
                 projectService.addProjectToFavourite(projectId, ownerId);
             } else {
                 projectService.removeProjectFromFavourite(projectId, ownerId);

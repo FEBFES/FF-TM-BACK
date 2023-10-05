@@ -1,158 +1,148 @@
 package com.febfes.fftmback.exception;
 
-import com.febfes.fftmback.dto.ApiErrorDto;
+import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.error.ErrorDto;
+import com.febfes.fftmback.dto.error.ErrorType;
+import com.febfes.fftmback.dto.error.StatusError;
 import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Map;
+
+import static com.febfes.fftmback.dto.error.AuthError.createBaseError;
+import static java.util.Objects.isNull;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
 @Slf4j
 public class ControllerAdvisor {
 
+    private static final String LOG_MSG = "Handled %s.";
+
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @Hidden
-    public ApiErrorDto handleEntityNotFoundException(
-            EntityNotFoundException ex,
-            HttpServletRequest httpRequest
+    public ErrorDto handleEntityNotFoundException(
+            EntityNotFoundException ex
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.NOT_FOUND, EntityNotFoundException.class.getSimpleName(),
-                ex.getMessage(), httpRequest.getRequestURI());
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createExceptionResponseBody(HttpStatus.NOT_FOUND, ex);
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     @Hidden
-    public ApiErrorDto handleEntityAlreadyExistsException(
-            EntityAlreadyExistsException ex,
-            HttpServletRequest httpRequest
+    public ErrorDto handleEntityAlreadyExistsException(
+            EntityAlreadyExistsException ex
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.CONFLICT, EntityAlreadyExistsException.class.getSimpleName(),
-                ex.getMessage(), httpRequest.getRequestURI());
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createExceptionResponseBody(HttpStatus.CONFLICT, ex);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @Hidden
-    public ApiErrorDto handleConstraintViolationException(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest httpRequest
+    public ErrorDto handleConstraintViolationException(
+            MethodArgumentNotValidException ex
     ) {
-        List<String> errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .toList();
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.UNPROCESSABLE_ENTITY, MethodArgumentNotValidException.class.getSimpleName(),
-                errors.toString(), httpRequest.getRequestURI());
+        ErrorType errorType = ErrorType.AUTH;
+        Map<String, ?> errorMap = ex.getBindingResult().getFieldErrors().stream().findFirst()
+                .map(err -> createBaseError(err.getObjectName(), err.getField(),
+                        isNull(err.getRejectedValue()) ? null : err.getRejectedValue().toString(), errorType))
+                .orElse(Collections.emptyMap());
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), StatusError.ARGUMENT_NOT_VALID,
+                errorType, DateUtils.getCurrentDate(), ex.getMessage(), errorMap);
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
+    @ExceptionHandler({ExpiredJwtException.class, TokenExpiredException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @Hidden
-    public ApiErrorDto handleExpiredJwtException(
-            ExpiredJwtException ex,
-            HttpServletRequest httpRequest
+    public ErrorDto handleExpiredJwtException(
+            RuntimeException ex
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, ExpiredJwtException.class.getSimpleName(),
-                ex.getMessage(), httpRequest.getRequestURI());
-    }
-
-    @ExceptionHandler(TokenExpiredException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @Hidden
-    public ApiErrorDto handleTokenRefreshException(
-            TokenExpiredException ex,
-            HttpServletRequest httpRequest
-    ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.UNAUTHORIZED, TokenExpiredException.class.getSimpleName(),
-                ex.getMessage(), httpRequest.getRequestURI());
-    }
-
-    @ExceptionHandler(ProjectOwnerException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @Hidden
-    public ApiErrorDto handleProjectOwnerException(
-            ProjectOwnerException ex,
-            HttpServletRequest httpRequest
-    ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.CONFLICT, ProjectOwnerException.class.getSimpleName(),
-                ex.getMessage(), httpRequest.getRequestURI());
-    }
-
-    @ExceptionHandler(ProjectColumnException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @Hidden
-    public ApiErrorDto handleProjectColumnException(
-            ProjectColumnException ex,
-            HttpServletRequest httpRequest
-    ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.CONFLICT, ProjectColumnException.class.getSimpleName(),
-                ex.getMessage(), httpRequest.getRequestURI());
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createExceptionResponseBody(HttpStatus.UNAUTHORIZED, ex);
     }
 
     @ExceptionHandler(RoleCheckException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @Hidden
-    public ApiErrorDto handleRoleCheckException(
-            RoleCheckException ex,
-            HttpServletRequest httpRequest
+    public ErrorDto handleRoleCheckException(
+            RoleCheckException ex
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.FORBIDDEN, RoleCheckException.class.getSimpleName(),
-                ex.getMessage(), httpRequest.getRequestURI());
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createExceptionResponseBody(HttpStatus.FORBIDDEN, ex);
     }
 
-    @ExceptionHandler({Exception.class, SaveFileException.class})
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @Hidden
+    public ErrorDto handleBadCredentialsException(
+            BadCredentialsException ex
+    ) {
+        ErrorType errorType = ErrorType.AUTH;
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), StatusError.BAD_CREDENTIALS,
+                errorType, DateUtils.getCurrentDate(), ex.getMessage(),
+                createBaseError(UserEntity.ENTITY_NAME, "password", null, errorType));
+    }
+
+    @ExceptionHandler(ProjectColumnException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @Hidden
+    public ErrorDto handleProjectColumnException(
+            ProjectColumnException ex
+    ) {
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createExceptionResponseBody(HttpStatus.CONFLICT, ex);
+    }
+
+    @ExceptionHandler({Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @Hidden
-    public ApiErrorDto handleGlobalException(
-            Exception ex,
-            HttpServletRequest httpRequest
+    public ErrorDto handleGlobalException(
+            Exception ex
     ) {
-        ex.printStackTrace();
-        return createResponseBodyForExceptions(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getSimpleName(),
-                ex.getMessage(), httpRequest.getRequestURI());
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createExceptionResponseBody(HttpStatus.INTERNAL_SERVER_ERROR, ex);
     }
 
-    private ApiErrorDto createResponseBodyForExceptions(
+    private ErrorDto createExceptionResponseBody(
             HttpStatus status,
-            List<String> errors,
-            String message,
-            String path
+            CustomException ex
     ) {
-        return new ApiErrorDto(
-                DateUtils.getCurrentDate(),
+        return new ErrorDto(
                 status.value(),
-                errors,
-                message,
-                path
+                ex.getStatusError(),
+                ex.getErrorType(),
+                DateUtils.getCurrentDate(),
+                ex.getMessage(),
+                ex.getBaseError()
         );
     }
 
-    private ApiErrorDto createResponseBodyForExceptions(
+    private ErrorDto createExceptionResponseBody(
             HttpStatus status,
-            String error,
-            String message,
-            String path
+            Exception ex
     ) {
-        return createResponseBodyForExceptions(status, List.of(error), message, path);
+        return new ErrorDto(
+                status.value(),
+                StatusError.UNDEFINED,
+                ErrorType.UNDEFINED,
+                DateUtils.getCurrentDate(),
+                ex.getMessage(),
+                null
+        );
     }
 }
