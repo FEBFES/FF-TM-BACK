@@ -27,7 +27,7 @@ public abstract class CustomException extends RuntimeException {
         this.baseError = new HashMap<>();
     }
 
-    public CustomException(
+    protected CustomException(
             String message,
             ErrorType errorType,
             StatusError statusError,
