@@ -9,25 +9,27 @@ import com.febfes.fftmback.service.RefreshTokenService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.restassured.RestAssured.given;
+import static org.instancio.Select.field;
 
 public class AuthenticationControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_AUTH_API = "/api/v1/auth";
-    public static final String USER_USERNAME = "test_username";
-    public static final String USER_PASSWORD = "test_password";
-    public static final String USER_EMAIL = "test_email@febfes.com";
+    public static final String EMAIL_PATTERN = "#a#a#a#a#a#a@example.com";
 
     @Autowired
     RefreshTokenService refreshTokenService;
 
     @Test
     void successfulRegisterTest() {
-        UserDetailsDto userDetailsDto = new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD);
+        UserDetailsDto userDetailsDto = Instancio.of(UserDetailsDto.class)
+                .generate(field(UserDetailsDto::email), gen -> gen.text().pattern(EMAIL_PATTERN))
+                .create();
         registerUser(userDetailsDto)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
@@ -35,12 +37,16 @@ public class AuthenticationControllerTest extends BasicTestClass {
 
     @Test
     void failedRegisterEmailAlreadyExistsTest() {
-        UserDetailsDto userDetailsDto = new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD);
+        UserDetailsDto userDetailsDto = Instancio.of(UserDetailsDto.class)
+                .generate(field(UserDetailsDto::email), gen -> gen.text().pattern(EMAIL_PATTERN))
+                .create();
         registerUser(userDetailsDto)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        UserDetailsDto wrongEmailUserDetailsDto = new UserDetailsDto(USER_EMAIL, USER_USERNAME + "1", USER_PASSWORD);
+        UserDetailsDto wrongEmailUserDetailsDto = Instancio.of(UserDetailsDto.class)
+                .set(field(UserDetailsDto::email), userDetailsDto.email())
+                .create();
         registerUser(wrongEmailUserDetailsDto)
                 .then()
                 .statusCode(HttpStatus.SC_CONFLICT);
@@ -48,20 +54,26 @@ public class AuthenticationControllerTest extends BasicTestClass {
 
     @Test
     void failedRegisterUsernameAlreadyExistsTest() {
-        UserDetailsDto userDetailsDto = new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD);
+        UserDetailsDto userDetailsDto = Instancio.of(UserDetailsDto.class)
+                .generate(field(UserDetailsDto::email), gen -> gen.text().pattern(EMAIL_PATTERN))
+                .create();
         registerUser(userDetailsDto)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        UserDetailsDto wrongEmailUserDetailsDto = new UserDetailsDto(USER_EMAIL + "1", USER_USERNAME, USER_PASSWORD);
+        UserDetailsDto wrongEmailUserDetailsDto = Instancio.of(UserDetailsDto.class)
+                .set(field(UserDetailsDto::username), userDetailsDto.username())
+                .create();
         registerUser(wrongEmailUserDetailsDto)
                 .then()
-                .statusCode(HttpStatus.SC_CONFLICT);
+                .statusCode(HttpStatus.SC_UNPROCESSABLE_ENTITY);
     }
 
     @Test
     void successfulAuthenticateTest() {
-        UserDetailsDto userDetailsDto = new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD);
+        UserDetailsDto userDetailsDto = Instancio.of(UserDetailsDto.class)
+                .generate(field(UserDetailsDto::email), gen -> gen.text().pattern(EMAIL_PATTERN))
+                .create();
 
         registerUser(userDetailsDto)
                 .then()
@@ -117,7 +129,9 @@ public class AuthenticationControllerTest extends BasicTestClass {
     }
 
     private GetAuthDto getRefreshTokenDto() {
-        UserDetailsDto userDetailsDto = new UserDetailsDto(USER_EMAIL, USER_USERNAME, USER_PASSWORD);
+        UserDetailsDto userDetailsDto = Instancio.of(UserDetailsDto.class)
+                .generate(field(UserDetailsDto::email), gen -> gen.text().pattern(EMAIL_PATTERN))
+                .create();
 
         registerUser(userDetailsDto)
                 .then()

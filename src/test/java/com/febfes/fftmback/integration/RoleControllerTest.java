@@ -1,16 +1,12 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.RoleName;
-import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.UserService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import lombok.NonNull;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,44 +18,24 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
-import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
-import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME;
+import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 
 public class RoleControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_ROLES_API = "/api/v1/roles";
 
-    private String token;
     private Long createdProjectId;
 
     @Autowired
     private AuthenticationService authenticationService;
 
     @Autowired
-    private ProjectService projectService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
     private TransactionTemplate txTemplate;
 
     @BeforeEach
     void beforeEach() {
-        authenticationService.registerUser(
-                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        );
-        token = authenticationService.authenticateUser(
-                UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        ).accessToken();
-
-        Long createdUserId = userService.getUserIdByUsername(USER_USERNAME);
-        ProjectEntity projectEntity = projectService.createProject(
-                ProjectEntity.builder().name(PROJECT_NAME).build(),
-                createdUserId
-        );
-        createdProjectId = projectEntity.getId();
+        createdProjectId = createNewProject();
     }
 
     @Test
@@ -79,10 +55,7 @@ public class RoleControllerTest extends BasicTestClass {
 
     @Test
     void successfulChangeRoleTest() {
-        authenticationService.registerUser(
-                UserEntity.builder().email(USER_EMAIL + "1").username(USER_USERNAME + "1").encryptedPassword(USER_PASSWORD).build()
-        );
-        Long newUserId = userService.getUserIdByUsername(USER_USERNAME + "1");
+        Long newUserId = createNewUser();
         projectService.addNewMembers(createdProjectId, List.of(newUserId));
         checkProjectUserRole(RoleName.MEMBER, newUserId);
 
@@ -99,13 +72,10 @@ public class RoleControllerTest extends BasicTestClass {
 
     @Test
     void failedChangeRoleTest() {
-        String newUsername = USER_USERNAME + "1";
-        authenticationService.registerUser(
-                UserEntity.builder().email(USER_EMAIL + "1").username(newUsername).encryptedPassword(USER_PASSWORD).build()
-        );
-        Long newUserId = userService.getUserIdByUsername(newUsername);
+        Long newUserId = createNewUser();
+        UserEntity newUser = userService.getUserById(newUserId);
         String newToken = authenticationService.authenticateUser(
-                UserEntity.builder().username(newUsername).encryptedPassword(USER_PASSWORD).build()
+                UserEntity.builder().username(newUser.getUsername()).encryptedPassword(PASSWORD).build()
         ).accessToken();
         projectService.addNewMembers(createdProjectId, List.of(newUserId));
 
@@ -116,10 +86,6 @@ public class RoleControllerTest extends BasicTestClass {
                         RoleName.MEMBER_PLUS.name(), createdProjectId, newUserId))
                 .then()
                 .statusCode(HttpStatus.SC_FORBIDDEN);
-    }
-
-    private RequestSpecification requestWithBearerToken() {
-        return given().header("Authorization", "Bearer " + token);
     }
 
     private void checkProjectUserRole(RoleName expectedUserRoleName, Long userId) {
