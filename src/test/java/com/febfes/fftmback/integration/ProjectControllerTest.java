@@ -6,6 +6,9 @@ import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -15,6 +18,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +31,12 @@ import static org.instancio.Select.field;
 class ProjectControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
+
+    @Autowired
+    TaskService taskService;
+
+    @Autowired
+    ColumnService columnService;
 
     @Test
     void successfulGetProjectsTest() {
@@ -120,12 +130,19 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulDeleteOfProjectTest() {
         Long createdProjectId = createNewProject();
+        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, 1L), createdUserId);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
+        Assertions.assertThatThrownBy(() -> projectService.getProject(createdProjectId))
+                .isInstanceOf(EntityNotFoundException.class);
+        Assertions.assertThat(columnService.getOrderedColumns(createdProjectId))
+                        .isEmpty();
+        Assertions.assertThatThrownBy(() -> taskService.getTaskById(taskId))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test

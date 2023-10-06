@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: IvanShish
+      comment: "Add cascade delete"
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: task_column
+            constraintName: fk_column_project
+        - addForeignKeyConstraint:
+            baseColumnNames: project_id
+            baseTableName: task_column
+            constraintName: fk_column_project
+            onDelete: CASCADE
+            referencedColumnNames: id
+            referencedTableName: project
+            validate: true
+        - dropForeignKeyConstraint:
+            baseTableName: task
+            constraintName: fk_task_project
+        - addForeignKeyConstraint:
+            baseColumnNames: project_id
+            baseTableName: task
+            constraintName: fk_task_project
+            onDelete: CASCADE
+            referencedColumnNames: id
+            referencedTableName: project
+            validate: true
