@@ -1,11 +1,11 @@
 package com.febfes.fftmback.domain.dao;
 
 import com.febfes.fftmback.domain.dao.abstracts.OrderedEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.util.List;
 
 @Entity
 @Table(name = "task_column")
@@ -24,11 +24,6 @@ public class TaskColumnEntity extends OrderedEntity {
 
     @Column(name = "project_id", nullable = false)
     private Long projectId;
-
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "\"columnId\"")
-    @ToString.Exclude
-    private List<TaskView> taskList;
 
     @Override
     public String getColumnToFindOrder() {

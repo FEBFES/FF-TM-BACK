@@ -1,17 +1,19 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
-import com.febfes.fftmback.domain.dao.*;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.EditTaskDto;
-import com.febfes.fftmback.service.*;
+import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.assertj.core.api.Assertions;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +23,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
-import static com.febfes.fftmback.integration.ColumnControllerTest.COLUMN_NAME;
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
-import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME;
-import static com.febfes.fftmback.integration.TaskControllerTest.TASK_NAME;
-import static io.restassured.RestAssured.given;
 
 class EntityOrderTest extends BasicTestClass {
 
     private Long createdProjectId;
     private Long createdColumnId;
-    private String token;
 
     @Autowired
     private TaskService taskService;
@@ -40,46 +36,13 @@ class EntityOrderTest extends BasicTestClass {
     @Autowired
     private ColumnService columnService;
 
-    @Autowired
-    private ProjectService projectService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private AuthenticationService authenticationService;
-
     @BeforeEach
     void beforeEach() {
-        authenticationService.registerUser(
-                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        );
-        token = authenticationService.authenticateUser(
-                UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        ).accessToken();
-
-        Long createdUserId = userService.getUserIdByUsername(USER_USERNAME);
-        ProjectEntity projectEntity = projectService.createProject(
-                ProjectEntity.builder().name(PROJECT_NAME).build(),
-                createdUserId
-        );
-        createdProjectId = projectEntity.getId();
-
-        TaskColumnEntity columnEntity = columnService.createColumn(TaskColumnEntity
-                .builder()
-                .name(COLUMN_NAME)
-                .projectId(createdProjectId)
-                .build()
-        );
-        createdColumnId = columnEntity.getId();
+        createdProjectId = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
+        createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
 
         for (int i = 0; i < 4; i++) {
-            taskService.createTask(TaskEntity.builder()
-                            .name(TASK_NAME + i)
-                            .columnId(createdColumnId)
-                            .projectId(createdProjectId)
-                            .build(),
-                    createdUserId);
+            taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), createdUserId);
         }
     }
 
@@ -103,8 +66,7 @@ class EntityOrderTest extends BasicTestClass {
         idsList.remove(lastTask.getId());
         idsList.add(0, lastTask.getId());
 
-        EditTaskDto editTaskDto = new EditTaskDto(lastTask.getName(), lastTask.getDescription(),
-                null, lastTask.getPriority(), null, 1);
+        EditTaskDto editTaskDto = DtoBuilders.createEditTaskDto(1);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editTaskDto)
@@ -203,9 +165,5 @@ class EntityOrderTest extends BasicTestClass {
                 .extract()
                 .response()
                 .as(DashboardDto.class);
-    }
-
-    private RequestSpecification requestWithBearerToken() {
-        return given().header("Authorization", "Bearer " + token);
     }
 }

@@ -65,7 +65,7 @@ public class ProjectServiceImpl implements ProjectService {
         columnService.createDefaultColumnsForProject(projectId);
         taskTypeService.createDefaultTaskTypesForProject(projectId);
         // by default, the owner will also be a member of the project
-        addOrChangeProjectMemberRole(project.getId(), userId, RoleName.OWNER);
+        addOrChangeProjectMemberRole(projectId, userId, RoleName.OWNER);
         return projectEntity;
     }
 

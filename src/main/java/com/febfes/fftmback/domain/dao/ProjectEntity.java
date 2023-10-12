@@ -1,11 +1,11 @@
 package com.febfes.fftmback.domain.dao;
 
 import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.util.List;
 
 @Entity
 @Table(name = "project")
@@ -13,8 +13,8 @@ import java.util.List;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@ToString(callSuper = true, exclude = {"taskColumnEntityList", "taskEntityList"})
-@EqualsAndHashCode(callSuper = true, exclude = {"taskColumnEntityList", "taskEntityList"})
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class ProjectEntity extends BaseEntity {
 
     public static final String ENTITY_NAME = "Project";
@@ -24,17 +24,6 @@ public class ProjectEntity extends BaseEntity {
 
     @Column(name = "description")
     private String description;
-
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "project_id")
-    private List<TaskColumnEntity> taskColumnEntityList;
-    //TODO problem when project was deleted
-    // TODO: rename to columns
-
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "project_id")
-    private List<TaskEntity> taskEntityList;
-    //TODO problem when project was deleted
 
     @Column(name = "owner_id")
     private Long ownerId;

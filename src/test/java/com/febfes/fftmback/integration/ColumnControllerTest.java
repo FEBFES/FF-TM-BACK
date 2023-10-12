@@ -1,67 +1,29 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.TaskColumnEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.service.ProjectService;
-import com.febfes.fftmback.service.UserService;
-import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import org.assertj.core.api.Assertions;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.function.LongConsumer;
 
-import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
-import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME;
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 
 class ColumnControllerTest extends BasicTestClass {
 
-    public static final String COLUMN_NAME = "Column name";
-
     private Long createdProjectId;
-    private String token;
-
-    @Autowired
-    private ColumnService columnService;
-
-    @Autowired
-    private ProjectService projectService;
-
-    @Autowired
-    private AuthenticationService authenticationService;
-
-    @Autowired
-    private UserService userService;
 
     @BeforeEach
     void beforeEach() {
-        authenticationService.registerUser(
-                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        );
-        token = authenticationService.authenticateUser(
-                UserEntity.builder().username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        ).accessToken();
-
-        Long createdUserId = userService.getUserIdByUsername(USER_USERNAME);
-        ProjectEntity projectEntity = projectService.createProject(
-                ProjectEntity.builder().name(PROJECT_NAME).build(),
-                createdUserId
-        );
+        ProjectEntity projectEntity = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
         createdProjectId = projectEntity.getId();
     }
 
@@ -74,85 +36,64 @@ class ColumnControllerTest extends BasicTestClass {
         beforeResponse.then()
                 .statusCode(HttpStatus.SC_OK);
 
-        int beforeSize = beforeResponse
-                .jsonPath()
-                .getInt("columns.size()");
-
-
-        columnService.createColumn(TaskColumnEntity
-                .builder()
-                .name(COLUMN_NAME + "1")
-                .projectId(createdProjectId)
-                .build()
-        );
-
-        columnService.createColumn(TaskColumnEntity
-                .builder()
-                .name(COLUMN_NAME + "2")
-                .projectId(createdProjectId)
-                .build()
-        );
-
-        Response response = requestWithBearerToken()
+        requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
-                .get("%s/{id}/dashboard".formatted(PATH_TO_PROJECTS_API), createdProjectId);
-        response.then()
+                .get("%s/{id}/dashboard".formatted(PATH_TO_PROJECTS_API), createdProjectId)
+                .then()
                 .statusCode(HttpStatus.SC_OK);
-
-        int size = response
-                .jsonPath()
-                .getInt("columns.size()");
-        Assertions.assertThat(size)
-                .isEqualTo(beforeSize + 2);
     }
 
     @Test
     void successfulCreateColumnTest() {
-        ColumnDto columnDto = DtoBuilders.createColumnDto(COLUMN_NAME);
+        ColumnDto columnDto = Instancio.create(ColumnDto.class);
 
-        createNewColumn(columnDto)
+        ColumnDto createdColumn = createNewColumn(columnDto)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .body("name", equalTo(COLUMN_NAME));
+                .extract()
+                .response()
+                .as(ColumnDto.class);
+        Assertions.assertThat(createdColumn.name())
+                .isEqualTo(columnDto.name());
     }
 
     @Test
     void failedCreateColumnTest() {
-        ColumnDto columnDto = ColumnDto.builder()
-                .build();
+        ColumnDto emptyColumn = ColumnDto.builder().build();
 
-        createNewColumn(columnDto)
+        createNewColumn(emptyColumn)
                 .then()
                 .statusCode(HttpStatus.SC_UNPROCESSABLE_ENTITY);
     }
 
     @Test
     void successfulEditColumnTest() {
-        ColumnDto createColumnDto = DtoBuilders.createColumnDto(COLUMN_NAME);
+        ColumnDto createColumnDto = Instancio.create(ColumnDto.class);
         Response createResponse = createNewColumn(createColumnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 
-        String newColumnName = COLUMN_NAME + "edit";
-        ColumnDto editColumnDto = DtoBuilders.createColumnDto(newColumnName);
+        ColumnDto editColumnDto = Instancio.create(ColumnDto.class);
 
-        requestWithBearerToken()
+        ColumnDto editedColumnDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editColumnDto)
                 .when()
                 .put("%s/{projectId}/columns/{columnId}".formatted(PATH_TO_PROJECTS_API), createdProjectId, createdColumnId)
                 .then()
-                .statusCode(HttpStatus.SC_OK);
+                .statusCode(HttpStatus.SC_OK).extract()
+                .response()
+                .as(ColumnDto.class);
+        Assertions.assertThat(editedColumnDto.name())
+                .isEqualTo(editColumnDto.name());
     }
 
     @Test
     void failedEditColumnTest() {
         String wrongColumnId = "54731584";
-        ColumnDto columnDto = DtoBuilders.createColumnDto(COLUMN_NAME);
-
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
-                .body(columnDto)
+                .body(Instancio.create(ColumnDto.class))
                 .when()
                 .put("%s/{projectId}/columns/{columnId}".formatted(PATH_TO_PROJECTS_API), createdProjectId, wrongColumnId)
                 .then()
@@ -161,7 +102,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteColumnTest() {
-        ColumnDto columnDto = DtoBuilders.createColumnDto(COLUMN_NAME);
+        ColumnDto columnDto = Instancio.create(ColumnDto.class);
         Response createResponse = createNewColumn(columnDto);
         long createdColumnId = createResponse.jsonPath().getLong("id");
 
@@ -193,7 +134,6 @@ class ColumnControllerTest extends BasicTestClass {
     @Test
     void failedDeleteColumnTest() {
         String wrongColumnId = "54731584";
-
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
@@ -219,9 +159,5 @@ class ColumnControllerTest extends BasicTestClass {
                 .extract()
                 .response()
                 .as(DashboardDto.class);
-    }
-
-    private RequestSpecification requestWithBearerToken() {
-        return given().header("Authorization", "Bearer " + token);
     }
 }

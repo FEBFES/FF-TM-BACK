@@ -1,9 +1,9 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.specification.UserSpec;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
+import com.febfes.fftmback.util.DtoBuilders;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,8 +13,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.stream.Stream;
-
-import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
 
 public class UserFilterTest extends BasicStaticDataTestClass {
 
@@ -27,16 +25,11 @@ public class UserFilterTest extends BasicStaticDataTestClass {
     static void beforeAll(
             @Autowired AuthenticationService authenticationService
     ) {
-        authenticationService.registerUser(UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME)
-                .encryptedPassword(USER_PASSWORD).displayName(USER_DISPLAY_NAME).build());
-        authenticationService.registerUser(UserEntity.builder().email(USER_EMAIL + "1").username(USER_USERNAME + "1")
-                .encryptedPassword(USER_PASSWORD).displayName("123" + USER_DISPLAY_NAME).build());
-        authenticationService.registerUser(UserEntity.builder().email(USER_EMAIL + "2").username(USER_USERNAME + "2")
-                .encryptedPassword(USER_PASSWORD).displayName(USER_DISPLAY_NAME + "456").build());
-        authenticationService.registerUser(UserEntity.builder().email(USER_EMAIL + "3").username(USER_USERNAME + "3")
-                .encryptedPassword(USER_PASSWORD).displayName("1256").build());
-        authenticationService.registerUser(UserEntity.builder().email(USER_EMAIL + "4").username(USER_USERNAME + "4")
-                .encryptedPassword(USER_PASSWORD).displayName("something").build());
+        authenticationService.registerUser(DtoBuilders.createUser(USER_DISPLAY_NAME));
+        authenticationService.registerUser(DtoBuilders.createUser("123" + USER_DISPLAY_NAME));
+        authenticationService.registerUser(DtoBuilders.createUser(USER_DISPLAY_NAME + "456"));
+        authenticationService.registerUser(DtoBuilders.createUser("1256"));
+        authenticationService.registerUser(DtoBuilders.createUser("something"));
     }
 
     @ParameterizedTest

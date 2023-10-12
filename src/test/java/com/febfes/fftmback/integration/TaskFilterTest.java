@@ -10,7 +10,9 @@ import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.util.DtoBuilders;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,11 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.stream.Stream;
 
-import static com.febfes.fftmback.integration.AuthenticationControllerTest.*;
-import static com.febfes.fftmback.integration.ProjectControllerTest.PROJECT_NAME;
-import static com.febfes.fftmback.integration.TaskControllerTest.TASK_NAME;
-
 class TaskFilterTest extends BasicStaticDataTestClass {
+
+    private static final String TASK_NAME = "task name";
 
     @Autowired
     private TaskViewRepository taskViewRepository;
@@ -36,30 +36,18 @@ class TaskFilterTest extends BasicStaticDataTestClass {
             @Autowired ProjectService projectService,
             @Autowired TaskService taskService
     ) {
-        authenticationService.registerUser(
-                UserEntity.builder().email(USER_EMAIL).username(USER_USERNAME).encryptedPassword(USER_PASSWORD).build()
-        );
-        Long createdUserId = userService.getUserIdByUsername(USER_USERNAME);
+        UserEntity user = DtoBuilders.createUser();
+        authenticationService.registerUser(user);
+        Long createdUserId = userService.getUserIdByUsername(user.getUsername());
 
-        authenticationService.registerUser(UserEntity
-                .builder()
-                .email("new_" + USER_EMAIL)
-                .username("new" + USER_USERNAME)
-                .encryptedPassword(USER_PASSWORD)
-                .build()
-        );
-        Long createdUserId2 = userService.getUserIdByUsername("new" + USER_USERNAME);
+        UserEntity user2 = DtoBuilders.createUser();
+        authenticationService.registerUser(user2);
+        Long createdUserId2 = userService.getUserIdByUsername(user2.getUsername());
 
-        ProjectEntity projectEntity = projectService.createProject(
-                ProjectEntity.builder().name(PROJECT_NAME).build(),
-                createdUserId
-        );
+        ProjectEntity projectEntity = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
         Long createdProjectId = projectEntity.getId();
 
-        ProjectEntity projectEntity2 = projectService.createProject(
-                ProjectEntity.builder().name(PROJECT_NAME).build(),
-                createdUserId2
-        );
+        ProjectEntity projectEntity2 = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId2);
         Long createdProjectId2 = projectEntity2.getId();
 
         taskService.createTask(
