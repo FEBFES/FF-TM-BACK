@@ -4,7 +4,7 @@ import com.febfes.fftmback.annotation.ApiGetOne;
 import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.project.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Project")
 public class DashboardController {
 
-    private final @NonNull ProjectService projectService;
+    private final @NonNull DashboardService dashboardService;
 
     @Operation(summary = "Get dashboard by project id")
     @ApiGetOne(path = "{id}/dashboard")
@@ -29,6 +29,6 @@ public class DashboardController {
             @PathVariable Long id,
             TaskSpec taskSpec
     ) {
-        return projectService.getDashboard(id, taskSpec);
+        return dashboardService.getDashboard(id, taskSpec);
     }
 }

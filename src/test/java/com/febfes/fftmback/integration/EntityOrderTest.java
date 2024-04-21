@@ -38,7 +38,7 @@ class EntityOrderTest extends BasicTestClass {
 
     @BeforeEach
     void beforeEach() {
-        createdProjectId = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
+        createdProjectId = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
         createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
 
         for (int i = 0; i < 4; i++) {

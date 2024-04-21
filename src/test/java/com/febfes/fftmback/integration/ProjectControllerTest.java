@@ -9,6 +9,7 @@ import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -38,10 +39,13 @@ class ProjectControllerTest extends BasicTestClass {
     @Autowired
     ColumnService columnService;
 
+    @Autowired
+    ProjectMemberService projectMemberService;
+
     @Test
     void successfulGetProjectsTest() {
-        projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
-        projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
+        projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
+        projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
 
         Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -137,10 +141,10 @@ class ProjectControllerTest extends BasicTestClass {
                 .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        Assertions.assertThatThrownBy(() -> projectService.getProject(createdProjectId))
+        Assertions.assertThatThrownBy(() -> projectManagementService.getProject(createdProjectId))
                 .isInstanceOf(EntityNotFoundException.class);
         Assertions.assertThat(columnService.getOrderedColumns(createdProjectId))
-                        .isEmpty();
+                .isEmpty();
         Assertions.assertThatThrownBy(() -> taskService.getTaskById(taskId))
                 .isInstanceOf(EntityNotFoundException.class);
     }
@@ -168,10 +172,10 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
+        OneProjectDto updatedProject = projectMemberService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.isFavourite())
                 .isTrue();
-        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId, Lists.newArrayList());
+        List<ProjectDto> userProjects = projectMemberService.getProjectsForUser(createdUserId, Lists.newArrayList());
         Optional<ProjectDto> userProject = userProjects.stream().findFirst();
         Assertions.assertThat(userProject)
                 .isNotEmpty();
@@ -191,10 +195,10 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
+        OneProjectDto updatedProject = projectMemberService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.isFavourite())
                 .isFalse();
-        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId, Lists.newArrayList());
+        List<ProjectDto> userProjects = projectMemberService.getProjectsForUser(createdUserId, Lists.newArrayList());
         Optional<ProjectDto> userProject = userProjects.stream().findFirst();
         Assertions.assertThat(userProject)
                 .isNotEmpty();
@@ -215,7 +219,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProject(createdProjectId);
+        ProjectEntity updatedProject = projectManagementService.getProject(createdProjectId);
         Assertions.assertThat(updatedProject.getName())
                 .isEqualTo(newName);
     }
@@ -224,7 +228,7 @@ class ProjectControllerTest extends BasicTestClass {
     void successfulGetUserProjectsTest() {
         Long secondCreatedUserId = createNewUser();
         UserEntity secondUser = userService.getUserById(secondCreatedUserId);
-        projectService.createProject(Instancio.create(ProjectEntity.class), secondCreatedUserId);
+        projectManagementService.createProject(Instancio.create(ProjectEntity.class), secondCreatedUserId);
 
         String tokenForSecondUser = authenticationService.authenticateUser(
                 UserEntity.builder().username(secondUser.getUsername()).encryptedPassword(PASSWORD).build()
@@ -262,8 +266,8 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulGetProjectsWithSort() {
         String name = "getProjectsWithSortName";
-        projectService.createProject(DtoBuilders.createProject(name + "1"), createdUserId);
-        projectService.createProject(DtoBuilders.createProject(name + "2"), createdUserId);
+        projectManagementService.createProject(DtoBuilders.createProject(name + "1"), createdUserId);
+        projectManagementService.createProject(DtoBuilders.createProject(name + "2"), createdUserId);
 
         List<ProjectDto> projects = requestWithBearerToken()
                 .contentType(ContentType.JSON)

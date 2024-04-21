@@ -4,8 +4,8 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.util.DatabaseCleanup;
 import com.febfes.fftmback.util.DtoBuilders;
 import io.restassured.RestAssured;
@@ -13,6 +13,7 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -41,7 +42,8 @@ public class BasicTestClass {
     protected UserService userService;
 
     @Autowired
-    protected ProjectService projectService;
+    @Qualifier("projectManagementServiceDecorator")
+    protected ProjectManagementService projectManagementService;
 
     @LocalServerPort
     private Integer port;
@@ -87,7 +89,7 @@ public class BasicTestClass {
 
     protected Long createNewProject() {
         ProjectEntity project = DtoBuilders.createProject(createdUserId);
-        return projectService.createProject(project, createdUserId).getId();
+        return projectManagementService.createProject(project, createdUserId).getId();
     }
 }
 

@@ -7,9 +7,9 @@ import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.util.DtoBuilders;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.instancio.Instancio;
@@ -19,6 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
     static void beforeAll(
             @Autowired AuthenticationService authenticationService,
             @Autowired UserService userService,
-            @Autowired ProjectService projectService,
+            @Autowired @Qualifier("projectManagementServiceDecorator") ProjectManagementService projectManagementService,
             @Autowired TaskService taskService
     ) {
         UserEntity user = DtoBuilders.createUser();
@@ -44,10 +45,10 @@ class TaskFilterTest extends BasicStaticDataTestClass {
         authenticationService.registerUser(user2);
         Long createdUserId2 = userService.getUserIdByUsername(user2.getUsername());
 
-        ProjectEntity projectEntity = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
+        ProjectEntity projectEntity = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
         Long createdProjectId = projectEntity.getId();
 
-        ProjectEntity projectEntity2 = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId2);
+        ProjectEntity projectEntity2 = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId2);
         Long createdProjectId2 = projectEntity2.getId();
 
         taskService.createTask(

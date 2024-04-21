@@ -5,8 +5,8 @@ import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.config.auth.RoleCheckerComponent;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.dto.MemberDto;
-import com.febfes.fftmback.service.ProjectService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.service.project.ProjectMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,7 +24,7 @@ import java.util.List;
 @Tag(name = "Project member")
 public class MemberController {
 
-    private final @NonNull ProjectService projectService;
+    private final @NonNull ProjectMemberService projectMemberService;
     private final @NonNull UserService userService;
     private final @NonNull RoleCheckerComponent roleCheckerComponent;
 
@@ -40,7 +40,7 @@ public class MemberController {
     @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
     public List<MemberDto> addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        return projectService.addNewMembers(id, memberIds);
+        return projectMemberService.addNewMembers(id, memberIds);
     }
 
     @Operation(summary = "Delete member from project")
@@ -50,6 +50,6 @@ public class MemberController {
     public MemberDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
         roleCheckerComponent.checkIfUserIsOwner(id, memberId);
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        return projectService.removeMember(id, memberId);
+        return projectMemberService.removeMember(id, memberId);
     }
 }

@@ -4,6 +4,7 @@ import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.service.AuthenticationService;
+import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -33,6 +34,9 @@ public class RoleControllerTest extends BasicTestClass {
     @Autowired
     private TransactionTemplate txTemplate;
 
+    @Autowired
+    private ProjectMemberService projectMemberService;
+
     @BeforeEach
     void beforeEach() {
         createdProjectId = createNewProject();
@@ -56,7 +60,7 @@ public class RoleControllerTest extends BasicTestClass {
     @Test
     void successfulChangeRoleTest() {
         Long newUserId = createNewUser();
-        projectService.addNewMembers(createdProjectId, List.of(newUserId));
+        projectMemberService.addNewMembers(createdProjectId, List.of(newUserId));
         checkProjectUserRole(RoleName.MEMBER, newUserId);
 
         requestWithBearerToken()
@@ -77,7 +81,7 @@ public class RoleControllerTest extends BasicTestClass {
         String newToken = authenticationService.authenticateUser(
                 UserEntity.builder().username(newUser.getUsername()).encryptedPassword(PASSWORD).build()
         ).accessToken();
-        projectService.addNewMembers(createdProjectId, List.of(newUserId));
+        projectMemberService.addNewMembers(createdProjectId, List.of(newUserId));
 
         given().header("Authorization", "Bearer " + newToken)
                 .contentType(ContentType.JSON)

@@ -64,7 +64,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @BeforeEach
     void beforeEach() {
-        createdProjectId = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
+        createdProjectId = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
         createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
     }
 

@@ -23,7 +23,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @BeforeEach
     void beforeEach() {
-        ProjectEntity projectEntity = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
+        ProjectEntity projectEntity = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
         createdProjectId = projectEntity.getId();
     }
 
