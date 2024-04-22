@@ -40,8 +40,9 @@ class EntityOrderTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         createdProjectId = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
+        System.out.println("DASHBOARD SIZE: " + getDashboard().columns().size());
         while (getDashboard().columns().size() != DEFAULT_COLUMNS.size()) {
-            System.out.println("SIZE: " + getDashboard().columns().size());
+            System.out.println("DASHBOARD SIZE: " + getDashboard().columns().size());
         }
         createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
 
