@@ -56,7 +56,7 @@ public class ProjectManagementServiceDecorator implements ProjectManagementServi
 
     @Override
     public void deleteProject(Long id) {
-        projectManagementService.deleteProject(id);
         taskTypeService.deleteAllTypesByProjectId(id);
+        projectManagementService.deleteProject(id);
     }
 }

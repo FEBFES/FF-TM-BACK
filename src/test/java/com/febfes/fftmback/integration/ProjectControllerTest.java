@@ -1,6 +1,7 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.OneProjectDto;
@@ -9,6 +10,7 @@ import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -28,6 +30,7 @@ import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
+import static org.mockito.Mockito.mock;
 
 class ProjectControllerTest extends BasicTestClass {
 
@@ -41,6 +44,9 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Autowired
     ProjectMemberService projectMemberService;
+
+    @Autowired
+    DashboardService dashboardService;
 
     @Test
     void successfulGetProjectsTest() {
@@ -134,7 +140,16 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulDeleteOfProjectTest() {
         Long createdProjectId = createNewProject();
-        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, 1L), createdUserId);
+        Long columnId;
+        TaskSpec taskSpec = mock(TaskSpec.class);
+        while (true) {
+            var dashboard1 = dashboardService.getDashboard(createdProjectId, taskSpec);
+            if (dashboard1.columns().size() > 0) {
+                columnId = dashboard1.columns().get(0).id();
+                break;
+            }
+        }
+        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, columnId), createdUserId);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()

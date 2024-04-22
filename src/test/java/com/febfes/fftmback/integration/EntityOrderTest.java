@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
+import static com.febfes.fftmback.service.impl.ColumnServiceImpl.DEFAULT_COLUMNS;
 
 class EntityOrderTest extends BasicTestClass {
 
@@ -39,6 +40,7 @@ class EntityOrderTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         createdProjectId = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
+        while (getDashboard().columns().size() != DEFAULT_COLUMNS.size());
         createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
 
         for (int i = 0; i < 4; i++) {

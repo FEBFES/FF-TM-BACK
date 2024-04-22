@@ -9,6 +9,7 @@ import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.util.DtoBuilders;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
@@ -23,6 +24,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.stream.Stream;
 
+import static org.mockito.Mockito.mock;
+
 class TaskFilterTest extends BasicStaticDataTestClass {
 
     private static final String TASK_NAME = "task name";
@@ -35,7 +38,8 @@ class TaskFilterTest extends BasicStaticDataTestClass {
             @Autowired AuthenticationService authenticationService,
             @Autowired UserService userService,
             @Autowired @Qualifier("projectManagementServiceDecorator") ProjectManagementService projectManagementService,
-            @Autowired TaskService taskService
+            @Autowired TaskService taskService,
+            @Autowired DashboardService dashboardService
     ) {
         UserEntity user = DtoBuilders.createUser();
         authenticationService.registerUser(user);
@@ -51,11 +55,26 @@ class TaskFilterTest extends BasicStaticDataTestClass {
         ProjectEntity projectEntity2 = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId2);
         Long createdProjectId2 = projectEntity2.getId();
 
+        TaskSpec taskSpec = mock(TaskSpec.class);
+        Long columnId1;
+        Long columnId2;
+        Long columnId3;
+        while (true) {
+            var dashboard1 = dashboardService.getDashboard(createdProjectId, taskSpec);
+            var dashboard2 = dashboardService.getDashboard(createdProjectId2, taskSpec);
+            if (dashboard1.columns().size() > 0 && dashboard2.columns().size() > 0) {
+                columnId1 = dashboard1.columns().get(0).id();
+                columnId2 = dashboard1.columns().get(1).id();
+                columnId3 = dashboard2.columns().get(0).id();
+                break;
+            }
+        }
+
         taskService.createTask(
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(1L)
+                        .columnId(columnId1)
                         .name(TASK_NAME + "1")
                         .description("123")
                         .priority(TaskPriority.LOW)
@@ -67,7 +86,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(1L)
+                        .columnId(columnId1)
                         .name(TASK_NAME + "2")
                         .description("12345")
                         .build(),
@@ -78,7 +97,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(2L)
+                        .columnId(columnId2)
                         .name(TASK_NAME)
                         .description("12345")
                         .build(),
@@ -89,7 +108,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(1L)
+                        .columnId(columnId1)
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
@@ -100,7 +119,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId2)
-                        .columnId(5L)
+                        .columnId(columnId3)
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
