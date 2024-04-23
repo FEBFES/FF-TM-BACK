@@ -4,6 +4,7 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
@@ -16,6 +17,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 
@@ -57,43 +63,35 @@ class DashboardControllerTests extends BasicTestClass {
     void successfulGetDashboardWithFilterTest() {
         Long projectId = createNewProject();
         Long projectId2 = createNewProject();
+        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
+            fail("Columns aren't created");
+        }
         String taskName = "task_name";
 
         TaskSpec taskSpec = mock(TaskSpec.class);
-        Long columnId1;
-        Long columnId2;
-        Long columnId3;
-        Long columnId4;
-        while (true) {
-            var dashboard1 = dashboardService.getDashboard(projectId, taskSpec);
-            var dashboard2 = dashboardService.getDashboard(projectId2, taskSpec);
-            if (!dashboard1.columns().isEmpty() && !dashboard2.columns().isEmpty()) {
-                columnId1 = dashboard1.columns().get(0).id();
-                columnId2 = dashboard1.columns().get(1).id();
-                columnId3 = dashboard1.columns().get(2).id();
-                columnId4 = dashboard2.columns().get(0).id();
-                break;
-            }
-        }
+        var dashboard1 = dashboardService.getDashboard(projectId, taskSpec);
+        var dashboard2 = dashboardService.getDashboard(projectId2, taskSpec);
+        List<Long> columnIds1 = dashboard1.columns().stream().map(ColumnWithTasksDto::id).toList();
+        Long columnId4 = dashboard2.columns().get(0).id();
 
         taskService.createTask(
-                DtoBuilders.createTask(projectId, columnId1, taskName),
+                DtoBuilders.createTask(projectId, columnIds1.get(0), taskName),
                 createdUserId
         );
         taskService.createTask(
-                DtoBuilders.createTask(projectId, columnId1, taskName + "2"),
+                DtoBuilders.createTask(projectId, columnIds1.get(0), taskName + "2"),
                 createdUserId
         );
         taskService.createTask(
-                DtoBuilders.createTask(projectId, columnId1, "2"),
+                DtoBuilders.createTask(projectId, columnIds1.get(0), "2"),
                 createdUserId
         );
         taskService.createTask(
-                DtoBuilders.createTask(projectId, columnId2, taskName + "3"),
+                DtoBuilders.createTask(projectId, columnIds1.get(1), taskName + "3"),
                 createdUserId
         );
         taskService.createTask(
-                DtoBuilders.createTask(projectId, columnId3, "3"),
+                DtoBuilders.createTask(projectId, columnIds1.get(2), "3"),
                 createdUserId
         );
 

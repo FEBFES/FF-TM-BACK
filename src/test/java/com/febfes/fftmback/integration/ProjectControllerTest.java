@@ -25,11 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 
 import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 class ProjectControllerTest extends BasicTestClass {
@@ -76,6 +79,10 @@ class ProjectControllerTest extends BasicTestClass {
                 .statusCode(HttpStatus.SC_OK)
                 .body("name", equalTo(projectDto.name()));
         Long createdProjectId = createResponse.jsonPath().getLong("id");
+
+        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
+            fail("Columns aren't created");
+        }
 
         // 4 default columns
         Response dashboardResponse = requestWithBearerToken()
@@ -140,15 +147,11 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulDeleteOfProjectTest() {
         Long createdProjectId = createNewProject();
-        Long columnId;
-        TaskSpec taskSpec = mock(TaskSpec.class);
-        while (true) {
-            var dashboard1 = dashboardService.getDashboard(createdProjectId, taskSpec);
-            if (dashboard1.columns().size() > 0) {
-                columnId = dashboard1.columns().get(0).id();
-                break;
-            }
+        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
+            fail("Columns aren't created");
         }
+        TaskSpec taskSpec = mock(TaskSpec.class);
+        Long columnId = dashboardService.getDashboard(createdProjectId, taskSpec).columns().get(0).id();
         Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, columnId), createdUserId);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)

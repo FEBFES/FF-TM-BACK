@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.TaskService;
@@ -22,8 +23,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 class TaskFilterTest extends BasicStaticDataTestClass {
@@ -55,26 +60,21 @@ class TaskFilterTest extends BasicStaticDataTestClass {
         ProjectEntity projectEntity2 = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId2);
         Long createdProjectId2 = projectEntity2.getId();
 
-        TaskSpec taskSpec = mock(TaskSpec.class);
-        Long columnId1;
-        Long columnId2;
-        Long columnId3;
-        while (true) {
-            var dashboard1 = dashboardService.getDashboard(createdProjectId, taskSpec);
-            var dashboard2 = dashboardService.getDashboard(createdProjectId2, taskSpec);
-            if (dashboard1.columns().size() > 0 && dashboard2.columns().size() > 0) {
-                columnId1 = dashboard1.columns().get(0).id();
-                columnId2 = dashboard1.columns().get(1).id();
-                columnId3 = dashboard2.columns().get(0).id();
-                break;
-            }
+        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
+            fail("Columns aren't created");
         }
+
+        TaskSpec taskSpec = mock(TaskSpec.class);
+        var dashboard1 = dashboardService.getDashboard(createdProjectId, taskSpec);
+        var dashboard2 = dashboardService.getDashboard(createdProjectId2, taskSpec);
+        List<Long> columnIds1 = dashboard1.columns().stream().map(ColumnWithTasksDto::id).toList();
+        Long columnId3 = dashboard2.columns().get(0).id();
 
         taskService.createTask(
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(columnId1)
+                        .columnId(columnIds1.get(0))
                         .name(TASK_NAME + "1")
                         .description("123")
                         .priority(TaskPriority.LOW)
@@ -86,7 +86,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(columnId1)
+                        .columnId(columnIds1.get(0))
                         .name(TASK_NAME + "2")
                         .description("12345")
                         .build(),
@@ -97,7 +97,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(columnId2)
+                        .columnId(columnIds1.get(1))
                         .name(TASK_NAME)
                         .description("12345")
                         .build(),
@@ -108,7 +108,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(columnId1)
+                        .columnId(columnIds1.get(0))
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
