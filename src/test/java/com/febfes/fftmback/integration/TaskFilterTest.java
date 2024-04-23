@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
 
 class TaskFilterTest extends BasicStaticDataTestClass {
 
@@ -64,9 +63,9 @@ class TaskFilterTest extends BasicStaticDataTestClass {
             fail("Columns aren't created");
         }
 
-        TaskSpec taskSpec = mock(TaskSpec.class);
-        var dashboard1 = dashboardService.getDashboard(createdProjectId, taskSpec);
-        var dashboard2 = dashboardService.getDashboard(createdProjectId2, taskSpec);
+        TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
+        var dashboard1 = dashboardService.getDashboard(createdProjectId, emptyTaskSpec);
+        var dashboard2 = dashboardService.getDashboard(createdProjectId2, emptyTaskSpec);
         List<Long> columnIds1 = dashboard1.columns().stream().map(ColumnWithTasksDto::id).toList();
         Long columnId3 = dashboard2.columns().get(0).id();
 

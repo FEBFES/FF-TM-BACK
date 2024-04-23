@@ -17,6 +17,7 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.TypeRef;
 import io.restassured.response.Response;
+import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.apache.commons.compress.utils.Lists;
 import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
@@ -25,14 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 
 import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 class ProjectControllerTest extends BasicTestClass {
@@ -63,6 +61,8 @@ class ProjectControllerTest extends BasicTestClass {
         response.then()
                 .statusCode(HttpStatus.SC_OK);
 
+        waitPools();
+
         int size = response
                 .jsonPath()
                 .getInt("data.size()");
@@ -80,21 +80,12 @@ class ProjectControllerTest extends BasicTestClass {
                 .body("name", equalTo(projectDto.name()));
         Long createdProjectId = createResponse.jsonPath().getLong("id");
 
-        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
-            fail("Columns aren't created");
-        }
+        waitPools();
 
         // 4 default columns
-        Response dashboardResponse = requestWithBearerToken()
-                .contentType(ContentType.JSON)
-                .when()
-                .get("%s/{id}/dashboard".formatted(PATH_TO_PROJECTS_API), createdProjectId);
-        dashboardResponse.then()
-                .statusCode(HttpStatus.SC_OK);
-        int size = dashboardResponse
-                .jsonPath()
-                .getInt("columns.size()");
-        Assertions.assertThat(size)
+        TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
+        var dashboard = dashboardService.getDashboard(createdProjectId, emptyTaskSpec);
+        Assertions.assertThat(dashboard.columns().size())
                 .isEqualTo(4);
     }
 
@@ -147,9 +138,7 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulDeleteOfProjectTest() {
         Long createdProjectId = createNewProject();
-        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
-            fail("Columns aren't created");
-        }
+        waitPools();
         TaskSpec taskSpec = mock(TaskSpec.class);
         Long columnId = dashboardService.getDashboard(createdProjectId, taskSpec).columns().get(0).id();
         Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, columnId), createdUserId);

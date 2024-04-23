@@ -20,13 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class EntityOrderTest extends BasicTestClass {
 
@@ -42,9 +39,7 @@ class EntityOrderTest extends BasicTestClass {
     @BeforeEach
     void beforeEach() {
         createdProjectId = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
-        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
-            fail("Columns aren't created");
-        }
+        waitPools();
         createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
 
         for (int i = 0; i < 4; i++) {

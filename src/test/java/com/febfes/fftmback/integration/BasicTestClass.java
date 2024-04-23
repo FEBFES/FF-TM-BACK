@@ -23,8 +23,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
+
 import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -90,6 +94,12 @@ public class BasicTestClass {
     protected Long createNewProject() {
         ProjectEntity project = DtoBuilders.createProject(createdUserId);
         return projectManagementService.createProject(project, createdUserId).getId();
+    }
+
+    protected void waitPools() {
+        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
+            fail("Pools aren't finished");
+        }
     }
 }
 

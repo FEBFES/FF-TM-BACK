@@ -13,16 +13,12 @@ import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
 
 
 class DashboardControllerTests extends BasicTestClass {
@@ -63,14 +59,12 @@ class DashboardControllerTests extends BasicTestClass {
     void successfulGetDashboardWithFilterTest() {
         Long projectId = createNewProject();
         Long projectId2 = createNewProject();
-        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
-            fail("Columns aren't created");
-        }
+        waitPools();
         String taskName = "task_name";
 
-        TaskSpec taskSpec = mock(TaskSpec.class);
-        var dashboard1 = dashboardService.getDashboard(projectId, taskSpec);
-        var dashboard2 = dashboardService.getDashboard(projectId2, taskSpec);
+        TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
+        var dashboard1 = dashboardService.getDashboard(projectId, emptyTaskSpec);
+        var dashboard2 = dashboardService.getDashboard(projectId2, emptyTaskSpec);
         List<Long> columnIds1 = dashboard1.columns().stream().map(ColumnWithTasksDto::id).toList();
         Long columnId4 = dashboard2.columns().get(0).id();
 
