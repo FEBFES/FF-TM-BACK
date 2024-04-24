@@ -10,6 +10,8 @@ import com.febfes.fftmback.util.DatabaseCleanup;
 import com.febfes.fftmback.util.DtoBuilders;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @ActiveProfiles("test")
+@Slf4j
 public class BasicTestClass {
 
     @Autowired
@@ -96,10 +99,15 @@ public class BasicTestClass {
         return projectManagementService.createProject(project, createdUserId).getId();
     }
 
+    @SneakyThrows
     protected void waitPools() {
-        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
+//        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(10));
+//        ForkJoinPool.commonPool().submit()
+        if (!ForkJoinPool.commonPool().awaitTermination(5, TimeUnit.SECONDS)) {
+            log.error("Pools aren't finished");
             fail("Pools aren't finished");
         }
+//        ForkJoinPool.commonPool().awaitTermination(5, TimeUnit.SECONDS);
     }
 }
 

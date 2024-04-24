@@ -17,6 +17,7 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.TypeRef;
 import io.restassured.response.Response;
+import lombok.extern.slf4j.Slf4j;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.apache.commons.compress.utils.Lists;
 import org.assertj.core.api.Assertions;
@@ -32,7 +33,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
 import static org.mockito.Mockito.mock;
-
+@Slf4j
 class ProjectControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
@@ -72,6 +73,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfProjectTest() {
+        log.info("successfulCreateOfProjectTest STARTED");
         ProjectDto projectDto = Instancio.create(ProjectDto.class);
 
         Response createResponse = createNewProject(projectDto);
@@ -83,6 +85,7 @@ class ProjectControllerTest extends BasicTestClass {
         waitPools();
 
         // 4 default columns
+        log.info("successfulCreateOfProjectTest CHECKING");
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         var dashboard = dashboardService.getDashboard(createdProjectId, emptyTaskSpec);
         Assertions.assertThat(dashboard.columns().size())
