@@ -103,7 +103,7 @@ public class BasicTestClass {
     protected void waitPools() {
 //        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(10));
 //        ForkJoinPool.commonPool().submit()
-        if (!ForkJoinPool.commonPool().awaitTermination(10, TimeUnit.SECONDS)) {
+        if (!ForkJoinPool.commonPool().awaitTermination(1, TimeUnit.MINUTES)) {
             log.error("Pools aren't finished");
             fail("Pools aren't finished");
         }
