@@ -62,8 +62,8 @@ class ProjectControllerTest extends BasicTestClass {
         waitPools();
 
         List<ProjectDto> projects = projectMemberService.getProjectsForUser(createdUserId, new ArrayList<>());
-        Assertions.assertThat(projects.size())
-                .isEqualTo(2);
+        Assertions.assertThat(projects)
+                .hasSize(2);
     }
 
     @Test
@@ -80,8 +80,8 @@ class ProjectControllerTest extends BasicTestClass {
 
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         DashboardDto dashboard = dashboardService.getDashboard(createdProjectId, emptyTaskSpec);
-        Assertions.assertThat(dashboard.columns().size())
-                .isEqualTo(DEFAULT_COLUMNS.size());
+        Assertions.assertThat(dashboard.columns())
+                .hasSize(DEFAULT_COLUMNS.size());
     }
 
     @Test
