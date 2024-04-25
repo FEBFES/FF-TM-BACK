@@ -8,6 +8,7 @@ import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
+import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.DashboardService;
@@ -24,11 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 class TaskFilterTest extends BasicStaticDataTestClass {
 
@@ -41,8 +38,9 @@ class TaskFilterTest extends BasicStaticDataTestClass {
     static void beforeAll(
             @Autowired AuthenticationService authenticationService,
             @Autowired UserService userService,
-            @Autowired @Qualifier("projectManagementServiceDecorator") ProjectManagementService projectManagementService,
+            @Autowired @Qualifier("projectManagementService") ProjectManagementService projectManagementService,
             @Autowired TaskService taskService,
+            @Autowired ColumnService columnService,
             @Autowired DashboardService dashboardService
     ) {
         UserEntity user = DtoBuilders.createUser();
@@ -53,15 +51,8 @@ class TaskFilterTest extends BasicStaticDataTestClass {
         authenticationService.registerUser(user2);
         Long createdUserId2 = userService.getUserIdByUsername(user2.getUsername());
 
-        ProjectEntity projectEntity = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
-        Long createdProjectId = projectEntity.getId();
-
-        ProjectEntity projectEntity2 = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId2);
-        Long createdProjectId2 = projectEntity2.getId();
-
-        if (!ForkJoinPool.commonPool().awaitQuiescence(10, TimeUnit.SECONDS)) {
-            fail("Columns aren't created");
-        }
+        Long createdProjectId = createProject(projectManagementService, columnService, createdUserId);
+        Long createdProjectId2 = createProject(projectManagementService, columnService, createdUserId2);
 
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         var dashboard1 = dashboardService.getDashboard(createdProjectId, emptyTaskSpec);
@@ -145,7 +136,6 @@ class TaskFilterTest extends BasicStaticDataTestClass {
     }
 
     static Stream<Arguments> taskFilterData() {
-        // TODO: add more data
         return Stream.of(
                 Arguments.of(SpecificationBuilder.specification(TaskSpec.class)
                         .withParam("taskId", "1")
@@ -160,5 +150,15 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .withParam("taskPriority", TaskPriority.LOW.name())
                         .build(), 1)
         );
+    }
+
+    static Long createProject(
+            ProjectManagementService projectManagementService,
+            ColumnService columnService,
+            Long userId
+    ) {
+        ProjectEntity project = projectManagementService.createProject(Instancio.create(ProjectEntity.class), userId);
+        columnService.createDefaultColumnsForProject(project.getId());
+        return project.getId();
     }
 }

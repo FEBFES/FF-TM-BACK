@@ -64,6 +64,9 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
             Long ownerId,
             List<PatchDto> patchDtoList
     ) {
+        if (patchDtoList.isEmpty()) {
+            return;
+        }
         log.info("Project with id={} partial update: {}", id, patchDtoList);
         ProjectEntity projectEntity = getProject(id);
         patchDtoList.forEach(patchDto -> {

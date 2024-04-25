@@ -4,7 +4,6 @@ import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -33,9 +32,6 @@ public class RoleControllerTest extends BasicTestClass {
 
     @Autowired
     private TransactionTemplate txTemplate;
-
-    @Autowired
-    private ProjectMemberService projectMemberService;
 
     @BeforeEach
     void beforeEach() {

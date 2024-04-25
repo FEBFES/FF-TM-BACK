@@ -8,10 +8,8 @@ import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.TaskFileDto;
 import com.febfes.fftmback.dto.TaskShortDto;
 import com.febfes.fftmback.dto.error.ErrorDto;
-import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.TaskService;
-import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -47,12 +45,6 @@ class TaskControllerTest extends BasicTestClass {
     private TaskService taskService;
 
     @Autowired
-    private ColumnService columnService;
-
-    @Autowired
-    private TaskTypeService taskTypeService;
-
-    @Autowired
     private FileService fileService;
 
     @DynamicPropertySource
@@ -64,7 +56,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @BeforeEach
     void beforeEach() {
-        createdProjectId = projectManagementService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
+        createdProjectId = createNewProject();
         createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
     }
 

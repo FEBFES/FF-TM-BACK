@@ -1,16 +1,18 @@
 package com.febfes.fftmback.integration;
 
 
-import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.service.AuthenticationService;
+import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
+import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.febfes.fftmback.util.DatabaseCleanup;
 import com.febfes.fftmback.util.DtoBuilders;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +27,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-
 import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.fail;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -49,7 +47,16 @@ public class BasicTestClass {
     protected UserService userService;
 
     @Autowired
-    @Qualifier("projectManagementServiceDecorator")
+    protected ColumnService columnService;
+
+    @Autowired
+    protected ProjectMemberService projectMemberService;
+
+    @Autowired
+    protected TaskTypeService taskTypeService;
+
+    @Autowired
+    @Qualifier("projectManagementService")
     protected ProjectManagementService projectManagementService;
 
     @LocalServerPort
@@ -95,19 +102,12 @@ public class BasicTestClass {
     }
 
     protected Long createNewProject() {
-        ProjectEntity project = DtoBuilders.createProject(createdUserId);
-        return projectManagementService.createProject(project, createdUserId).getId();
-    }
-
-    @SneakyThrows
-    protected void waitPools() {
-//        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(10));
-//        ForkJoinPool.commonPool().submit()
-        if (!ForkJoinPool.commonPool().awaitTermination(1, TimeUnit.MINUTES)) {
-            log.error("Pools aren't finished");
-            fail("Pools aren't finished");
-        }
-//        ForkJoinPool.commonPool().awaitTermination(5, TimeUnit.SECONDS);
+        Long projectId = projectManagementService.createProject(DtoBuilders.createProject(createdUserId), createdUserId)
+                .getId();
+        columnService.createDefaultColumnsForProject(projectId);
+        taskTypeService.createDefaultTaskTypesForProject(projectId);
+        projectMemberService.addUserToProjectAndChangeRole(projectId, createdUserId, RoleName.OWNER);
+        return projectId;
     }
 }
 

@@ -40,7 +40,8 @@ public class MemberController {
     @ApiResponse(responseCode = "409", description = "Only owner can add a new member", content = @Content)
     public List<MemberDto> addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        return projectMemberService.addNewMembers(id, memberIds);
+        projectMemberService.addNewMembers(id, memberIds);
+        return userService.getProjectMembersWithRole(id, memberIds);
     }
 
     @Operation(summary = "Delete member from project")

@@ -2,7 +2,6 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.TypeRef;
@@ -24,9 +23,6 @@ class MemberControllerTest extends BasicTestClass {
 
     @Autowired
     TransactionTemplate txTemplate;
-
-    @Autowired
-    ProjectMemberService projectMemberService;
 
     @Test
     void successfulAddNewMembersTest() {

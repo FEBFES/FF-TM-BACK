@@ -35,7 +35,7 @@ public class ProjectManagementServiceDecorator implements ProjectManagementServi
         CompletableFuture.runAsync(() -> columnService.createDefaultColumnsForProject(projectId));
         CompletableFuture.runAsync(() -> taskTypeService.createDefaultTaskTypesForProject(projectId));
         // by default, the owner will also be a member of the project
-        CompletableFuture.runAsync(() -> projectMemberService.addOrChangeProjectMemberRole(projectId, userId, RoleName.OWNER));
+        CompletableFuture.runAsync(() -> projectMemberService.addUserToProjectAndChangeRole(projectId, userId, RoleName.OWNER));
         return createdProject;
     }
 

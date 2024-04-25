@@ -12,11 +12,11 @@ public interface ProjectMemberService {
 
     List<ProjectDto> getProjectsForUser(Long userId, List<Sort.Order> sort);
 
-    OneProjectDto getProjectForUser(Long id, Long userId);
+    OneProjectDto getProjectForUser(Long projectId, Long userId);
 
-    List<MemberDto> addNewMembers(Long projectId, List<Long> memberIds);
+    void addNewMembers(Long projectId, List<Long> memberIds);
 
     MemberDto removeMember(Long projectId, Long memberId);
 
-    void addOrChangeProjectMemberRole(Long projectId, Long memberId, RoleName roleName);
+    void addUserToProjectAndChangeRole(Long projectId, Long memberId, RoleName roleName);
 }

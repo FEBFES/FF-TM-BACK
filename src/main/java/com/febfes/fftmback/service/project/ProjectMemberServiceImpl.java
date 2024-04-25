@@ -49,19 +49,18 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public OneProjectDto getProjectForUser(Long id, Long userId) {
-        ProjectWithMembersProjection project = projectRepository.getProjectByIdAndUserId(id, userId)
-                .orElseThrow(Exceptions.projectNotFound(id));
-        log.info("Received project by id={} and userId={}", id, userId);
-        List<MemberDto> members = userService.getProjectMembersWithRole(id);
+    public OneProjectDto getProjectForUser(Long projectId, Long userId) {
+        ProjectWithMembersProjection project = projectRepository.getProjectByIdAndUserId(projectId, userId)
+                .orElseThrow(Exceptions.projectNotFound(projectId));
+        log.info("Received project by id={} and userId={}", projectId, userId);
+        List<MemberDto> members = userService.getProjectMembersWithRole(projectId);
         return ProjectMapper.INSTANCE.projectWithMembersProjectionToOneProjectDto(project, members);
     }
 
     @Override
-    public List<MemberDto> addNewMembers(Long projectId, List<Long> memberIds) {
-        memberIds.forEach(memberId -> addOrChangeProjectMemberRole(projectId, memberId, RoleName.MEMBER));
+    public void addNewMembers(Long projectId, List<Long> memberIds) {
+        memberIds.forEach(memberId -> addUserToProjectAndChangeRole(projectId, memberId, RoleName.MEMBER));
         log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
-        return userService.getProjectMembersWithRole(projectId, memberIds);
     }
 
     @Override
@@ -73,7 +72,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public void addOrChangeProjectMemberRole(Long projectId, Long memberId, RoleName roleName) {
+    public void addUserToProjectAndChangeRole(Long projectId, Long memberId, RoleName roleName) {
         UserProject userProject = UserProject.builder()
                 .id(UserProjectId.builder()
                         .userId(memberId)
