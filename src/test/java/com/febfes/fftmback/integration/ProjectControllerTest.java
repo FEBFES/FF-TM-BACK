@@ -17,7 +17,6 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.TypeRef;
 import io.restassured.response.Response;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.apache.commons.compress.utils.Lists;
@@ -38,6 +37,7 @@ import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @Slf4j
 class ProjectControllerTest extends BasicTestClass {
@@ -298,26 +298,12 @@ class ProjectControllerTest extends BasicTestClass {
                 .post(PATH_TO_PROJECTS_API);
     }
 
-    @SneakyThrows
     private void waitPools() {
-        ForkJoinPool commonPool = ForkJoinPool.commonPool();
-        commonPool.awaitTermination(1, TimeUnit.MINUTES);
-        log.info(commonPool.getRunningThreadCount() + " " + commonPool);
-//        try {
-//            commonPool.inv
-//        } catch (InterruptedException E) {
-//            fail("Can't await for pools to finish");
-//        }
-//        try {
-//            ForkJoinPool.commonPool().wait();
-//            System.out.println("Thread in runnable state");
-//        } catch (Exception e) {
-//            log.error(e.getMessage());
-//        }
-//        if (!ForkJoinPool.commonPool().awaitTermination(1, TimeUnit.MINUTES)) {
-//            log.error("Pools aren't finished");
-//            fail("Pools aren't finished");
-//        }
-//        ForkJoinPool.commonPool().awaitTermination(5, TimeUnit.SECONDS);
+        try {
+            boolean ignored = ForkJoinPool.commonPool().awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            fail("Exception occurred while waiting for pools to complete. Running threads count: "
+                 + ForkJoinPool.commonPool().getRunningThreadCount());
+        }
     }
 }

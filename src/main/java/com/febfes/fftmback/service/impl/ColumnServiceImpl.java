@@ -8,6 +8,7 @@ import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.order.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,9 @@ public class ColumnServiceImpl implements ColumnService {
     public static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
 
     @Override
+    @SneakyThrows
     public TaskColumnEntity createColumn(TaskColumnEntity column) {
+        Thread.sleep(5000L);
         column.setEntityOrder(orderService.getNewOrder(column));
         TaskColumnEntity savedColumn = columnRepository.save(column);
 
