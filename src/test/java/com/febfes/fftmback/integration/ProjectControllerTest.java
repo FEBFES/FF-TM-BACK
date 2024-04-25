@@ -68,7 +68,6 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateOfProjectTest() {
-        log.info("successfulCreateOfProjectTest STARTED");
         ProjectDto projectDto = Instancio.create(ProjectDto.class);
 
         Response createResponse = createNewProject(projectDto);
@@ -79,7 +78,6 @@ class ProjectControllerTest extends BasicTestClass {
 
         waitPools();
 
-        log.info("successfulCreateOfProjectTest CHECKING");
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         DashboardDto dashboard = dashboardService.getDashboard(createdProjectId, emptyTaskSpec);
         Assertions.assertThat(dashboard.columns().size())
@@ -304,9 +302,7 @@ class ProjectControllerTest extends BasicTestClass {
     private void waitPools() {
         ForkJoinPool commonPool = ForkJoinPool.commonPool();
         commonPool.awaitTermination(1, TimeUnit.MINUTES);
-        while (true) {
-            log.info(commonPool.getRunningThreadCount() + " " + commonPool);
-        }
+        log.info(commonPool.getRunningThreadCount() + " " + commonPool);
 //        try {
 //            commonPool.inv
 //        } catch (InterruptedException E) {
