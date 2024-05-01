@@ -29,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserViewRepository userViewRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<MemberDto> getProjectMembersWithRole(Long projectId) {
         return userViewRepository.getProjectMembersWithRole(projectId).stream()
-                .map(UserMapper.INSTANCE::memberProjectionToMemberDto)
+                .map(userMapper::memberProjectionToMemberDto)
                 .toList();
     }
 
@@ -87,7 +88,7 @@ public class UserServiceImpl implements UserService {
     public MemberDto getProjectMemberWithRole(Long projectId, Long memberId) {
         MemberProjection member = userViewRepository.getProjectMemberWithRole(projectId, memberId)
                 .orElseThrow(Exceptions.userNotFoundById(memberId));
-        return UserMapper.INSTANCE.memberProjectionToMemberDto(member);
+        return userMapper.memberProjectionToMemberDto(member);
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.febfes.fftmback.service.project;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.PatchDto;
-import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskTypeService;
 import jakarta.transaction.Transactional;
@@ -45,7 +44,7 @@ public class ProjectManagementServiceDecorator implements ProjectManagementServi
     }
 
     @Override
-    public ProjectDto editProject(Long id, ProjectEntity project) {
+    public ProjectEntity editProject(Long id, ProjectEntity project) {
         return projectManagementService.editProject(id, project);
     }
 

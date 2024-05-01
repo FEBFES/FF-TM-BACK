@@ -7,7 +7,6 @@ import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.service.project.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Project")
 public class DashboardController {
 
-    private final @NonNull DashboardService dashboardService;
+    private final DashboardService dashboardService;
 
     @Operation(summary = "Get dashboard by project id")
     @ApiGetOne(path = "{id}/dashboard")

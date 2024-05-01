@@ -24,19 +24,20 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private final RefreshTokenService refreshTokenService;
+    private final UserMapper userMapper;
 
     @Operation(summary = "Register new user")
     @ApiCreate(path = "register")
     @ApiResponse(responseCode = "409", description = "User already exists", content = @Content)
     public void register(@RequestBody @Valid UserDetailsDto userDetailsDto) {
-        authenticationService.registerUser(UserMapper.INSTANCE.userDetailsDtoToUser(userDetailsDto));
+        authenticationService.registerUser(userMapper.userDetailsDtoToUser(userDetailsDto));
     }
 
     @Operation(summary = "User authentication using username and password")
     @ApiCreate(path = "authenticate")
     @ApiResponse(responseCode = "404", description = "User not found by username", content = @Content)
     public GetAuthDto authenticate(@RequestBody @Valid AuthenticationDto authenticationDto) {
-        return authenticationService.authenticateUser(UserMapper.INSTANCE.authenticationDtoToUser(authenticationDto));
+        return authenticationService.authenticateUser(userMapper.authenticationDtoToUser(authenticationDto));
     }
 
     @Operation(summary = "Update refresh and access token. You need to send an existent Refresh Token")

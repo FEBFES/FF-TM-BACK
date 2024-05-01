@@ -3,10 +3,8 @@ package com.febfes.fftmback.service.project;
 import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.PatchDto;
-import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.Exceptions;
-import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.project.patch.ProjectPatchFieldProcessor;
 import jakarta.transaction.Transactional;
@@ -48,14 +46,14 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     }
 
     @Override
-    public ProjectDto editProject(Long id, ProjectEntity project) {
+    public ProjectEntity editProject(Long id, ProjectEntity project) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(Exceptions.projectNotFound(id));
         projectEntity.setName(project.getName());
         projectEntity.setDescription(project.getDescription());
         projectRepository.save(projectEntity);
         log.info("Updated project: {}", projectEntity);
-        return ProjectMapper.INSTANCE.projectToProjectDto(projectEntity);
+        return projectEntity;
     }
 
     @Override

@@ -16,7 +16,6 @@ import com.febfes.fftmback.service.project.ProjectMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,10 +33,11 @@ import static com.febfes.fftmback.util.SortUtils.getOrderFromParams;
 public class ProjectController {
 
     @Qualifier("projectManagementServiceDecorator")
-    private final @NonNull ProjectManagementService projectManagementService;
-    private final @NonNull ProjectMemberService projectMemberService;
-    private final @NonNull TaskTypeService taskTypeService;
-    private final @NonNull RoleCheckerComponent roleCheckerComponent;
+    private final ProjectManagementService projectManagementService;
+    private final ProjectMemberService projectMemberService;
+    private final TaskTypeService taskTypeService;
+    private final RoleCheckerComponent roleCheckerComponent;
+    private final ProjectMapper projectMapper;
 
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
@@ -55,9 +55,9 @@ public class ProjectController {
             @RequestBody @Valid ProjectDto projectDto
     ) {
         ProjectEntity project = projectManagementService.createProject(
-                ProjectMapper.INSTANCE.projectDtoToProject(projectDto), user.getId()
+                projectMapper.projectDtoToProject(projectDto), user.getId()
         );
-        return ProjectMapper.INSTANCE.projectToProjectDto(project);
+        return projectMapper.projectToProjectDto(project);
     }
 
     @Operation(summary = "Get project by its id")
@@ -74,7 +74,9 @@ public class ProjectController {
             @RequestBody ProjectDto projectDto
     ) {
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        return projectManagementService.editProject(id, ProjectMapper.INSTANCE.projectDtoToProject(projectDto));
+        return projectMapper.projectToProjectDto(
+                projectManagementService.editProject(id, projectMapper.projectDtoToProject(projectDto))
+        );
     }
 
     @Operation(summary = "Delete project by its id")
