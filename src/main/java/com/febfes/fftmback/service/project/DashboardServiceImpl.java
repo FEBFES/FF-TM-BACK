@@ -1,6 +1,7 @@
 package com.febfes.fftmback.service.project;
 
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
+import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
@@ -11,8 +12,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -24,12 +27,18 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public DashboardDto getDashboard(Long id, TaskSpec taskSpec) {
-        List<ColumnWithTasksDto> columnsWithTasks = columnService.getOrderedColumns(id)
+        List<TaskColumnEntity> columns = columnService.getOrderedColumns(id);
+        Map<Long, List<TaskView>> columnIdToTaskListMap = taskService.getTasks(
+                columns.stream().map(TaskColumnEntity::getId).collect(Collectors.toSet()),
+                taskSpec
+        )
                 .stream()
-                .map(column -> {
-                    List<TaskView> filteredTasks = taskService.getTasks(column.getId(), taskSpec);
-                    return columnWithTasksMapper.columnToColumnWithTasksDto(column, filteredTasks);
-                })
+                .collect(Collectors.groupingBy(TaskView::getColumnId, Collectors.toList()));
+        List<ColumnWithTasksDto> columnsWithTasks = columns.stream()
+                .map(column -> columnWithTasksMapper.columnToColumnWithTasksDto(
+                        column,
+                        columnIdToTaskListMap.getOrDefault(column.getId(), Collections.EMPTY_LIST)
+                ))
                 .toList();
         return new DashboardDto(columnsWithTasks);
     }

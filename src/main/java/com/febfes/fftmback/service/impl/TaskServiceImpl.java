@@ -21,8 +21,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.febfes.fftmback.domain.common.specification.TaskSpec.byColumnId;
+import static com.febfes.fftmback.domain.common.specification.TaskSpec.columnIdIn;
 import static com.febfes.fftmback.service.order.OrderServiceImpl.ORDER_FIELD_NAME;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -57,10 +59,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskView> getTasks(
-            Long columnId,
+            Set<Long> columnIds,
             TaskSpec taskSpec
     ) {
-        List<TaskView> tasks = taskViewRepository.findAll(taskSpec.and(byColumnId(columnId)), Sort.by(ORDER_FIELD_NAME));
+        List<TaskView> tasks = taskViewRepository.findAll(
+                taskSpec.and(columnIdIn(columnIds)),
+                Sort.by(ORDER_FIELD_NAME)
+        );
         log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
         return tasks;
     }
