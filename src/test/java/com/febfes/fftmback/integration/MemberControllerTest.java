@@ -2,7 +2,6 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.service.ProjectService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.TypeRef;
@@ -25,9 +24,6 @@ class MemberControllerTest extends BasicTestClass {
     @Autowired
     TransactionTemplate txTemplate;
 
-    @Autowired
-    ProjectService projectService;
-
     @Test
     void successfulAddNewMembersTest() {
         Long secondCreatedUserId = createNewUser();
@@ -44,10 +40,10 @@ class MemberControllerTest extends BasicTestClass {
                 // as owner is also a member
                 Assertions.assertThat(members).hasSize(3);
                 List<ProjectDto> secondUserProjects =
-                        projectService.getProjectsForUser(secondCreatedUserId, Lists.newArrayList());
+                        projectMemberService.getProjectsForUser(secondCreatedUserId, Lists.newArrayList());
                 Assertions.assertThat(secondUserProjects).hasSize(1);
                 List<ProjectDto> thirdUserProjects =
-                        projectService.getProjectsForUser(thirdCreatedUserId, Lists.newArrayList());
+                        projectMemberService.getProjectsForUser(thirdCreatedUserId, Lists.newArrayList());
                 Assertions.assertThat(thirdUserProjects).hasSize(1);
             }
         });
@@ -67,7 +63,7 @@ class MemberControllerTest extends BasicTestClass {
 
         List<MemberDto> members = userService.getProjectMembersWithRole(createdProjectId);
         Assertions.assertThat(members).hasSize(1);
-        List<ProjectDto> secondMemberProjects = projectService.getProjectsForUser(secondCreatedUserId, Lists.newArrayList());
+        List<ProjectDto> secondMemberProjects = projectMemberService.getProjectsForUser(secondCreatedUserId, Lists.newArrayList());
         Assertions.assertThat(secondMemberProjects).isEmpty();
     }
 

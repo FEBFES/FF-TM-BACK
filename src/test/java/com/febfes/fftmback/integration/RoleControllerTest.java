@@ -56,7 +56,7 @@ public class RoleControllerTest extends BasicTestClass {
     @Test
     void successfulChangeRoleTest() {
         Long newUserId = createNewUser();
-        projectService.addNewMembers(createdProjectId, List.of(newUserId));
+        projectMemberService.addNewMembers(createdProjectId, List.of(newUserId));
         checkProjectUserRole(RoleName.MEMBER, newUserId);
 
         requestWithBearerToken()
@@ -77,7 +77,7 @@ public class RoleControllerTest extends BasicTestClass {
         String newToken = authenticationService.authenticateUser(
                 UserEntity.builder().username(newUser.getUsername()).encryptedPassword(PASSWORD).build()
         ).accessToken();
-        projectService.addNewMembers(createdProjectId, List.of(newUserId));
+        projectMemberService.addNewMembers(createdProjectId, List.of(newUserId));
 
         given().header("Authorization", "Bearer " + newToken)
                 .contentType(ContentType.JSON)

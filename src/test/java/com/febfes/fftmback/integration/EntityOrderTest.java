@@ -1,19 +1,16 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
-import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.EditTaskDto;
-import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.assertj.core.api.Assertions;
-import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +30,9 @@ class EntityOrderTest extends BasicTestClass {
     @Autowired
     private TaskService taskService;
 
-    @Autowired
-    private ColumnService columnService;
-
     @BeforeEach
     void beforeEach() {
-        createdProjectId = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId).getId();
+        createdProjectId = createNewProject();
         createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
 
         for (int i = 0; i < 4; i++) {

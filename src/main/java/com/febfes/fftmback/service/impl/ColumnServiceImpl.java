@@ -22,7 +22,7 @@ public class ColumnServiceImpl implements ColumnService {
     private final ColumnRepository columnRepository;
     private final OrderService<TaskColumnEntity> orderService;
 
-    private static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
+    public static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
 
     @Override
     public TaskColumnEntity createColumn(TaskColumnEntity column) {

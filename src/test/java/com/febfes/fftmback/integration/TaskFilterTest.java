@@ -5,11 +5,14 @@ import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.service.project.DashboardService;
+import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.util.DtoBuilders;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.instancio.Instancio;
@@ -19,7 +22,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 class TaskFilterTest extends BasicStaticDataTestClass {
@@ -33,8 +38,10 @@ class TaskFilterTest extends BasicStaticDataTestClass {
     static void beforeAll(
             @Autowired AuthenticationService authenticationService,
             @Autowired UserService userService,
-            @Autowired ProjectService projectService,
-            @Autowired TaskService taskService
+            @Autowired @Qualifier("projectManagementService") ProjectManagementService projectManagementService,
+            @Autowired TaskService taskService,
+            @Autowired ColumnService columnService,
+            @Autowired DashboardService dashboardService
     ) {
         UserEntity user = DtoBuilders.createUser();
         authenticationService.registerUser(user);
@@ -44,17 +51,20 @@ class TaskFilterTest extends BasicStaticDataTestClass {
         authenticationService.registerUser(user2);
         Long createdUserId2 = userService.getUserIdByUsername(user2.getUsername());
 
-        ProjectEntity projectEntity = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
-        Long createdProjectId = projectEntity.getId();
+        Long createdProjectId = createProject(projectManagementService, columnService, createdUserId);
+        Long createdProjectId2 = createProject(projectManagementService, columnService, createdUserId2);
 
-        ProjectEntity projectEntity2 = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId2);
-        Long createdProjectId2 = projectEntity2.getId();
+        TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
+        var dashboard1 = dashboardService.getDashboard(createdProjectId, emptyTaskSpec);
+        var dashboard2 = dashboardService.getDashboard(createdProjectId2, emptyTaskSpec);
+        List<Long> columnIds1 = dashboard1.columns().stream().map(ColumnWithTasksDto::id).toList();
+        Long columnId3 = dashboard2.columns().get(0).id();
 
         taskService.createTask(
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(1L)
+                        .columnId(columnIds1.get(0))
                         .name(TASK_NAME + "1")
                         .description("123")
                         .priority(TaskPriority.LOW)
@@ -66,7 +76,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(1L)
+                        .columnId(columnIds1.get(0))
                         .name(TASK_NAME + "2")
                         .description("12345")
                         .build(),
@@ -77,7 +87,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(2L)
+                        .columnId(columnIds1.get(1))
                         .name(TASK_NAME)
                         .description("12345")
                         .build(),
@@ -88,7 +98,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId)
-                        .columnId(1L)
+                        .columnId(columnIds1.get(0))
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
@@ -99,7 +109,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                 TaskEntity
                         .builder()
                         .projectId(createdProjectId2)
-                        .columnId(5L)
+                        .columnId(columnId3)
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
@@ -126,7 +136,6 @@ class TaskFilterTest extends BasicStaticDataTestClass {
     }
 
     static Stream<Arguments> taskFilterData() {
-        // TODO: add more data
         return Stream.of(
                 Arguments.of(SpecificationBuilder.specification(TaskSpec.class)
                         .withParam("taskId", "1")
@@ -141,5 +150,15 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .withParam("taskPriority", TaskPriority.LOW.name())
                         .build(), 1)
         );
+    }
+
+    static Long createProject(
+            ProjectManagementService projectManagementService,
+            ColumnService columnService,
+            Long userId
+    ) {
+        ProjectEntity project = projectManagementService.createProject(Instancio.create(ProjectEntity.class), userId);
+        columnService.createDefaultColumnsForProject(project.getId());
+        return project.getId();
     }
 }

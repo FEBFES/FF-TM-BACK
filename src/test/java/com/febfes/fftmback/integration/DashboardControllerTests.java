@@ -1,28 +1,32 @@
 package com.febfes.fftmback.integration;
 
 
+import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
-import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 
 class DashboardControllerTests extends BasicTestClass {
 
     @Autowired
-    private ColumnService columnService;
+    private TaskService taskService;
 
     @Autowired
-    private TaskService taskService;
+    private DashboardService dashboardService;
 
     @Test
     void successfulGetDashboardTest() {
@@ -40,41 +44,31 @@ class DashboardControllerTests extends BasicTestClass {
                 .extract()
                 .response()
                 .as(DashboardDto.class);
-        ColumnWithTasksDto createdColumn = dashboardDto.columns().get(4);
-        Assertions.assertEquals(columnEntity.getName(), createdColumn.name());
-        Assertions.assertEquals(task.getName(), createdColumn.tasks().get(0).name());
+        var createdColumn = dashboardDto.columns().stream()
+                .filter(column -> columnEntity.getName().equals(column.name()))
+                .findFirst();
+        Assertions.assertTrue(createdColumn.isPresent());
+        Assertions.assertEquals(task.getName(), createdColumn.get().tasks().get(0).name());
     }
 
     @Test
     void successfulGetDashboardWithFilterTest() {
         Long projectId = createNewProject();
-        String taskName = "task_name";
-        taskService.createTask(
-                DtoBuilders.createTask(projectId, 1L, taskName),
-                createdUserId
-        );
-        taskService.createTask(
-                DtoBuilders.createTask(projectId, 1L, taskName + "2"),
-                createdUserId
-        );
-        taskService.createTask(
-                DtoBuilders.createTask(projectId, 1L, "2"),
-                createdUserId
-        );
-        taskService.createTask(
-                DtoBuilders.createTask(projectId, 2L, taskName + "3"),
-                createdUserId
-        );
-        taskService.createTask(
-                DtoBuilders.createTask(projectId, 3L, "3"),
-                createdUserId
-        );
-
         Long projectId2 = createNewProject();
-        taskService.createTask(
-                DtoBuilders.createTask(projectId2, 5L, taskName),
-                createdUserId
-        );
+        String taskName = "task_name";
+
+        TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
+        var dashboard1 = dashboardService.getDashboard(projectId, emptyTaskSpec);
+        var dashboard2 = dashboardService.getDashboard(projectId2, emptyTaskSpec);
+        List<Long> columnIds1 = dashboard1.columns().stream().map(ColumnWithTasksDto::id).toList();
+        Long columnId4 = dashboard2.columns().get(0).id();
+
+        createTask(projectId, columnIds1.get(0), taskName);
+        createTask(projectId, columnIds1.get(0), taskName + "2");
+        createTask(projectId, columnIds1.get(0), "2");
+        createTask(projectId, columnIds1.get(1), taskName + "3");
+        createTask(projectId, columnIds1.get(2), "3");
+        createTask(projectId2, columnId4, taskName);
 
         Response response = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -87,5 +81,12 @@ class DashboardControllerTests extends BasicTestClass {
                 .response()
                 .as(DashboardDto.class);
         Assertions.assertEquals(2, dashboardDto.columns().get(0).tasks().size());
+    }
+
+    private void createTask(Long projectId, Long columnId, String taskName) {
+        taskService.createTask(
+                DtoBuilders.createTask(projectId, columnId, taskName),
+                createdUserId
+        );
     }
 }

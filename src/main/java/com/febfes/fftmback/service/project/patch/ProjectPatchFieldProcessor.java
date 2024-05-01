@@ -1,13 +1,10 @@
-package com.febfes.fftmback.util.patch;
+package com.febfes.fftmback.service.project.patch;
 
 import com.febfes.fftmback.dto.PatchDto;
-import com.febfes.fftmback.service.ProjectService;
-import lombok.AllArgsConstructor;
+import lombok.Setter;
 
-@AllArgsConstructor
+@Setter
 public abstract class ProjectPatchFieldProcessor {
-
-    protected ProjectService projectService;
 
     protected ProjectPatchFieldProcessor nextProcessor;
 

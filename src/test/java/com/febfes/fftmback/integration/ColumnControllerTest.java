@@ -1,6 +1,5 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
@@ -23,8 +22,7 @@ class ColumnControllerTest extends BasicTestClass {
 
     @BeforeEach
     void beforeEach() {
-        ProjectEntity projectEntity = projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
-        createdProjectId = projectEntity.getId();
+        createdProjectId = createNewProject();
     }
 
     @Test

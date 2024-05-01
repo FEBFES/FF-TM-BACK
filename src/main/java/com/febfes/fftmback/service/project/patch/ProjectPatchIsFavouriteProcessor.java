@@ -1,23 +1,22 @@
-package com.febfes.fftmback.util.patch;
+package com.febfes.fftmback.service.project.patch;
 
 import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.dto.PatchDto;
-import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.project.ProjectFavoriteService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import static java.util.Objects.nonNull;
 
 @Slf4j
+@Service
+@RequiredArgsConstructor
 public class ProjectPatchIsFavouriteProcessor extends ProjectPatchFieldProcessor {
 
-    private static final String FIELD_NAME = "isFavourite";
+    private final ProjectFavoriteService projectFavoriteService;
 
-    public ProjectPatchIsFavouriteProcessor(
-            ProjectService projectService,
-            ProjectPatchFieldProcessor nextProcessor
-    ) {
-        super(projectService, nextProcessor);
-    }
+    private static final String FIELD_NAME = "isFavourite";
 
     @Override
     public void patchField(
@@ -34,9 +33,9 @@ public class ProjectPatchIsFavouriteProcessor extends ProjectPatchFieldProcessor
         if (PatchOperation.UPDATE.equals(operation)) {
             Boolean isFavourite = (Boolean) patchDto.value();
             if (Boolean.TRUE.equals(isFavourite)) {
-                projectService.addProjectToFavourite(projectId, ownerId);
+                projectFavoriteService.addProjectToFavourite(projectId, ownerId);
             } else {
-                projectService.removeProjectFromFavourite(projectId, ownerId);
+                projectFavoriteService.removeProjectFromFavourite(projectId, ownerId);
             }
             log.info("Project field \"{}\" updated. New value: {}", FIELD_NAME, isFavourite);
         }

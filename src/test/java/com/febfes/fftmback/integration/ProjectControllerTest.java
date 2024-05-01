@@ -1,33 +1,45 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.service.project.DashboardService;
+import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.TypeRef;
 import io.restassured.response.Response;
+import lombok.extern.slf4j.Slf4j;
+import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.apache.commons.compress.utils.Lists;
 import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 
+import static com.febfes.fftmback.service.impl.ColumnServiceImpl.DEFAULT_COLUMNS;
 import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
+import static org.junit.jupiter.api.Assertions.fail;
 
+@Slf4j
 class ProjectControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
@@ -36,25 +48,22 @@ class ProjectControllerTest extends BasicTestClass {
     TaskService taskService;
 
     @Autowired
-    ColumnService columnService;
+    DashboardService dashboardService;
+
+    @Autowired
+    @Qualifier("projectManagementServiceDecorator")
+    protected ProjectManagementService projectManagementServiceDecorator;
 
     @Test
     void successfulGetProjectsTest() {
-        projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
-        projectService.createProject(Instancio.create(ProjectEntity.class), createdUserId);
+        projectManagementServiceDecorator.createProject(Instancio.create(ProjectEntity.class), createdUserId);
+        projectManagementServiceDecorator.createProject(Instancio.create(ProjectEntity.class), createdUserId);
 
-        Response response = requestWithBearerToken()
-                .contentType(ContentType.JSON)
-                .when()
-                .get(PATH_TO_PROJECTS_API);
-        response.then()
-                .statusCode(HttpStatus.SC_OK);
+        waitPools();
 
-        int size = response
-                .jsonPath()
-                .getInt("data.size()");
-        Assertions.assertThat(size)
-                .isEqualTo(2);
+        List<ProjectDto> projects = projectMemberService.getProjectsForUser(createdUserId, new ArrayList<>());
+        Assertions.assertThat(projects)
+                .hasSize(2);
     }
 
     @Test
@@ -67,18 +76,12 @@ class ProjectControllerTest extends BasicTestClass {
                 .body("name", equalTo(projectDto.name()));
         Long createdProjectId = createResponse.jsonPath().getLong("id");
 
-        // 4 default columns
-        Response dashboardResponse = requestWithBearerToken()
-                .contentType(ContentType.JSON)
-                .when()
-                .get("%s/{id}/dashboard".formatted(PATH_TO_PROJECTS_API), createdProjectId);
-        dashboardResponse.then()
-                .statusCode(HttpStatus.SC_OK);
-        int size = dashboardResponse
-                .jsonPath()
-                .getInt("columns.size()");
-        Assertions.assertThat(size)
-                .isEqualTo(4);
+        waitPools();
+
+        TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
+        DashboardDto dashboard = dashboardService.getDashboard(createdProjectId, emptyTaskSpec);
+        Assertions.assertThat(dashboard.columns())
+                .hasSize(DEFAULT_COLUMNS.size());
     }
 
     @Test
@@ -130,17 +133,19 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulDeleteOfProjectTest() {
         Long createdProjectId = createNewProject();
-        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, 1L), createdUserId);
+        TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
+        Long columnId = dashboardService.getDashboard(createdProjectId, emptyTaskSpec).columns().get(0).id();
+        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, columnId), createdUserId);
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .delete("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        Assertions.assertThatThrownBy(() -> projectService.getProject(createdProjectId))
+        Assertions.assertThatThrownBy(() -> projectManagementServiceDecorator.getProject(createdProjectId))
                 .isInstanceOf(EntityNotFoundException.class);
         Assertions.assertThat(columnService.getOrderedColumns(createdProjectId))
-                        .isEmpty();
+                .isEmpty();
         Assertions.assertThatThrownBy(() -> taskService.getTaskById(taskId))
                 .isInstanceOf(EntityNotFoundException.class);
     }
@@ -168,10 +173,10 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
+        OneProjectDto updatedProject = projectMemberService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.isFavourite())
                 .isTrue();
-        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId, Lists.newArrayList());
+        List<ProjectDto> userProjects = projectMemberService.getProjectsForUser(createdUserId, Lists.newArrayList());
         Optional<ProjectDto> userProject = userProjects.stream().findFirst();
         Assertions.assertThat(userProject)
                 .isNotEmpty();
@@ -191,10 +196,10 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        OneProjectDto updatedProject = projectService.getProjectForUser(createdProjectId, createdUserId);
+        OneProjectDto updatedProject = projectMemberService.getProjectForUser(createdProjectId, createdUserId);
         Assertions.assertThat(updatedProject.isFavourite())
                 .isFalse();
-        List<ProjectDto> userProjects = projectService.getProjectsForUser(createdUserId, Lists.newArrayList());
+        List<ProjectDto> userProjects = projectMemberService.getProjectsForUser(createdUserId, Lists.newArrayList());
         Optional<ProjectDto> userProject = userProjects.stream().findFirst();
         Assertions.assertThat(userProject)
                 .isNotEmpty();
@@ -215,7 +220,7 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        ProjectEntity updatedProject = projectService.getProject(createdProjectId);
+        ProjectEntity updatedProject = projectManagementServiceDecorator.getProject(createdProjectId);
         Assertions.assertThat(updatedProject.getName())
                 .isEqualTo(newName);
     }
@@ -224,7 +229,7 @@ class ProjectControllerTest extends BasicTestClass {
     void successfulGetUserProjectsTest() {
         Long secondCreatedUserId = createNewUser();
         UserEntity secondUser = userService.getUserById(secondCreatedUserId);
-        projectService.createProject(Instancio.create(ProjectEntity.class), secondCreatedUserId);
+        projectManagementServiceDecorator.createProject(Instancio.create(ProjectEntity.class), secondCreatedUserId);
 
         String tokenForSecondUser = authenticationService.authenticateUser(
                 UserEntity.builder().username(secondUser.getUsername()).encryptedPassword(PASSWORD).build()
@@ -261,9 +266,10 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulGetProjectsWithSort() {
-        String name = "getProjectsWithSortName";
-        projectService.createProject(DtoBuilders.createProject(name + "1"), createdUserId);
-        projectService.createProject(DtoBuilders.createProject(name + "2"), createdUserId);
+        String name1 = "getProjectsWithSortName1";
+        String name2 = "getProjectsWithSortName2";
+        projectManagementServiceDecorator.createProject(DtoBuilders.createProject(name1), createdUserId);
+        projectManagementServiceDecorator.createProject(DtoBuilders.createProject(name2), createdUserId);
 
         List<ProjectDto> projects = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -279,9 +285,9 @@ class ProjectControllerTest extends BasicTestClass {
         Assertions.assertThat(projects)
                 .hasSize(2);
         Assertions.assertThat(projects.get(0).name())
-                .isEqualTo(name + "2");
+                .isEqualTo(name2);
         Assertions.assertThat(projects.get(1).name())
-                .isEqualTo(name + "1");
+                .isEqualTo(name1);
     }
 
     private Response createNewProject(ProjectDto projectDto) {
@@ -290,5 +296,14 @@ class ProjectControllerTest extends BasicTestClass {
                 .body(projectDto)
                 .when()
                 .post(PATH_TO_PROJECTS_API);
+    }
+
+    private void waitPools() {
+        try {
+            boolean ignored = ForkJoinPool.commonPool().awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            fail("Exception occurred while waiting for pools to complete. Running threads count: "
+                 + ForkJoinPool.commonPool().getRunningThreadCount());
+        }
     }
 }

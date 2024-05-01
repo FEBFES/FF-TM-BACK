@@ -1,18 +1,23 @@
 package com.febfes.fftmback.integration;
 
 
-import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.ProjectService;
+import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.service.project.ProjectManagementService;
+import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.febfes.fftmback.util.DatabaseCleanup;
 import com.febfes.fftmback.util.DtoBuilders;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,6 +34,7 @@ import static io.restassured.RestAssured.given;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @ActiveProfiles("test")
+@Slf4j
 public class BasicTestClass {
 
     @Autowired
@@ -41,7 +47,17 @@ public class BasicTestClass {
     protected UserService userService;
 
     @Autowired
-    protected ProjectService projectService;
+    protected ColumnService columnService;
+
+    @Autowired
+    protected ProjectMemberService projectMemberService;
+
+    @Autowired
+    protected TaskTypeService taskTypeService;
+
+    @Autowired
+    @Qualifier("projectManagementService")
+    protected ProjectManagementService projectManagementService;
 
     @LocalServerPort
     private Integer port;
@@ -86,8 +102,12 @@ public class BasicTestClass {
     }
 
     protected Long createNewProject() {
-        ProjectEntity project = DtoBuilders.createProject(createdUserId);
-        return projectService.createProject(project, createdUserId).getId();
+        Long projectId = projectManagementService.createProject(DtoBuilders.createProject(createdUserId), createdUserId)
+                .getId();
+        columnService.createDefaultColumnsForProject(projectId);
+        taskTypeService.createDefaultTaskTypesForProject(projectId);
+        projectMemberService.addUserToProjectAndChangeRole(projectId, createdUserId, RoleName.OWNER);
+        return projectId;
     }
 }
 
