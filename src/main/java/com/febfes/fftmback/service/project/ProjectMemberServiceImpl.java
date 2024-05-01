@@ -3,8 +3,8 @@ package com.febfes.fftmback.service.project;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.common.UserProjectId;
 import com.febfes.fftmback.domain.dao.UserProject;
+import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
 import com.febfes.fftmback.domain.projection.ProjectProjection;
-import com.febfes.fftmback.domain.projection.ProjectWithMembersProjection;
 import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.ProjectDto;
@@ -34,6 +34,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private final UserProjectRepository userProjectRepository;
     private final UserService userService;
     private final RoleService roleService;
+    private final ProjectMapper projectMapper;
 
     @Override
     public List<ProjectDto> getProjectsForUser(Long userId, List<Sort.Order> sort) {
@@ -44,17 +45,17 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
                 userId, Sort.by(snakeCaseSort));
         log.info("Received {} projects for user with id={}", userProjects.size(), userId);
         return userProjects.stream()
-                .map(ProjectMapper.INSTANCE::projectProjectionToProjectDto)
+                .map(projectMapper::projectProjectionToProjectDto)
                 .toList();
     }
 
     @Override
     public OneProjectDto getProjectForUser(Long projectId, Long userId) {
-        ProjectWithMembersProjection project = projectRepository.getProjectByIdAndUserId(projectId, userId)
+        ProjectForUserProjection projectForUser = projectRepository.getProjectForUser(projectId, userId)
                 .orElseThrow(Exceptions.projectNotFound(projectId));
         List<MemberDto> members = userService.getProjectMembersWithRole(projectId);
         log.info("Received project by id={} and userId={}", projectId, userId);
-        return ProjectMapper.INSTANCE.projectWithMembersProjectionToOneProjectDto(project, members);
+        return projectMapper.projectWithMembersProjectionToOneProjectDto(projectForUser, members);
     }
 
     @Override

@@ -14,7 +14,6 @@ import com.febfes.fftmback.service.ColumnService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,8 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Column")
 public class ColumnController {
 
-    private final @NonNull ColumnService columnService;
-    private final @NonNull RoleCheckerComponent roleCheckerComponent;
+    private final ColumnService columnService;
+    private final RoleCheckerComponent roleCheckerComponent;
+    private final ColumnMapper columnMapper;
 
     @Operation(summary = "Create new column in a project with given id")
     @ApiCreate(path = "{projectId}/columns")
@@ -40,9 +40,9 @@ public class ColumnController {
     ) {
         roleCheckerComponent.checkIfHasRole(projectId, RoleName.MEMBER_PLUS);
         TaskColumnEntity newColumn = columnService.createColumn(
-                ColumnMapper.INSTANCE.columnDtoToColumn(columnDto, projectId)
+                columnMapper.columnDtoToColumn(columnDto, projectId)
         );
-        return ColumnMapper.INSTANCE.columnToColumnDto(newColumn);
+        return columnMapper.columnToColumnDto(newColumn);
     }
 
     @Operation(summary = "Edit column by its columnId")
@@ -53,7 +53,7 @@ public class ColumnController {
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER_PLUS);
         TaskColumnEntity updatedColumn = columnService.editColumn(columnDto, pathVars.columnId());
-        return ColumnMapper.INSTANCE.columnToColumnDto(updatedColumn);
+        return columnMapper.columnToColumnDto(updatedColumn);
     }
 
     @Operation(summary = "Delete column by its columnId")

@@ -22,6 +22,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final ColumnService columnService;
     private final TaskService taskService;
+    private final ColumnWithTasksMapper columnWithTasksMapper;
 
     @Override
     public DashboardDto getDashboard(Long id, TaskSpec taskSpec) {
@@ -29,7 +30,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .stream()
                 .map(column -> {
                     List<TaskView> filteredTasks = taskService.getTasks(column.getId(), taskSpec);
-                    return ColumnWithTasksMapper.INSTANCE.columnToColumnWithTasksDto(column, filteredTasks);
+                    return columnWithTasksMapper.columnToColumnWithTasksDto(column, filteredTasks);
                 })
                 .toList();
         log.info("Received dashboard with id={}", id);

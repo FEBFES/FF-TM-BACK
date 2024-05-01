@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -36,7 +35,8 @@ import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
 @Slf4j
 public class FileController {
 
-    private final @NonNull FileService fileService;
+    private final FileService fileService;
+    private final FileMapper fileMapper;
 
     @Operation(summary = "Upload user pic")
     @PostMapping(
@@ -48,7 +48,7 @@ public class FileController {
             @RequestParam("image") MultipartFile userPic
     ) throws IOException {
         FileEntity file = fileService.saveFile(userId, userId, EntityType.USER_PIC, userPic);
-        return FileMapper.INSTANCE.fileToUserPicDto(file);
+        return fileMapper.fileToUserPicDto(file);
     }
 
     @Operation(summary = "Get user pic")
@@ -74,7 +74,7 @@ public class FileController {
         return Arrays.stream(files)
                 .map(file -> saveTaskFile(user.getId(), taskId, file))
                 .flatMap(Optional::stream)
-                .map(FileMapper.INSTANCE::fileToTaskFileDto)
+                .map(fileMapper::fileToTaskFileDto)
                 .toList();
     }
 

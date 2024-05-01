@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +23,9 @@ import java.util.List;
 @Tag(name = "Project member")
 public class MemberController {
 
-    private final @NonNull ProjectMemberService projectMemberService;
-    private final @NonNull UserService userService;
-    private final @NonNull RoleCheckerComponent roleCheckerComponent;
+    private final ProjectMemberService projectMemberService;
+    private final UserService userService;
+    private final RoleCheckerComponent roleCheckerComponent;
 
     @Operation(summary = "Get project members")
     @ApiGet(path = "{id}/members")
