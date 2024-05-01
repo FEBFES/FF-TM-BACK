@@ -11,6 +11,7 @@ import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.service.impl.DefaultColumns;
 import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.util.DtoBuilders;
@@ -33,7 +34,6 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
-import static com.febfes.fftmback.service.impl.ColumnServiceImpl.DEFAULT_COLUMNS;
 import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -82,7 +82,7 @@ class ProjectControllerTest extends BasicTestClass {
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         DashboardDto dashboard = dashboardService.getDashboard(createdProjectId, emptyTaskSpec);
         Assertions.assertThat(dashboard.columns())
-                .hasSize(DEFAULT_COLUMNS.size());
+                .hasSize(DefaultColumns.values().length);
     }
 
     @Test

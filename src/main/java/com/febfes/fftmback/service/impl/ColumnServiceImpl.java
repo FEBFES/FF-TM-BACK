@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -22,7 +23,6 @@ public class ColumnServiceImpl implements ColumnService {
     private final ColumnRepository columnRepository;
     private final OrderService<TaskColumnEntity> orderService;
 
-    public static final List<String> DEFAULT_COLUMNS = List.of("BACKLOG", "IN PROGRESS", "REVIEW", "DONE");
 
     @Override
     public TaskColumnEntity createColumn(TaskColumnEntity column) {
@@ -55,12 +55,14 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public void createDefaultColumnsForProject(Long projectId) {
-        DEFAULT_COLUMNS.forEach(columnName -> createColumn(TaskColumnEntity.builder()
+        Arrays.stream(DefaultColumns.values())
+                .map(DefaultColumns::getCaption)
+                .forEach(columnName -> createColumn(TaskColumnEntity.builder()
                 .name(columnName)
                 .projectId(projectId)
                 .build()
         ));
-        log.info("Created default columns with names: {}", DEFAULT_COLUMNS);
+        log.info("Created default columns");
     }
 
     @Override
