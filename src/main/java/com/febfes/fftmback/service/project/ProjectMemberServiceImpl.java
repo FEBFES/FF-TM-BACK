@@ -10,6 +10,7 @@ import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.mapper.ProjectMapper;
+import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.UserProjectRepository;
 import com.febfes.fftmback.service.RoleService;
@@ -35,6 +36,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private final UserService userService;
     private final RoleService roleService;
     private final ProjectMapper projectMapper;
+    private final UserMapper userMapper;
 
     @Override
     public List<ProjectDto> getProjectsForUser(Long userId, List<Sort.Order> sort) {
@@ -54,7 +56,10 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         ProjectForUserProjection projectForUser = projectRepository.getProjectForUser(projectId, userId)
                 .orElseThrow(Exceptions.projectNotFound(projectId));
         log.info("Received project by id={} and userId={}", projectId, userId);
-        List<MemberDto> members = userService.getProjectMembersWithRole(projectId);
+        List<MemberDto> members = userService.getProjectMembersWithRole(projectId)
+                .stream()
+                .map(userMapper::memberProjectionToMemberDto)
+                .toList();
         return projectMapper.projectWithMembersProjectionToOneProjectDto(projectForUser, members);
     }
 
@@ -66,7 +71,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     @Override
     public MemberDto removeMember(Long projectId, Long memberId) {
-        MemberDto memberToDelete = userService.getProjectMemberWithRole(projectId, memberId);
+        MemberDto memberToDelete = userMapper.memberProjectionToMemberDto(
+                userService.getProjectMemberWithRole(projectId, memberId)
+        );
         userProjectRepository.deleteByIdProjectIdAndIdUserId(projectId, memberId);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
         return memberToDelete;
