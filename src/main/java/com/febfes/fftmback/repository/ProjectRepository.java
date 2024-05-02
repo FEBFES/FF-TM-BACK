@@ -19,7 +19,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
             nativeQuery = true,
             value = "SELECT COUNT(*) > 0 FROM favourite_project WHERE project_id = :projectId AND user_id = :userId"
     )
-    Boolean isProjectFavourite(Long projectId, Long userId);
+    boolean isProjectFavourite(Long projectId, Long userId);
 
     @Query(
             value = "SELECT COUNT(*) > 0 FROM ProjectEntity P " +

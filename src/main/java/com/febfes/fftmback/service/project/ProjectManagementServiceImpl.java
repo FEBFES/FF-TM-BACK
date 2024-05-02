@@ -35,10 +35,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     }
 
     @Override
-    public ProjectEntity createProject(
-            ProjectEntity project,
-            Long userId
-    ) {
+    public ProjectEntity createProject(ProjectEntity project, Long userId) {
         project.setOwnerId(userId);
         ProjectEntity projectEntity = projectRepository.save(project);
         log.info("Created project with id={}", projectEntity.getId());
@@ -55,8 +52,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
 
     @Override
     public ProjectEntity editProject(Long id, ProjectEntity project) {
-        ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(Exceptions.projectNotFound(id));
+        ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow(Exceptions.projectNotFound(id));
         projectEntity.setName(project.getName());
         projectEntity.setDescription(project.getDescription());
         projectRepository.save(projectEntity);
@@ -65,11 +61,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     }
 
     @Override
-    public void editProjectPartially(
-            Long id,
-            Long ownerId,
-            List<PatchDto> patchDtoList
-    ) {
+    public void editProjectPartially(Long id, Long ownerId, List<PatchDto> patchDtoList) {
         if (patchDtoList.isEmpty()) {
             return;
         }
