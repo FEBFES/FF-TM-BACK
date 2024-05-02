@@ -23,14 +23,10 @@ import java.util.List;
 public class ProjectManagementServiceImpl implements ProjectManagementService {
 
     private final ProjectRepository projectRepository;
-
     private final ProjectPatchFieldProcessor patchIsFavouriteProcessor;
 
     @Override
-    public ProjectEntity createProject(
-            ProjectEntity project,
-            Long userId
-    ) {
+    public ProjectEntity createProject(ProjectEntity project, Long userId) {
         project.setOwnerId(userId);
         ProjectEntity projectEntity = projectRepository.save(project);
         log.info("Saved project: {}", projectEntity);
@@ -39,16 +35,14 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
 
     @Override
     public ProjectEntity getProject(Long id) {
-        ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(Exceptions.projectNotFound(id));
+        ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow(Exceptions.projectNotFound(id));
         log.info("Received project {} by id={}", projectEntity, id);
         return projectEntity;
     }
 
     @Override
     public ProjectEntity editProject(Long id, ProjectEntity project) {
-        ProjectEntity projectEntity = projectRepository.findById(id)
-                .orElseThrow(Exceptions.projectNotFound(id));
+        ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow(Exceptions.projectNotFound(id));
         projectEntity.setName(project.getName());
         projectEntity.setDescription(project.getDescription());
         projectRepository.save(projectEntity);
@@ -57,11 +51,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     }
 
     @Override
-    public void editProjectPartially(
-            Long id,
-            Long ownerId,
-            List<PatchDto> patchDtoList
-    ) {
+    public void editProjectPartially(Long id, Long ownerId, List<PatchDto> patchDtoList) {
         if (patchDtoList.isEmpty()) {
             return;
         }
@@ -87,10 +77,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
         }
     }
 
-    private void updateProjectField(
-            PatchDto patchDto,
-            ProjectEntity projectEntity
-    ) {
+    private void updateProjectField(PatchDto patchDto, ProjectEntity projectEntity) {
         try {
             Field field = projectEntity.getClass().getDeclaredField(patchDto.key());
             field.setAccessible(true);
