@@ -53,23 +53,31 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileEntity saveFile(
+    public Optional<FileEntity> saveFile(
+            Long userId,
+            Long entityId,
+            EntityType entityType,
+            MultipartFile file
+    ) {
+        FileEntity fileEntity = createFileEntity(userId, entityId, entityType, file);
+        try {
+            fileProcess(fileEntity, file, entityId, entityType);
+        } catch (IOException e) {
+            log.error(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
+            return Optional.empty();
+        }
+        log.info("File saved by user with id={}", userId);
+        return Optional.of(fileEntity);
+    }
+
+    @Override
+    public FileEntity saveFileWithException(
             Long userId,
             Long entityId,
             EntityType entityType,
             MultipartFile file
     ) throws IOException {
-        String uuid = UUID.randomUUID().toString();
-        String idForPath = getIdForPath(entityType, userId, uuid);
-        FileEntity fileEntity = FileEntity.builder()
-                .userId(userId)
-                .entityId(entityId)
-                .name(file.getOriginalFilename())
-                .entityType(entityType)
-                .contentType(file.getContentType())
-                .fileUrn(getFileUrn(entityType, idForPath))
-                .filePath(getFilePath(entityType, file, idForPath))
-                .build();
+        FileEntity fileEntity = createFileEntity(userId, entityId, entityType, file);
         fileProcess(fileEntity, file, entityId, entityType);
         log.info("File saved by user with id={}", userId);
         return fileEntity;
@@ -138,5 +146,24 @@ public class FileServiceImpl implements FileService {
                     return null;
                 })
                 .orElseThrow(() -> new IllegalArgumentException("File path cannot be null or empty"));
+    }
+
+    private FileEntity createFileEntity(
+            Long userId,
+            Long entityId,
+            EntityType entityType,
+            MultipartFile file
+    ) {
+        String uuid = UUID.randomUUID().toString();
+        String idForPath = getIdForPath(entityType, userId, uuid);
+        return FileEntity.builder()
+                .userId(userId)
+                .entityId(entityId)
+                .name(file.getOriginalFilename())
+                .entityType(entityType)
+                .contentType(file.getContentType())
+                .fileUrn(getFileUrn(entityType, idForPath))
+                .filePath(getFilePath(entityType, file, idForPath))
+                .build();
     }
 }

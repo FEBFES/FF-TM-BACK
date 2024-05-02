@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
 
@@ -47,7 +47,7 @@ public class FileController {
             @PathVariable Long userId,
             @RequestParam("image") MultipartFile userPic
     ) throws IOException {
-        FileEntity file = fileService.saveFile(userId, userId, EntityType.USER_PIC, userPic);
+        FileEntity file = fileService.saveFileWithException(userId, userId, EntityType.USER_PIC, userPic);
         return FileMapper.INSTANCE.fileToUserPicDto(file);
     }
 
@@ -71,16 +71,11 @@ public class FileController {
             @PathVariable Long taskId,
             @RequestParam("files") MultipartFile[] files
     ) {
-        List<TaskFileDto> response = new ArrayList<>();
-        Arrays.stream(files).forEach(file -> {
-            try {
-                FileEntity savedFile = fileService.saveFile(user.getId(), taskId, EntityType.TASK, file);
-                response.add(FileMapper.INSTANCE.fileToTaskFileDto(savedFile));
-            } catch (IOException e) {
-               log.error(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
-            }
-        });
-        return response;
+        return Arrays.stream(files)
+                .map(file -> fileService.saveFile(user.getId(), taskId, EntityType.TASK, file))
+                .flatMap(Optional::stream)
+                .map(FileMapper.INSTANCE::fileToTaskFileDto)
+                .toList();
     }
 
     @Operation(summary = "Get task file")

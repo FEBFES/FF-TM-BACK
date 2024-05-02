@@ -24,7 +24,7 @@ public class SortUtils {
     }
 
     public static List<Order> getOrderFromParams(String[] sortParams) {
-        List<Order> sortRows = new ArrayList<>();
+        List<Order> sortRows = new ArrayList<>(sortParams.length);
         for (String sortParam : sortParams) {
             sortRows.add(getOrderFromParam(sortParam));
         }
