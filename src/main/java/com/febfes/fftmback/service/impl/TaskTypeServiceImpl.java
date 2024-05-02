@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,23 +16,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TaskTypeServiceImpl implements TaskTypeService {
 
-    public static final List<String> DEFAULT_TASK_TYPES = List.of("bug", "feature", "research", "question");
-
-
     private final TaskTypeRepository taskTypeRepository;
 
     @Override
     public void createDefaultTaskTypesForProject(Long projectId) {
-        DEFAULT_TASK_TYPES
-                .stream()
-                .map(typeName -> TaskTypeEntity
-                        .builder()
-                        .name(typeName)
+        Arrays.stream(DefaultTaskTypes.values())
+                .map(type -> TaskTypeEntity.builder()
+                        .name(type.getCaption())
                         .projectId(projectId)
                         .build()
                 )
                 .forEach(taskTypeRepository::save);
-        log.info("Created default task types: {} for project with id={}", DEFAULT_TASK_TYPES, projectId);
+        log.info("Created default task types for project with id={}", projectId);
     }
 
     @Override
