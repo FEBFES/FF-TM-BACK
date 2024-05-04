@@ -19,7 +19,7 @@ public enum EntityType {
 
         @Override
         public String getFilePath(MultipartFile file, String idForPath) {
-            return "%s%s.%s".formatted(FILES_FOLDER,
+            return "%s%s.%s".formatted(filesFolder,
                     idForPath, FileUtils.getExtension(file.getOriginalFilename()));
         }
     },
@@ -36,16 +36,16 @@ public enum EntityType {
 
         @Override
         public String getFilePath(MultipartFile file, String idForPath) {
-            return "%s%s.%s".formatted(USER_PIC_FOLDER,
+            return "%s%s.%s".formatted(userPicFolder,
                     idForPath, FileUtils.getExtension(file.getOriginalFilename()));
         }
     };
 
     @Value("${files.folder}")
-    private static String FILES_FOLDER;
+    private static String filesFolder;
 
     @Value("${user-pic.folder}")
-    private static String USER_PIC_FOLDER;
+    private static String userPicFolder;
 
     public abstract String getIdForPath(Long userId, String uuid);
 

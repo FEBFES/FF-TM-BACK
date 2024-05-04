@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,11 +24,9 @@ public class SortUtils {
     }
 
     public static List<Order> getOrderFromParams(String[] sortParams) {
-        List<Order> sortRows = new ArrayList<>(sortParams.length);
-        for (String sortParam : sortParams) {
-            sortRows.add(getOrderFromParam(sortParam));
-        }
-        return sortRows;
+        return Arrays.stream(sortParams)
+                .map(SortUtils::getOrderFromParam)
+                .toList();
     }
 
     private static Sort.Direction getDirection(String direction) {
