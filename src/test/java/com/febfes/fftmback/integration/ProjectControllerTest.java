@@ -4,6 +4,8 @@ import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
+import com.febfes.fftmback.domain.projection.ProjectProjection;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
@@ -61,9 +63,8 @@ class ProjectControllerTest extends BasicTestClass {
 
         waitPools();
 
-        List<ProjectDto> projects = projectMemberService.getProjectsForUser(createdUserId, new ArrayList<>());
-        Assertions.assertThat(projects)
-                .hasSize(2);
+        List<ProjectProjection> projects = projectMemberService.getProjectsForUser(createdUserId, new ArrayList<>());
+        Assertions.assertThat(projects).hasSize(2);
     }
 
     @Test
@@ -173,15 +174,15 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        OneProjectDto updatedProject = projectMemberService.getProjectForUser(createdProjectId, createdUserId);
-        Assertions.assertThat(updatedProject.isFavourite())
-                .isTrue();
-        List<ProjectDto> userProjects = projectMemberService.getProjectsForUser(createdUserId, Lists.newArrayList());
-        Optional<ProjectDto> userProject = userProjects.stream().findFirst();
-        Assertions.assertThat(userProject)
-                .isNotEmpty();
-        Assertions.assertThat(userProject.get().isFavourite())
-                .isTrue();
+        ProjectForUserProjection updatedProject = projectMemberService
+                .getProjectForUser(createdProjectId, createdUserId);
+        Assertions.assertThat(updatedProject.getIsFavourite()).isTrue();
+        Optional<ProjectProjection> userProject = projectMemberService
+                .getProjectsForUser(createdUserId, Lists.newArrayList())
+                .stream()
+                .findFirst();
+        Assertions.assertThat(userProject).isNotEmpty();
+        Assertions.assertThat(userProject.get().getIsFavourite()).isTrue();
     }
 
     @Test
@@ -196,15 +197,15 @@ class ProjectControllerTest extends BasicTestClass {
                 .patch("%s/{id}".formatted(PATH_TO_PROJECTS_API), createdProjectId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        OneProjectDto updatedProject = projectMemberService.getProjectForUser(createdProjectId, createdUserId);
-        Assertions.assertThat(updatedProject.isFavourite())
-                .isFalse();
-        List<ProjectDto> userProjects = projectMemberService.getProjectsForUser(createdUserId, Lists.newArrayList());
-        Optional<ProjectDto> userProject = userProjects.stream().findFirst();
-        Assertions.assertThat(userProject)
-                .isNotEmpty();
-        Assertions.assertThat(userProject.get().isFavourite())
-                .isFalse();
+        ProjectForUserProjection updatedProject = projectMemberService
+                .getProjectForUser(createdProjectId, createdUserId);
+        Assertions.assertThat(updatedProject.getIsFavourite()).isFalse();
+        Optional<ProjectProjection> userProject = projectMemberService
+                .getProjectsForUser(createdUserId, Lists.newArrayList())
+                .stream()
+                .findFirst();
+        Assertions.assertThat(userProject).isNotEmpty();
+        Assertions.assertThat(userProject.get().getIsFavourite()).isFalse();
     }
 
     @Test

@@ -3,14 +3,10 @@ package com.febfes.fftmback.service.project;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.common.UserProjectId;
 import com.febfes.fftmback.domain.dao.UserProject;
+import com.febfes.fftmback.domain.projection.MemberProjection;
 import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
 import com.febfes.fftmback.domain.projection.ProjectProjection;
-import com.febfes.fftmback.dto.MemberDto;
-import com.febfes.fftmback.dto.OneProjectDto;
-import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.exception.Exceptions;
-import com.febfes.fftmback.mapper.ProjectMapper;
-import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.UserProjectRepository;
 import com.febfes.fftmback.service.RoleService;
@@ -35,32 +31,23 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private final UserProjectRepository userProjectRepository;
     private final UserService userService;
     private final RoleService roleService;
-    private final ProjectMapper projectMapper;
-    private final UserMapper userMapper;
 
     @Override
-    public List<ProjectDto> getProjectsForUser(Long userId, List<Sort.Order> sort) {
+    public List<ProjectProjection> getProjectsForUser(Long userId, List<Sort.Order> sort) {
         List<Sort.Order> snakeCaseSort = sort.stream()
                 .map(s -> new Sort.Order(s.getDirection(), camelToSnake(s.getProperty())))
                 .toList();
-        List<ProjectProjection> userProjects = projectRepository.getUserProjects(
-                userId, Sort.by(snakeCaseSort));
+        List<ProjectProjection> userProjects = projectRepository.getUserProjects(userId, Sort.by(snakeCaseSort));
         log.info("Received {} projects for user with id={}", userProjects.size(), userId);
-        return userProjects.stream()
-                .map(projectMapper::projectProjectionToProjectDto)
-                .toList();
+        return userProjects;
     }
 
     @Override
-    public OneProjectDto getProjectForUser(Long projectId, Long userId) {
+    public ProjectForUserProjection getProjectForUser(Long projectId, Long userId) {
         ProjectForUserProjection projectForUser = projectRepository.getProjectForUser(projectId, userId)
                 .orElseThrow(Exceptions.projectNotFound(projectId));
         log.info("Received project by id={} and userId={}", projectId, userId);
-        List<MemberDto> members = userService.getProjectMembersWithRole(projectId)
-                .stream()
-                .map(userMapper::memberProjectionToMemberDto)
-                .toList();
-        return projectMapper.projectWithMembersProjectionToOneProjectDto(projectForUser, members);
+        return projectForUser ;
     }
 
     @Override
@@ -70,10 +57,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public MemberDto removeMember(Long projectId, Long memberId) {
-        MemberDto memberToDelete = userMapper.memberProjectionToMemberDto(
-                userService.getProjectMemberWithRole(projectId, memberId)
-        );
+    public MemberProjection removeMember(Long projectId, Long memberId) {
+        MemberProjection memberToDelete = userService.getProjectMemberWithRole(projectId, memberId);
         userProjectRepository.deleteByIdProjectIdAndIdUserId(projectId, memberId);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
         return memberToDelete;
@@ -85,7 +70,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
                 .id(UserProjectId.builder()
                         .userId(memberId)
                         .projectId(projectId)
-                        .build())
+                        .build()
+                )
                 .build();
         userProjectRepository.save(userProject);
         roleService.changeUserRoleOnProject(projectId, memberId, roleName);
