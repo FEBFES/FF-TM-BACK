@@ -53,6 +53,6 @@ public class MemberController {
     public MemberDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
         roleCheckerComponent.checkIfUserIsOwner(id, memberId);
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        return projectMemberService.removeMember(id, memberId);
+        return userMapper.memberProjectionToMemberDto(projectMemberService.removeMember(id, memberId));
     }
 }

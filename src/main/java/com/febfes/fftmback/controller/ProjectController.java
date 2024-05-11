@@ -6,11 +6,14 @@ import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.projection.MemberProjection;
+import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.TaskTypeService;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +41,8 @@ public class ProjectController {
     private final TaskTypeService taskTypeService;
     private final RoleCheckerComponent roleCheckerComponent;
     private final ProjectMapper projectMapper;
+    private final UserService userService;
+
 
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
@@ -45,7 +50,9 @@ public class ProjectController {
             @SortParam @RequestParam(defaultValue = "-createDate") String[] sort,
             @AuthenticationPrincipal UserEntity user
     ) {
-        return projectMemberService.getProjectsForUser(user.getId(), getOrderFromParams(sort));
+        return projectMapper.projectProjectionToProjectDto(
+                projectMemberService.getProjectsForUser(user.getId(), getOrderFromParams(sort))
+        );
     }
 
     @Operation(summary = "Create new project")
@@ -64,7 +71,9 @@ public class ProjectController {
     @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public OneProjectDto getProject(@AuthenticationPrincipal UserEntity user, @PathVariable Long id) {
-        return projectMemberService.getProjectForUser(id, user.getId());
+        ProjectForUserProjection project = projectMemberService.getProjectForUser(id, user.getId());
+        List<MemberProjection> members =  userService.getProjectMembersWithRole(id);
+        return projectMapper.projectWithMembersProjectionToOneProjectDto(project, members);
     }
 
     @Operation(summary = "Edit project by its id")

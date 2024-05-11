@@ -1,8 +1,10 @@
 package com.febfes.fftmback.service.impl;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public enum DefaultTaskTypes {
 
     BUG("bug"),
@@ -11,7 +13,4 @@ public enum DefaultTaskTypes {
     QUESTION("question");
 
     private final String caption;
-    DefaultTaskTypes(String caption) {
-        this.caption = caption;
-    }
 }

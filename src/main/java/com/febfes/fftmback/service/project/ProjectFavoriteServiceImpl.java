@@ -14,7 +14,7 @@ public class ProjectFavoriteServiceImpl implements ProjectFavoriteService {
 
     @Override
     public void addProjectToFavourite(Long projectId, Long userId) {
-        if (projectRepository.isProjectFavourite(projectId, userId)) {
+        if (!projectRepository.isProjectFavourite(projectId, userId)) {
             projectRepository.addProjectToFavourite(projectId, userId);
         }
     }
