@@ -14,11 +14,6 @@
       "name": "jwt.refreshExpirationDateInSeconds",
       "type": "java.lang.Integer",
       "description": "Refresh JWT expiration date in seconds."
-    },
-    {
-      "name": "user-pic.folder",
-      "type": "java.lang.String",
-      "description": "User pic folder."
     }
   ]
 }

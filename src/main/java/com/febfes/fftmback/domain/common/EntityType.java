@@ -1,7 +1,6 @@
 package com.febfes.fftmback.domain.common;
 
 import com.febfes.fftmback.util.FileUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 public enum EntityType {
@@ -18,9 +17,8 @@ public enum EntityType {
         }
 
         @Override
-        public String getFilePath(MultipartFile file, String idForPath) {
-            return "%s%s.%s".formatted(filesFolder,
-                    idForPath, FileUtils.getExtension(file.getOriginalFilename()));
+        public String getPathPropertyName() {
+            return "folders.task-files";
         }
     },
     USER_PIC {
@@ -35,21 +33,18 @@ public enum EntityType {
         }
 
         @Override
-        public String getFilePath(MultipartFile file, String idForPath) {
-            return "%s%s.%s".formatted(userPicFolder,
-                    idForPath, FileUtils.getExtension(file.getOriginalFilename()));
+        public String getPathPropertyName() {
+            return "folders.user-pic";
         }
     };
-
-    @Value("${files.folder}")
-    private static String filesFolder;
-
-    @Value("${user-pic.folder}")
-    private static String userPicFolder;
 
     public abstract String getIdForPath(Long userId, String uuid);
 
     public abstract String getFileUrn(String idForUrn);
 
-    public abstract String getFilePath(MultipartFile file, String idForPath);
+    public abstract String getPathPropertyName();
+
+    public String getFilePath(MultipartFile file, String folderPath, String idForPath) {
+        return "%s%s.%s".formatted(folderPath, idForPath, FileUtils.getExtension(file.getOriginalFilename()));
+    }
 }

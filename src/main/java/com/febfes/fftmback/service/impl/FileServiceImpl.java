@@ -7,6 +7,7 @@ import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
+    private final Environment env;
     private final FileRepository repository;
 
     @Override
@@ -45,25 +47,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Optional<FileEntity> saveFile(
-            Long userId,
-            Long entityId,
-            EntityType entityType,
-            MultipartFile file
-    ) {
-        FileEntity fileEntity = createFileEntity(userId, entityId, entityType, file);
-        try {
-            fileProcess(fileEntity, file, entityId, entityType);
-        } catch (IOException e) {
-            log.error(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
-            return Optional.empty();
-        }
-        log.info("File saved by user with id={}", userId);
-        return Optional.of(fileEntity);
-    }
-
-    @Override
-    public FileEntity saveFileWithException(
+    public FileEntity saveFile(
             Long userId,
             Long entityId,
             EntityType entityType,
@@ -113,7 +97,7 @@ public class FileServiceImpl implements FileService {
 
     private String getFilePath(EntityType entityType, MultipartFile file, String idForPath) {
         return Optional.ofNullable(entityType)
-                .map(type -> type.getFilePath(file, idForPath))
+                .map(type -> type.getFilePath(file, env.getProperty(type.getPathPropertyName()), idForPath))
                 .orElseThrow(() -> new IllegalArgumentException("File path cannot be null or empty"));
     }
 

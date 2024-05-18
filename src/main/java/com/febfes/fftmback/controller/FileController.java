@@ -47,7 +47,7 @@ public class FileController {
             @PathVariable Long userId,
             @RequestParam("image") MultipartFile userPic
     ) throws IOException {
-        FileEntity file = fileService.saveFileWithException(userId, userId, EntityType.USER_PIC, userPic);
+        FileEntity file = fileService.saveFile(userId, userId, EntityType.USER_PIC, userPic);
         return FileMapper.INSTANCE.fileToUserPicDto(file);
     }
 
@@ -72,7 +72,7 @@ public class FileController {
             @RequestParam("files") MultipartFile[] files
     ) {
         return Arrays.stream(files)
-                .map(file -> fileService.saveFile(user.getId(), taskId, EntityType.TASK, file))
+                .map(file -> saveTaskFile(user.getId(), taskId, file))
                 .flatMap(Optional::stream)
                 .map(FileMapper.INSTANCE::fileToTaskFileDto)
                 .toList();
@@ -98,5 +98,19 @@ public class FileController {
     @ApiDelete(path = "user-pic/{userId}")
     public void deleteUserPic(@PathVariable Long userId) {
         fileService.deleteFileById(fileService.getFile(String.format(USER_PIC_URN, userId)).getId());
+    }
+
+    private Optional<FileEntity> saveTaskFile(
+            Long userId,
+            Long entityId,
+            MultipartFile file
+    ) {
+        try {
+            FileEntity fileEntity = fileService.saveFile(userId, entityId, EntityType.TASK, file);
+            return Optional.of(fileEntity);
+        } catch (IOException e) {
+            log.error(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
+            return Optional.empty();
+        }
     }
 }
