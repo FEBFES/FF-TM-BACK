@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
 
@@ -71,16 +71,11 @@ public class FileController {
             @PathVariable Long taskId,
             @RequestParam("files") MultipartFile[] files
     ) {
-        List<TaskFileDto> response = new ArrayList<>();
-        Arrays.stream(files).forEach(file -> {
-            try {
-                FileEntity savedFile = fileService.saveFile(user.getId(), taskId, EntityType.TASK, file);
-                response.add(FileMapper.INSTANCE.fileToTaskFileDto(savedFile));
-            } catch (IOException e) {
-               log.error(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
-            }
-        });
-        return response;
+        return Arrays.stream(files)
+                .map(file -> saveTaskFile(user.getId(), taskId, file))
+                .flatMap(Optional::stream)
+                .map(FileMapper.INSTANCE::fileToTaskFileDto)
+                .toList();
     }
 
     @Operation(summary = "Get task file")
@@ -103,5 +98,19 @@ public class FileController {
     @ApiDelete(path = "user-pic/{userId}")
     public void deleteUserPic(@PathVariable Long userId) {
         fileService.deleteFileById(fileService.getFile(String.format(USER_PIC_URN, userId)).getId());
+    }
+
+    private Optional<FileEntity> saveTaskFile(
+            Long userId,
+            Long entityId,
+            MultipartFile file
+    ) {
+        try {
+            FileEntity fileEntity = fileService.saveFile(userId, entityId, EntityType.TASK, file);
+            return Optional.of(fileEntity);
+        } catch (IOException e) {
+            log.error(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
+            return Optional.empty();
+        }
     }
 }

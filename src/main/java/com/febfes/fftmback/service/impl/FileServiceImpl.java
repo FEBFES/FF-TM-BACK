@@ -5,10 +5,9 @@ import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.FileService;
-import com.febfes.fftmback.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,13 +24,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
+    private final Environment env;
     private final FileRepository repository;
-
-    @Value("${files.folder}")
-    private String filesFolder;
-
-    @Value("${user-pic.folder}")
-    private String userPicFolder;
 
     @Override
     public FileEntity getFile(String fileUrn) {
@@ -59,17 +53,7 @@ public class FileServiceImpl implements FileService {
             EntityType entityType,
             MultipartFile file
     ) throws IOException {
-        String uuid = UUID.randomUUID().toString();
-        String idForPath = getIdForPath(entityType, userId, uuid);
-        FileEntity fileEntity = FileEntity.builder()
-                .userId(userId)
-                .entityId(entityId)
-                .name(file.getOriginalFilename())
-                .entityType(entityType)
-                .contentType(file.getContentType())
-                .fileUrn(getFileUrn(entityType, idForPath))
-                .filePath(getFilePath(entityType, file, idForPath))
-                .build();
+        FileEntity fileEntity = createFileEntity(userId, entityId, entityType, file);
         fileProcess(fileEntity, file, entityId, entityType);
         log.info("File saved by user with id={}", userId);
         return fileEntity;
@@ -101,42 +85,38 @@ public class FileServiceImpl implements FileService {
 
     private String getIdForPath(EntityType entityType, Long userId, String uuid) {
         return Optional.ofNullable(entityType)
-                .map(type -> {
-                    if (EntityType.USER_PIC.equals(type)) {
-                        return userId.toString();
-                    } else if (EntityType.TASK.equals(type)) {
-                        return uuid;
-                    }
-                    return null;
-                })
+                .map(type -> type.getIdForPath(userId, uuid))
                 .orElseThrow(() -> new IllegalArgumentException("ID for URN cannot be null or empty"));
     }
 
     private String getFileUrn(EntityType entityType, String idForUrn) {
         return Optional.ofNullable(entityType)
-                .map(type -> {
-                    if (EntityType.USER_PIC.equals(type)) {
-                        return String.format(FileUtils.USER_PIC_URN, Long.parseLong(idForUrn));
-                    } else if (EntityType.TASK.equals(type)) {
-                        return String.format(FileUtils.TASK_FILE_URN, idForUrn);
-                    }
-                    return null;
-                })
+                .map(type -> type.getFileUrn(idForUrn))
                 .orElseThrow(() -> new IllegalArgumentException("File URN cannot be null or empty"));
     }
 
     private String getFilePath(EntityType entityType, MultipartFile file, String idForPath) {
         return Optional.ofNullable(entityType)
-                .map(type -> {
-                    if (EntityType.USER_PIC.equals(type)) {
-                        return "%s%s.%s".formatted(userPicFolder,
-                                idForPath, FileUtils.getExtension(file.getOriginalFilename()));
-                    } else if (EntityType.TASK.equals(type)) {
-                        return "%s%s.%s".formatted(filesFolder,
-                                idForPath, FileUtils.getExtension(file.getOriginalFilename()));
-                    }
-                    return null;
-                })
+                .map(type -> type.getFilePath(file, env.getProperty(type.getPathPropertyName()), idForPath))
                 .orElseThrow(() -> new IllegalArgumentException("File path cannot be null or empty"));
+    }
+
+    private FileEntity createFileEntity(
+            Long userId,
+            Long entityId,
+            EntityType entityType,
+            MultipartFile file
+    ) {
+        String uuid = UUID.randomUUID().toString();
+        String idForPath = getIdForPath(entityType, userId, uuid);
+        return FileEntity.builder()
+                .userId(userId)
+                .entityId(entityId)
+                .name(file.getOriginalFilename())
+                .entityType(entityType)
+                .contentType(file.getContentType())
+                .fileUrn(getFileUrn(entityType, idForPath))
+                .filePath(getFilePath(entityType, file, idForPath))
+                .build();
     }
 }

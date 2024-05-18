@@ -21,7 +21,7 @@ public abstract class BaseView {
     @Column(name = "\"id\"")
     private Long id;
 
-    @Column(name = "\"createDate\"")
+    @Column(name = "\"createDate\"", updatable = false)
     @CreationTimestamp
     private Date createDate;
 }
