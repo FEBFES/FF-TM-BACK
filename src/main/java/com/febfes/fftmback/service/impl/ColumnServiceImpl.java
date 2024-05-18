@@ -58,11 +58,12 @@ public class ColumnServiceImpl implements ColumnService {
     public void createDefaultColumnsForProject(Long projectId) {
         Arrays.stream(DefaultColumns.values())
                 .map(DefaultColumns::getCaption)
-                .forEach(columnName -> createColumn(TaskColumnEntity.builder()
-                .name(columnName)
-                .projectId(projectId)
-                .build()
-        ));
+                .forEach(columnName -> createColumn(
+                        TaskColumnEntity.builder()
+                                .name(columnName)
+                                .projectId(projectId)
+                                .build()
+                ));
         log.info("Created default columns");
     }
 
