@@ -10,7 +10,8 @@ public enum DefaultTaskTypes {
     BUG("bug"),
     FEATURE("feature"),
     RESEARCH("research"),
-    QUESTION("question");
+    QUESTION("question")
+    ;
 
     private final String caption;
 }

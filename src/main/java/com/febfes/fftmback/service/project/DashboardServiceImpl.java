@@ -39,7 +39,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<ColumnWithTasksDto> columnsWithTasks = columns.stream()
                 .map(column -> columnWithTasksMapper.columnToColumnWithTasksDto(
                         column,
-                        columnIdToTaskListMap.getOrDefault(column.getId(), Collections.EMPTY_LIST)
+                        columnIdToTaskListMap.getOrDefault(column.getId(), Collections.emptyList())
                 ))
                 .toList();
         log.info("Received dashboard with id={}", id);
