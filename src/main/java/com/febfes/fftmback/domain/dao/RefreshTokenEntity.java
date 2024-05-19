@@ -15,14 +15,14 @@ import java.util.Date;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = {"userEntity"})
+@NamedEntityGraph(name = "refresh-token-entity-graph", attributeNodes = @NamedAttributeNode("userEntity"))
 public class RefreshTokenEntity extends BaseEntity {
 
     public static final String ENTITY_NAME = "Refresh token";
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ToString.Exclude
     private UserEntity userEntity;
 
     @Column(name = "token", nullable = false, unique = true)
