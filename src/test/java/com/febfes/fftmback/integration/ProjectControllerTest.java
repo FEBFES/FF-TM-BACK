@@ -271,6 +271,8 @@ class ProjectControllerTest extends BasicTestClass {
         projectManagementServiceDecorator.createProject(DtoBuilders.createProject(name1), createdUserId);
         projectManagementServiceDecorator.createProject(DtoBuilders.createProject(name2), createdUserId);
 
+        waitPools();
+
         List<ProjectDto> projects = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
