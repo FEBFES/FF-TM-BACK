@@ -62,7 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         user.setDisplayName(isNull(user.getDisplayName()) ? generateDisplayName() : user.getDisplayName());
         userRepository.save(user);
-        log.info("User saved: {}", user);
+        log.info("User with username = {} saved", user.getUsername());
     }
 
     @Override
@@ -96,7 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new TokenExpiredException(token);
             }
         } catch (JWTDecodeException e) {
-            log.error(e.getMessage());
+            log.error("checkAccessTokenExpiration throws JWTDecodeException", e);
             throw e;
         }
     }

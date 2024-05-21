@@ -34,7 +34,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshTokenEntity getByToken(String token) {
         RefreshTokenEntity refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(Exceptions.refreshTokenNotFound(token));
-        log.info("Received refresh token {} by token={}", refreshToken, token);
+        log.info("Received refresh token entity with id={} by token={}", refreshToken.getId(), token);
         return refreshToken;
     }
 
@@ -42,7 +42,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshTokenEntity getByUserId(Long userId) {
         RefreshTokenEntity refreshToken = refreshTokenRepository.findByUserId(userId)
                 .orElseThrow(Exceptions.refreshTokenNotFoundByUserId(userId));
-        log.info("Received refresh token {} by user id={}", refreshToken, userId);
+        log.info("Received refresh token entity with id={} by user_id={}", refreshToken.getId(), userId);
         return refreshToken;
     }
 
@@ -51,7 +51,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpiryDate(DateUtils.getCurrentDatePlusSeconds(jwtRefreshExpirationDateInSeconds));
         RefreshTokenEntity updatedRefreshToken = refreshTokenRepository.save(refreshToken);
-        log.info("Updated refresh token: {}", updatedRefreshToken);
+        log.info("Updated refresh token entity: {}", updatedRefreshToken);
         return updatedRefreshToken;
     }
 
@@ -64,7 +64,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                         .token(UUID.randomUUID().toString())
                         .build()
         );
-        log.info("Saved refresh token: {}", refreshToken);
+        log.info("Saved refresh token entity with id={}", refreshToken.getId());
         return refreshToken;
     }
 
@@ -73,7 +73,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshTokenEntity refreshTokenEntity = getByToken(token);
         String accessToken = jwtService.generateToken(refreshTokenEntity.getUserEntity());
         RefreshTokenEntity updatedRefreshTokenEntity = updateRefreshToken(refreshTokenEntity);
-        log.info("Refresh token with id={} refreshed", updatedRefreshTokenEntity.getId());
+        log.info("Refresh token entity with id={} was refreshed", updatedRefreshTokenEntity.getId());
         return new TokenDto(accessToken, updatedRefreshTokenEntity.getToken());
     }
 
@@ -89,7 +89,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             log.info("User with id={} authenticated with existed non expired refresh token", userId);
             return existedRefreshToken;
         } catch (EntityNotFoundException ignored) {
-            log.info("There is no refresh token in db for user with id={}", userId);
+            log.info("There is no refresh token in DB for user with id={}", userId);
         }
 
         return createRefreshToken(userId);
