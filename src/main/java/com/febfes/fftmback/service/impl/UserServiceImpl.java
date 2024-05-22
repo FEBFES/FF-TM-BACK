@@ -32,8 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .orElseThrow(Exceptions.userNotFound(username));
+        return userRepository.findByUsername(username).orElseThrow(Exceptions.userNotFound(username));
     }
 
     @Override
@@ -43,17 +42,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity getUserById(Long id) {
-        UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(Exceptions.userNotFoundById(id));
-        log.info("Received user {} by id={}", userEntity, id);
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(Exceptions.userNotFoundById(id));
+        log.info("Received user by id={}", id);
         return userEntity;
     }
 
     @Override
     public UserView getUserViewById(Long id) {
-        UserView user = userViewRepository.findById(id)
-                .orElseThrow(Exceptions.userNotFoundById(id));
-        log.info("Received user {} by id={}", user, id);
+        UserView user = userViewRepository.findById(id).orElseThrow(Exceptions.userNotFoundById(id));
+        log.info("Received user by id={}", id);
         return user;
     }
 
@@ -68,7 +65,7 @@ public class UserServiceImpl implements UserService {
             userToUpdate.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         }
         userRepository.save(userToUpdate);
-        log.info("Updated user: {}", userToUpdate);
+        log.info("Updated user with id={}", id);
     }
 
     @Override

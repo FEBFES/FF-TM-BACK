@@ -47,10 +47,12 @@ public class TaskTypeServiceImpl implements TaskTypeService {
     @Override
     public void deleteAllTypesByProjectId(Long projectId) {
         taskTypeRepository.deleteAllByProjectId(projectId);
+        log.info("All project {} task types were removed", projectId);
     }
 
     @Override
     public TaskTypeEntity createTaskType(TaskTypeEntity taskType) {
+        log.info("Task type created: {}", taskType);
         return taskTypeRepository.save(taskType);
     }
 

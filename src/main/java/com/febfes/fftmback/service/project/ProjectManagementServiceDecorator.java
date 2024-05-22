@@ -8,14 +8,12 @@ import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskTypeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-@Slf4j
 @Service("projectManagementServiceDecorator")
 @Transactional
 @RequiredArgsConstructor

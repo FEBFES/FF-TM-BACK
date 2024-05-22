@@ -52,8 +52,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     public OneProjectDto getProjectForUser(Long projectId, Long userId) {
         ProjectWithMembersProjection project = projectRepository.getProjectByIdAndUserId(projectId, userId)
                 .orElseThrow(Exceptions.projectNotFound(projectId));
-        log.info("Received project by id={} and userId={}", projectId, userId);
         List<MemberDto> members = userService.getProjectMembersWithRole(projectId);
+        log.info("Received project by id={} and userId={}", projectId, userId);
         return ProjectMapper.INSTANCE.projectWithMembersProjectionToOneProjectDto(project, members);
     }
 
