@@ -8,14 +8,29 @@ import java.util.Date;
 
 @UtilityClass
 public class DateUtils {
-    public static final String STANDARD_DATE_PATTERN = "dd-MM-yyyy HH:mm:ss";
 
     public static Date getCurrentDate() {
         return new Date();
     }
 
+    public static LocalDateTime getCurrentLocalDateTime() {
+        return LocalDateTime.now();
+    }
+
     public static Date getCurrentDatePlusSeconds(int seconds) {
         return new Date(System.currentTimeMillis() + seconds * 1000L);
+    }
+
+    public static LocalDateTime getCurrentLocalDateTimePlusSeconds(int seconds) {
+        return LocalDateTime.now().plusSeconds(seconds);
+    }
+
+    public static boolean isDateBeforeCurrentDate(Date date) {
+        return date.before(DateUtils.getCurrentDate());
+    }
+
+    public static boolean isDateBeforeCurrentDate(LocalDateTime date) {
+        return date.isBefore(DateUtils.getCurrentLocalDateTime());
     }
 
     public static LocalDateTime convertDateToLocalDateTime(Date date) {
@@ -23,11 +38,6 @@ public class DateUtils {
     }
 
     public static Date convertLocalDateTimeToDate(LocalDateTime dateToConvert) {
-        return Date.from(dateToConvert.atZone(ZoneId.systemDefault())
-                .toInstant());
-    }
-
-    public static boolean isDateBeforeCurrentDate(Date date) {
-        return date.before(DateUtils.getCurrentDate());
+        return Date.from(dateToConvert.atZone(ZoneId.systemDefault()).toInstant());
     }
 }

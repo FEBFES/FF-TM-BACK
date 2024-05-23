@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @MappedSuperclass
 @SuperBuilder
@@ -23,5 +23,5 @@ public abstract class BaseView {
 
     @Column(name = "\"createDate\"", updatable = false)
     @CreationTimestamp
-    private Date createDate;
+    private LocalDateTime createDate;
 }
