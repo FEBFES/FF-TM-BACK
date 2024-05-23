@@ -2,7 +2,7 @@ package com.febfes.fftmback.dto;
 
 import com.febfes.fftmback.domain.common.TaskPriority;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public record TaskShortDto(
         Long id,
@@ -10,13 +10,14 @@ public record TaskShortDto(
         String description,
         Long columnId,
         Long projectId,
-        Date createDate,
+        LocalDateTime createDate,
         TaskPriority priority,
         String type,
         Long filesCounter,
         UserDto owner,
         UserDto assignee,
-        Date updateDate,
-        Integer order
+        LocalDateTime updateDate,
+        Integer order,
+        LocalDateTime deadlineDate
 ) {
 }

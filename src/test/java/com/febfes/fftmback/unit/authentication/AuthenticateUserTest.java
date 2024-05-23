@@ -69,7 +69,7 @@ class AuthenticateUserTest {
         refreshToken.setId(FIRST_ID);
         refreshToken.setToken(TOKEN);
         refreshToken.setUserEntity(user);
-        refreshToken.setExpiryDate(DateUtils.getCurrentDate());
+        refreshToken.setExpiryDate(DateUtils.getCurrentLocalDateTime());
 
         // Set up the mock objects to return the expected values
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(null);

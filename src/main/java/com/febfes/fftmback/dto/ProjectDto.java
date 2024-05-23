@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Builder
 public record ProjectDto(
@@ -18,7 +18,7 @@ public record ProjectDto(
         String description,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-        Date createDate,
+        LocalDateTime createDate,
 
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Long ownerId,

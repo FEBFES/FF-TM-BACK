@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: IvanShish
+      comment: "Add task deadline"
+      changes:
+        - addColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: deadline_date
+                  type: timestamp
