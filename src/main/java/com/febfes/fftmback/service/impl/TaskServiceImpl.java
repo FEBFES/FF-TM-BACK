@@ -105,6 +105,7 @@ public class TaskServiceImpl implements TaskService {
         task.setProjectId(editTask.getProjectId());
         task.setPriority(editTask.getPriority());
         task.setAssigneeId(editTask.getAssigneeId());
+        task.setDeadlineDate(editTask.getDeadlineDate());
         fillTaskType(task, editTask.getTaskType().getName(), editTask.getProjectId());
         taskRepository.save(task);
         orderService.editOrder(task, editTask.getEntityOrder());
