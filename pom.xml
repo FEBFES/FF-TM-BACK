@@ -16,7 +16,7 @@
     <properties>
         <java.version>17</java.version>
         <jwt.version>0.11.5</jwt.version>
-        <jaxb.veresion>2.3.0</jaxb.veresion>
+        <jaxb.version>2.3.0</jaxb.version>
         <sonar.organization>febfes</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -122,7 +122,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.17.6</version>
+            <version>1.19.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -141,7 +141,7 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
-            <version>3.3.0</version>
+            <version>5.4.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -149,17 +149,17 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>${jaxb.veresion}</version>
+            <version>${jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-core</artifactId>
-            <version>${jaxb.veresion}</version>
+            <version>${jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb.veresion}</version>
+            <version>${jaxb.version}</version>
         </dependency>
 
         <!--    liquibase   -->

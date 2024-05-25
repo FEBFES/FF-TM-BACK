@@ -23,9 +23,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<RoleEntity> getRoles() {
-        List<RoleEntity> roles = roleRepository.findAll();
-        log.info("Received {} roles", roles);
-        return roles;
+        return roleRepository.findAll();
     }
 
     @Override
@@ -51,7 +49,7 @@ public class RoleServiceImpl implements RoleService {
         RoleEntity ownerRole = getRoleByName(roleName);
         user.getProjectRoles().put(projectId, ownerRole);
         userRepository.save(user);
-        log.info("Changed user roleOnProject on project. User id: {}, Project id: {}, Role name: {}",
+        log.info("The user's role on the project has been changed. User id: {}, Project id: {}, Role name: {}",
                 user.getId(), projectId, roleName.name());
     }
 }

@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -55,15 +54,14 @@ public class FileServiceImpl implements FileService {
     ) throws IOException {
         FileEntity fileEntity = createFileEntity(userId, entityId, entityType, file);
         fileProcess(fileEntity, file, entityId, entityType);
-        log.info("File saved by user with id={}", userId);
+        log.info("File entity with id={} saved by user with id={}", fileEntity.getId(), userId);
         return fileEntity;
     }
 
     @Override
-    @Transactional
     public void deleteFileById(Long id) {
         repository.deleteById(id);
-        log.info("Deleted file with id={}", id);
+        log.info("Deleted file entity with id={}", id);
     }
 
     private void fileProcess(

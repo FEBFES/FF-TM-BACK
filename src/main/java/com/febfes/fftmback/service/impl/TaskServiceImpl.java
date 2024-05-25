@@ -33,7 +33,7 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
-    private static final String RECEIVED_TASKS_SIZE_LOG = "Received tasks size: {}";
+    private static final String RECEIVED_TASKS_SIZE_LOG = "Received {} tasks";
 
     private final TaskRepository taskRepository;
     private final TaskViewRepository taskViewRepository;
@@ -67,8 +67,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskView getTaskById(Long id) {
-        return taskViewRepository.findById(id)
-                .orElseThrow(Exceptions.taskNotFound(id));
+        return taskViewRepository.findById(id).orElseThrow(Exceptions.taskNotFound(id));
     }
 
     @Override
@@ -87,15 +86,14 @@ public class TaskServiceImpl implements TaskService {
         }
         task.setEntityOrder(orderService.getNewOrder(task));
         TaskEntity savedTask = taskRepository.save(task);
-        log.info("Saved task: {}", savedTask);
+        log.info("Saved task {} with name = {}", savedTask.getId(), savedTask.getName());
         return savedTask.getId();
     }
 
     @Override
     public void updateTask(TaskEntity editTask) {
         Long id = editTask.getId();
-        TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(Exceptions.taskNotFound(id));
+        TaskEntity task = taskRepository.findById(id).orElseThrow(Exceptions.taskNotFound(id));
         task.setName(editTask.getName());
         task.setDescription(editTask.getDescription());
         task.setColumnId(editTask.getColumnId());
@@ -110,8 +108,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteTask(Long id) {
-        TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(Exceptions.taskNotFound(id));
+        TaskEntity task = taskRepository.findById(id).orElseThrow(Exceptions.taskNotFound(id));
         taskRepository.deleteById(id);
         orderService.removeEntity(task);
         log.info("Task with id={} deleted", id);

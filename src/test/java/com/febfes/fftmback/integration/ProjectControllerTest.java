@@ -14,8 +14,8 @@ import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
-import io.restassured.mapper.TypeRef;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
@@ -300,7 +300,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     private void waitPools() {
         try {
-            boolean ignored = ForkJoinPool.commonPool().awaitTermination(1, TimeUnit.MINUTES);
+            ForkJoinPool.commonPool().awaitTermination(1, TimeUnit.MINUTES);
         } catch (InterruptedException e) {
             fail("Exception occurred while waiting for pools to complete. Running threads count: "
                  + ForkJoinPool.commonPool().getRunningThreadCount());

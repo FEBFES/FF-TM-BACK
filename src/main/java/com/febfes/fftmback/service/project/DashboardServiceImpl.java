@@ -9,6 +9,7 @@ import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class DashboardServiceImpl implements DashboardService {
 
     private final ColumnService columnService;
@@ -30,6 +32,7 @@ public class DashboardServiceImpl implements DashboardService {
                     return ColumnWithTasksMapper.INSTANCE.columnToColumnWithTasksDto(column, filteredTasks);
                 })
                 .toList();
+        log.info("Received dashboard with id={}", id);
         return new DashboardDto(columnsWithTasks);
     }
 }

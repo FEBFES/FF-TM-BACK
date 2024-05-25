@@ -7,12 +7,10 @@ import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import static java.util.Objects.isNull;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional

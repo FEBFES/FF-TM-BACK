@@ -35,7 +35,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     ) {
         project.setOwnerId(userId);
         ProjectEntity projectEntity = projectRepository.save(project);
-        log.info("Saved project: {}", projectEntity);
+        log.info("Created project with id={}", projectEntity.getId());
         return projectEntity;
     }
 
@@ -43,7 +43,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     public ProjectEntity getProject(Long id) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(Exceptions.projectNotFound(id));
-        log.info("Received project {} by id={}", projectEntity, id);
+        log.info("Received project by id={}", id);
         return projectEntity;
     }
 
@@ -54,7 +54,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
         projectEntity.setName(project.getName());
         projectEntity.setDescription(project.getDescription());
         projectRepository.save(projectEntity);
-        log.info("Updated project: {}", projectEntity);
+        log.info("Updated project with id={}", id);
         return ProjectMapper.INSTANCE.projectToProjectDto(projectEntity);
     }
 
@@ -67,7 +67,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
         if (patchDtoList.isEmpty()) {
             return;
         }
-        log.info("Project with id={} partial update: {}", id, patchDtoList);
+        log.debug("Project with id={} partial update: {}", id, patchDtoList);
         ProjectEntity projectEntity = getProject(id);
         patchDtoList.forEach(patchDto -> {
             patchIsFavouriteProcessor.patchField(id, ownerId, patchDto);
@@ -98,7 +98,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
             field.setAccessible(true);
             ReflectionUtils.setField(field, projectEntity, patchDto.value());
         } catch (NoSuchFieldException e) {
-            log.info(String.format("Can't find field \"%s\" in Project entity", patchDto.key()), e);
+            log.warn(String.format("Can't find field \"%s\" in Project entity", patchDto.key()), e);
         }
     }
 }

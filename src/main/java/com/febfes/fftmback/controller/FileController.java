@@ -109,7 +109,7 @@ public class FileController {
             FileEntity fileEntity = fileService.saveFile(userId, entityId, EntityType.TASK, file);
             return Optional.of(fileEntity);
         } catch (IOException e) {
-            log.error(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
+            log.warn(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
             return Optional.empty();
         }
     }

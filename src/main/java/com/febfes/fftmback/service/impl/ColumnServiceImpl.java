@@ -28,8 +28,7 @@ public class ColumnServiceImpl implements ColumnService {
     public TaskColumnEntity createColumn(TaskColumnEntity column) {
         column.setEntityOrder(orderService.getNewOrder(column));
         TaskColumnEntity savedColumn = columnRepository.save(column);
-
-        log.info("Saved column: {}", savedColumn);
+        log.info("Created column with name = {} and ID = {}", savedColumn.getName(), savedColumn.getId());
         return savedColumn;
     }
 
