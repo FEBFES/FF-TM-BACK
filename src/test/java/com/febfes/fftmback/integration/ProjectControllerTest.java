@@ -300,7 +300,7 @@ class ProjectControllerTest extends BasicTestClass {
 
     private void waitPools() {
         try {
-            boolean ignored = ForkJoinPool.commonPool().awaitTermination(1, TimeUnit.MINUTES);
+            ForkJoinPool.commonPool().awaitTermination(1, TimeUnit.MINUTES);
         } catch (InterruptedException e) {
             fail("Exception occurred while waiting for pools to complete. Running threads count: "
                  + ForkJoinPool.commonPool().getRunningThreadCount());
