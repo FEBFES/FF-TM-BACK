@@ -6,16 +6,15 @@ import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskTypeService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service("projectManagementServiceDecorator")
-@Transactional
 @RequiredArgsConstructor
 public class ProjectManagementServiceDecorator implements ProjectManagementService {
 
@@ -53,6 +52,7 @@ public class ProjectManagementServiceDecorator implements ProjectManagementServi
     }
 
     @Override
+    @Transactional
     public void deleteProject(Long id) {
         taskTypeService.deleteAllTypesByProjectId(id);
         projectManagementService.deleteProject(id);

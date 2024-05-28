@@ -23,6 +23,13 @@ public record ProjectDto(
         @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Long ownerId,
 
+        @Schema(accessMode = Schema.AccessMode.READ_ONLY)
         Boolean isFavourite
 ) {
+
+    public ProjectDto {
+        if (isFavourite == null) {
+            isFavourite = false;
+        }
+    }
 }

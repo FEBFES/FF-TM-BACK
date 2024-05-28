@@ -1,6 +1,5 @@
 package com.febfes.fftmback.service.project;
 
-import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
@@ -9,13 +8,13 @@ import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.project.patch.ProjectPatchFieldProcessor;
-import jakarta.transaction.Transactional;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.util.ReflectionUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 @Slf4j
@@ -26,7 +25,16 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
 
     private final ProjectRepository projectRepository;
 
+    @Qualifier("projectPatchIsFavouriteProcessor")
     private final ProjectPatchFieldProcessor patchIsFavouriteProcessor;
+
+    @Qualifier("projectPatchCommonProcessor")
+    private final ProjectPatchFieldProcessor patchCommonProcessor;
+
+    @PostConstruct
+    private void postConstruct() {
+        patchIsFavouriteProcessor.setNextProcessor(patchCommonProcessor);
+    }
 
     @Override
     public ProjectEntity createProject(
@@ -69,13 +77,8 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
         }
         log.debug("Project with id={} partial update: {}", id, patchDtoList);
         ProjectEntity projectEntity = getProject(id);
-        patchDtoList.forEach(patchDto -> {
-            patchIsFavouriteProcessor.patchField(id, ownerId, patchDto);
-            if (PatchOperation.getByCode(patchDto.op()).equals(PatchOperation.UPDATE)) {
-                updateProjectField(patchDto, projectEntity);
-            }
-        });
-        projectRepository.save(projectEntity);
+        patchDtoList.forEach(patchDto -> patchIsFavouriteProcessor.patchField(projectEntity, ownerId, patchDto));
+        projectRepository.save(projectEntity); // добавить бы какую-то проверку на то, надо ли обновлять проект или нет
         log.info("Project updated partially: {}", projectEntity);
     }
 
@@ -86,19 +89,6 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
             log.info("Project with id={} was deleted", id);
         } else {
             throw new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id);
-        }
-    }
-
-    private void updateProjectField(
-            PatchDto patchDto,
-            ProjectEntity projectEntity
-    ) {
-        try {
-            Field field = projectEntity.getClass().getDeclaredField(patchDto.key());
-            field.setAccessible(true);
-            ReflectionUtils.setField(field, projectEntity, patchDto.value());
-        } catch (NoSuchFieldException e) {
-            log.warn(String.format("Can't find field \"%s\" in Project entity", patchDto.key()), e);
         }
     }
 }

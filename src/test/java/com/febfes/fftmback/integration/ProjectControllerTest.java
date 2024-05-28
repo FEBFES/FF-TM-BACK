@@ -1,5 +1,6 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
@@ -164,7 +165,7 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulSetProjectFavouriteTest() {
         Long createdProjectId = createNewProject();
-        List<PatchDto> patchDtoList = List.of(new PatchDto("update", "isFavourite", Boolean.TRUE));
+        List<PatchDto> patchDtoList = List.of(new PatchDto(PatchOperation.UPDATE, "isFavourite", Boolean.TRUE));
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -187,7 +188,7 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void failedSetProjectFavouriteTest() {
         Long createdProjectId = createNewProject();
-        List<PatchDto> patchDtoList = List.of(new PatchDto("update", "isFavourite!", Boolean.TRUE));
+        List<PatchDto> patchDtoList = List.of(new PatchDto(PatchOperation.UPDATE, "isFavourite!", Boolean.TRUE));
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -211,7 +212,7 @@ class ProjectControllerTest extends BasicTestClass {
     void successfulUpdateNameTest() {
         String newName = "new name";
         Long createdProjectId = createNewProject();
-        List<PatchDto> patchDtoList = List.of(new PatchDto("update", "name", newName));
+        List<PatchDto> patchDtoList = List.of(new PatchDto(PatchOperation.UPDATE, "name", newName));
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
