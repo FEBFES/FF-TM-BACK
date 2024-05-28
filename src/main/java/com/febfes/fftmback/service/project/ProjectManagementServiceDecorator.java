@@ -9,7 +9,6 @@ import com.febfes.fftmback.service.TaskTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -53,7 +52,7 @@ public class ProjectManagementServiceDecorator implements ProjectManagementServi
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     public void deleteProject(Long id) {
         taskTypeService.deleteAllTypesByProjectId(id);
         projectManagementService.deleteProject(id);
