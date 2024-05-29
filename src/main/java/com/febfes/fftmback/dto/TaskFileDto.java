@@ -1,12 +1,12 @@
 package com.febfes.fftmback.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public record TaskFileDto(
 
         Long id,
 
-        Date createDate,
+        LocalDateTime createDate,
 
         Long userId,
 

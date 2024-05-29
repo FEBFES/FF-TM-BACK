@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -55,7 +55,10 @@ public class TaskEntity extends OrderedEntity {
 
     @Column(name = "update_date")
     @UpdateTimestamp
-    private Date updateDate;
+    private LocalDateTime updateDate;
+
+    @Column(name = "deadline_date")
+    private LocalDateTime deadlineDate;
 
     @Override
     public String getColumnToFindOrder() {

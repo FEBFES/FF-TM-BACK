@@ -1,6 +1,6 @@
 package com.febfes.fftmback.domain.projection;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public interface ProjectProjection {
 
@@ -10,7 +10,7 @@ public interface ProjectProjection {
 
     String getDescription();
 
-    Date getCreateDate();
+    LocalDateTime getCreateDate();
 
     Long getOwnerId();
 

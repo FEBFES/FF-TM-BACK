@@ -20,5 +20,6 @@ select t.id                            as "id"
           and fe.entity_type = 'TASK') as "filesCounter"
      , t.update_date                   as "updateDate"
      , t.entity_order                  as "entityOrder"
+     , t.deadline_date                 as "deadlineDate"
 from task t
 ;

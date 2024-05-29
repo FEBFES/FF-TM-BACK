@@ -4,7 +4,6 @@ import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.error.ErrorDto;
 import com.febfes.fftmback.dto.error.ErrorType;
 import com.febfes.fftmback.dto.error.StatusError;
-import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import static com.febfes.fftmback.dto.error.AuthError.createBaseError;
+import static com.febfes.fftmback.util.DateUtils.getCurrentLocalDateTime;
 import static java.util.Objects.isNull;
 
 @RestControllerAdvice
@@ -62,7 +62,7 @@ public class ControllerAdvisor {
                 .orElse(Collections.emptyMap());
         log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
         return new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), StatusError.ARGUMENT_NOT_VALID,
-                errorType, DateUtils.getCurrentDate(), ex.getMessage(), errorMap);
+                errorType, getCurrentLocalDateTime(), ex.getMessage(), errorMap);
     }
 
     @ExceptionHandler({ExpiredJwtException.class, TokenExpiredException.class})
@@ -94,7 +94,7 @@ public class ControllerAdvisor {
         ErrorType errorType = ErrorType.AUTH;
         log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
         return new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), StatusError.BAD_CREDENTIALS,
-                errorType, DateUtils.getCurrentDate(), ex.getMessage(),
+                errorType, getCurrentLocalDateTime(), ex.getMessage(),
                 createBaseError(UserEntity.ENTITY_NAME, "password", null, errorType));
     }
 
@@ -126,7 +126,7 @@ public class ControllerAdvisor {
                 status.value(),
                 ex.getStatusError(),
                 ex.getErrorType(),
-                DateUtils.getCurrentDate(),
+                getCurrentLocalDateTime(),
                 ex.getMessage(),
                 ex.getBaseError()
         );
@@ -140,7 +140,7 @@ public class ControllerAdvisor {
                 status.value(),
                 StatusError.UNDEFINED,
                 ErrorType.UNDEFINED,
-                DateUtils.getCurrentDate(),
+                getCurrentLocalDateTime(),
                 ex.getMessage(),
                 null
         );
