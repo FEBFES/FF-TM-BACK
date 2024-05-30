@@ -6,14 +6,14 @@
       "description": "JWT secret key."
     },
     {
-      "name": "jwt.expirationDateInSeconds",
+      "name": "jwt.expirationDateDuration",
       "type": "java.lang.Integer",
-      "description": "JWT expiration date in seconds."
+      "description": "JWT expiration date duration."
     },
     {
-      "name": "jwt.refreshExpirationDateInSeconds",
+      "name": "jwt.refreshExpirationDateDuration",
       "type": "java.lang.Integer",
-      "description": "Refresh JWT expiration date in seconds."
+      "description": "Refresh JWT expiration date duration."
     }
   ]
 }
