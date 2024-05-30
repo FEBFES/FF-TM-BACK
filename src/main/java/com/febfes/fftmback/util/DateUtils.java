@@ -2,6 +2,7 @@ package com.febfes.fftmback.util;
 
 import lombok.experimental.UtilityClass;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -17,12 +18,12 @@ public class DateUtils {
         return LocalDateTime.now();
     }
 
-    public static Date getCurrentDatePlusSeconds(int seconds) {
-        return new Date(System.currentTimeMillis() + seconds * 1000L);
+    public static Date getCurrentDatePlusDuration(Duration duration) {
+        return new Date(System.currentTimeMillis() + duration.toMillis());
     }
 
-    public static LocalDateTime getCurrentLocalDateTimePlusSeconds(int seconds) {
-        return LocalDateTime.now().plusSeconds(seconds);
+    public static LocalDateTime getCurrentLocalDateTimePlusDuration(Duration duration) {
+        return LocalDateTime.now().plus(duration);
     }
 
     public static boolean isDateBeforeCurrentDate(Date date) {

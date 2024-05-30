@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
+import java.time.Duration;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -52,7 +53,7 @@ class AccessTokenExpirationTest {
                         .setClaims(new HashMap<>())
                         .setSubject("username")
                         .setIssuedAt(DateUtils.getCurrentDate())
-                        .setExpiration(DateUtils.getCurrentDatePlusSeconds(-5))
+                        .setExpiration(DateUtils.getCurrentDatePlusDuration(Duration.ofSeconds(-5)))
                         .signWith(secretKey, SignatureAlgorithm.HS256)
                         .compact()
         );
@@ -69,7 +70,7 @@ class AccessTokenExpirationTest {
                         .setClaims(new HashMap<>())
                         .setSubject("username")
                         .setIssuedAt(DateUtils.getCurrentDate())
-                        .setExpiration(DateUtils.getCurrentDatePlusSeconds(5))
+                        .setExpiration(DateUtils.getCurrentDatePlusDuration(Duration.ofSeconds(5)))
                         .signWith(secretKey, SignatureAlgorithm.HS256)
                         .compact()
         );

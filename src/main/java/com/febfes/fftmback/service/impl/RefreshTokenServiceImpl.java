@@ -15,9 +15,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.UUID;
 
-import static com.febfes.fftmback.util.DateUtils.getCurrentLocalDateTimePlusSeconds;
+import static com.febfes.fftmback.util.DateUtils.getCurrentLocalDateTimePlusDuration;
 
 @Service
 @Slf4j
@@ -25,8 +26,8 @@ import static com.febfes.fftmback.util.DateUtils.getCurrentLocalDateTimePlusSeco
 @Transactional
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
-    @Value("${jwt.refreshExpirationDateInSeconds}")
-    private int jwtRefreshExpirationDateInSeconds;
+    @Value("${jwt.refreshExpirationDateDuration}")
+    private Duration jwtRefreshExpirationDateDuration;
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserService userService;
@@ -51,7 +52,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshTokenEntity updateRefreshToken(RefreshTokenEntity refreshToken) {
         refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiryDate(getCurrentLocalDateTimePlusSeconds(jwtRefreshExpirationDateInSeconds));
+        refreshToken.setExpiryDate(getCurrentLocalDateTimePlusDuration(jwtRefreshExpirationDateDuration));
         RefreshTokenEntity updatedRefreshToken = refreshTokenRepository.save(refreshToken);
         log.info("Updated refresh token entity: {}", updatedRefreshToken);
         return updatedRefreshToken;
@@ -62,7 +63,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshTokenEntity refreshToken = refreshTokenRepository.save(
                 RefreshTokenEntity.builder()
                         .userEntity(userService.getUserById(userId))
-                        .expiryDate(getCurrentLocalDateTimePlusSeconds(jwtRefreshExpirationDateInSeconds))
+                        .expiryDate(getCurrentLocalDateTimePlusDuration(jwtRefreshExpirationDateDuration))
                         .token(UUID.randomUUID().toString())
                         .build()
         );
