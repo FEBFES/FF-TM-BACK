@@ -46,7 +46,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     public ProjectForUserProjection getProjectForUser(Long projectId, Long userId) {
         ProjectForUserProjection projectForUser = projectRepository.getProjectForUser(projectId, userId)
                 .orElseThrow(Exceptions.projectNotFound(projectId));
-        List<MemberDto> members = userService.getProjectMembersWithRole(projectId);
         log.info("Received project by id={} and userId={}", projectId, userId);
         return projectForUser ;
     }
