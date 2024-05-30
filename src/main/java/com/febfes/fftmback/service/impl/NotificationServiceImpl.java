@@ -23,6 +23,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<NotificationEntity> getNotificationsByUserIdAndIsRead(Long userId, Boolean isRead) {
-        return notificationRepository.findByUserIdToAndRead(userId, isRead);
+        return notificationRepository.findByUserIdToAndIsRead(userId, isRead);
     }
 }
