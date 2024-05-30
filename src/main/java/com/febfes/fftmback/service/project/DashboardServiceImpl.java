@@ -1,6 +1,7 @@
 package com.febfes.fftmback.service.project;
 
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
+import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
@@ -12,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -22,15 +25,22 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final ColumnService columnService;
     private final TaskService taskService;
+    private final ColumnWithTasksMapper columnWithTasksMapper;
 
     @Override
     public DashboardDto getDashboard(Long id, TaskSpec taskSpec) {
-        List<ColumnWithTasksDto> columnsWithTasks = columnService.getOrderedColumns(id)
+        List<TaskColumnEntity> columns = columnService.getOrderedColumns(id);
+        Map<Long, List<TaskView>> columnIdToTaskListMap = taskService.getTasks(
+                columns.stream().map(TaskColumnEntity::getId).collect(Collectors.toSet()),
+                taskSpec
+        )
                 .stream()
-                .map(column -> {
-                    List<TaskView> filteredTasks = taskService.getTasks(column.getId(), taskSpec);
-                    return ColumnWithTasksMapper.INSTANCE.columnToColumnWithTasksDto(column, filteredTasks);
-                })
+                .collect(Collectors.groupingBy(TaskView::getColumnId, Collectors.toList()));
+        List<ColumnWithTasksDto> columnsWithTasks = columns.stream()
+                .map(column -> columnWithTasksMapper.columnToColumnWithTasksDto(
+                        column,
+                        columnIdToTaskListMap.getOrDefault(column.getId(), Collections.emptyList())
+                ))
                 .toList();
         log.info("Received dashboard with id={}", id);
         return new DashboardDto(columnsWithTasks);

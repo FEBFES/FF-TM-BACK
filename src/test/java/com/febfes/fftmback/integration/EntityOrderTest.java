@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -43,7 +44,7 @@ class EntityOrderTest extends BasicTestClass {
     @Test
     void addTaskOrderTest() {  // checking whether the order of the tasks is set when creating them
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
-        List<TaskView> tasks = taskService.getTasks(createdColumnId, emptyTaskSpec);
+        List<TaskView> tasks = taskService.getTasks(Set.of(createdColumnId), emptyTaskSpec);
         List<Integer> orders = tasks.stream()
                 .map(TaskView::getEntityOrder)
                 .toList();
@@ -54,7 +55,7 @@ class EntityOrderTest extends BasicTestClass {
     @Test
     void changeTaskOrderTest() {
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
-        List<TaskView> tasks = taskService.getTasks(createdColumnId, emptyTaskSpec);
+        List<TaskView> tasks = taskService.getTasks(Set.of(createdColumnId), emptyTaskSpec);
         List<Long> idsList = tasksToIds(tasks);
         TaskView lastTask = tasks.get(tasks.size() - 1);
         idsList.remove(lastTask.getId());
@@ -69,7 +70,7 @@ class EntityOrderTest extends BasicTestClass {
                         createdProjectId, createdColumnId, lastTask.getId())
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        List<Long> idsListAfterUpdate = tasksToIds(taskService.getTasks(createdColumnId, emptyTaskSpec));
+        List<Long> idsListAfterUpdate = tasksToIds(taskService.getTasks(Set.of(createdColumnId), emptyTaskSpec));
         Assertions.assertThat(idsListAfterUpdate)
                 .isEqualTo(idsList);
     }
@@ -77,13 +78,13 @@ class EntityOrderTest extends BasicTestClass {
     @Test
     void removeTaskOrderTest() {
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
-        List<TaskView> tasks = taskService.getTasks(createdColumnId, emptyTaskSpec);
+        List<TaskView> tasks = taskService.getTasks(Set.of(createdColumnId), emptyTaskSpec);
         Assertions.assertThat(tasks)
                 .hasSizeGreaterThan(1);
         TaskView taskToDelete = tasks.get(1);
         taskService.deleteTask(taskToDelete.getId());
 
-        List<TaskView> tasksAfterDelete = taskService.getTasks(createdColumnId, emptyTaskSpec);
+        List<TaskView> tasksAfterDelete = taskService.getTasks(Set.of(createdColumnId), emptyTaskSpec);
         List<Integer> orders = tasksAfterDelete.stream()
                 .map(TaskView::getEntityOrder)
                 .toList();

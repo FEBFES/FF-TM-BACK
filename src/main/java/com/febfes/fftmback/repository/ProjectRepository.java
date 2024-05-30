@@ -1,8 +1,8 @@
 package com.febfes.fftmback.repository;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
 import com.febfes.fftmback.domain.projection.ProjectProjection;
-import com.febfes.fftmback.domain.projection.ProjectWithMembersProjection;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,7 +19,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
             nativeQuery = true,
             value = "SELECT COUNT(*) > 0 FROM favourite_project WHERE project_id = :projectId AND user_id = :userId"
     )
-    Boolean isProjectFavourite(Long projectId, Long userId);
+    boolean isProjectFavourite(Long projectId, Long userId);
 
     @Query(
             value = "SELECT COUNT(*) > 0 FROM ProjectEntity P " +
@@ -60,7 +60,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
                     WHERE P.id = :projectId
                     """
     )
-    Optional<ProjectWithMembersProjection> getProjectByIdAndUserId(Long projectId, Long userId);
+    Optional<ProjectForUserProjection> getProjectForUser(Long projectId, Long userId);
 
     @Query(
             nativeQuery = true,

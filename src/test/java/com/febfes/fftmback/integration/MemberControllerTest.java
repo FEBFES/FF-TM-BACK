@@ -1,7 +1,8 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.domain.projection.ProjectProjection;
 import com.febfes.fftmback.dto.MemberDto;
-import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.mapper.UserMapper;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -22,7 +23,9 @@ import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJ
 class MemberControllerTest extends BasicTestClass {
 
     @Autowired
-    TransactionTemplate txTemplate;
+    private TransactionTemplate txTemplate;
+    @Autowired
+    private UserMapper userMapper;
 
     @Test
     void successfulAddNewMembersTest() {
@@ -36,13 +39,15 @@ class MemberControllerTest extends BasicTestClass {
 
             @Override
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
-                List<MemberDto> members = userService.getProjectMembersWithRole(createdProjectId);
+                List<MemberDto> members = userMapper.memberProjectionToMemberDto(
+                        userService.getProjectMembersWithRole(createdProjectId)
+                );
                 // as owner is also a member
                 Assertions.assertThat(members).hasSize(3);
-                List<ProjectDto> secondUserProjects =
+                List<ProjectProjection> secondUserProjects =
                         projectMemberService.getProjectsForUser(secondCreatedUserId, Lists.newArrayList());
                 Assertions.assertThat(secondUserProjects).hasSize(1);
-                List<ProjectDto> thirdUserProjects =
+                List<ProjectProjection> thirdUserProjects =
                         projectMemberService.getProjectsForUser(thirdCreatedUserId, Lists.newArrayList());
                 Assertions.assertThat(thirdUserProjects).hasSize(1);
             }
@@ -61,9 +66,11 @@ class MemberControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        List<MemberDto> members = userService.getProjectMembersWithRole(createdProjectId);
+        List<MemberDto> members = userMapper.memberProjectionToMemberDto(
+                userService.getProjectMembersWithRole(createdProjectId)
+        );
         Assertions.assertThat(members).hasSize(1);
-        List<ProjectDto> secondMemberProjects = projectMemberService.getProjectsForUser(secondCreatedUserId, Lists.newArrayList());
+        List<ProjectProjection> secondMemberProjects = projectMemberService.getProjectsForUser(secondCreatedUserId, Lists.newArrayList());
         Assertions.assertThat(secondMemberProjects).isEmpty();
     }
 

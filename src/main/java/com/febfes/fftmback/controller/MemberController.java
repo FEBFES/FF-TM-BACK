@@ -5,17 +5,18 @@ import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.config.auth.RoleCheckerComponent;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.dto.MemberDto;
+import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("v1/projects")
@@ -24,14 +25,15 @@ import java.util.List;
 @Tag(name = "Project member")
 public class MemberController {
 
-    private final @NonNull ProjectMemberService projectMemberService;
-    private final @NonNull UserService userService;
-    private final @NonNull RoleCheckerComponent roleCheckerComponent;
+    private final ProjectMemberService projectMemberService;
+    private final UserService userService;
+    private final RoleCheckerComponent roleCheckerComponent;
+    private final UserMapper userMapper;
 
     @Operation(summary = "Get project members")
     @ApiGet(path = "{id}/members")
     public List<MemberDto> getProjectMembers(@PathVariable Long id) {
-        return userService.getProjectMembersWithRole(id);
+        return userMapper.memberProjectionToMemberDto(userService.getProjectMembersWithRole(id));
     }
 
     @Operation(summary = "Add new members to the project")
@@ -41,7 +43,7 @@ public class MemberController {
     public List<MemberDto> addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
         projectMemberService.addNewMembers(id, memberIds);
-        return userService.getProjectMembersWithRole(id, memberIds);
+        return userMapper.memberProjectionToMemberDto(userService.getProjectMembersWithRole(id, Set.copyOf(memberIds)));
     }
 
     @Operation(summary = "Delete member from project")
@@ -51,6 +53,6 @@ public class MemberController {
     public MemberDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
         roleCheckerComponent.checkIfUserIsOwner(id, memberId);
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        return projectMemberService.removeMember(id, memberId);
+        return userMapper.memberProjectionToMemberDto(projectMemberService.removeMember(id, memberId));
     }
 }

@@ -9,6 +9,8 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.JoinFetch;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Set;
+
 @JoinFetch(paths = "owner", alias = "own")
 @JoinFetch(paths = "assignee", alias = "asg")
 @JoinFetch(paths = "taskType", alias = "tt")
@@ -25,5 +27,9 @@ public interface TaskSpec extends Specification<TaskView> {
 
     static Specification<TaskView> byColumnId(Long columnId) {
         return (root, query, builder) -> builder.equal(root.get("columnId"), columnId);
+    }
+
+    static Specification<TaskView> columnIdIn(Set<Long> columnIds) {
+        return (root, query, builder) -> root.get("columnId").in(columnIds);
     }
 }

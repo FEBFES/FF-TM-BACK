@@ -11,7 +11,6 @@ import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,13 +26,14 @@ import java.util.List;
 @Tag(name = "User")
 public class UserController {
 
-    private final @NonNull UserService userService;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
     @Operation(summary = "Get user by its id")
     @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public UserDto getUser(@PathVariable Long id) {
-        return UserMapper.INSTANCE.userViewToUserDto(userService.getUserViewById(id));
+        return userMapper.userViewToUserDto(userService.getUserViewById(id));
     }
 
     @Operation(summary = "Edit user by its id")
@@ -42,14 +42,14 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody EditUserDto editUserDto
     ) {
-        userService.updateUser(UserMapper.INSTANCE.editUserDtoToUser(editUserDto), id);
+        userService.updateUser(userMapper.editUserDtoToUser(editUserDto), id);
     }
 
     @Operation(summary = "Get users with filter")
     @ApiGet()
     public List<UserDto> getUsersWithFilter(UserSpec userSpec) {
         return userService.getUsersByFilter(userSpec).stream()
-                .map(UserMapper.INSTANCE::userViewToUserDto)
+                .map(userMapper::userViewToUserDto)
                 .toList();
     }
 }

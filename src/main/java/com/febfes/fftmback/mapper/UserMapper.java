@@ -12,14 +12,13 @@ import com.febfes.fftmback.dto.auth.UserDetailsDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 import static java.util.Objects.isNull;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
-
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(target = "encryptedPassword", source = "password")
     UserEntity userDetailsDtoToUser(UserDetailsDto userDetailsDto);
@@ -34,6 +33,8 @@ public interface UserMapper {
     UserDto userViewToUserDto(UserView userView);
 
     MemberDto memberProjectionToMemberDto(MemberProjection memberProjection);
+
+    List<MemberDto> memberProjectionToMemberDto(List<MemberProjection> memberProjections);
 
     @Named("userPicToString")
     static String userPicToString(FileEntity userPic) {

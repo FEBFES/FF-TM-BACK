@@ -3,7 +3,6 @@ package com.febfes.fftmback.service.project;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.PatchDto;
-import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskTypeService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ public class ProjectManagementServiceDecorator implements ProjectManagementServi
 
     @Qualifier("projectManagementService")
     private final ProjectManagementService projectManagementService;
-
     private final ColumnService columnService;
     private final TaskTypeService taskTypeService;
     private final ProjectMemberService projectMemberService;
@@ -32,7 +30,9 @@ public class ProjectManagementServiceDecorator implements ProjectManagementServi
         CompletableFuture.runAsync(() -> columnService.createDefaultColumnsForProject(projectId));
         CompletableFuture.runAsync(() -> taskTypeService.createDefaultTaskTypesForProject(projectId));
         // by default, the owner will also be a member of the project
-        CompletableFuture.runAsync(() -> projectMemberService.addUserToProjectAndChangeRole(projectId, userId, RoleName.OWNER));
+        CompletableFuture.runAsync(
+                () -> projectMemberService.addUserToProjectAndChangeRole(projectId, userId, RoleName.OWNER)
+        );
         return createdProject;
     }
 
@@ -42,7 +42,7 @@ public class ProjectManagementServiceDecorator implements ProjectManagementServi
     }
 
     @Override
-    public ProjectDto editProject(Long id, ProjectEntity project) {
+    public ProjectEntity editProject(Long id, ProjectEntity project) {
         return projectManagementService.editProject(id, project);
     }
 
