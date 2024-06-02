@@ -51,9 +51,7 @@ public class WebSecurity {
                         "/v1/auth/check-token-expiration",
                         "/v1/roles",
                         "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/ws/**",
-                        "/test-ws/**"
+                        "/v3/api-docs/**"
                 )
                 .permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/files/user-pic/**")
