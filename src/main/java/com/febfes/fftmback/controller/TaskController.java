@@ -23,6 +23,7 @@ import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,7 @@ import java.util.List;
 @Tag(name = "Task")
 public class TaskController {
 
+    @Qualifier("taskServiceDecorator")
     private final @NonNull TaskService taskService;
     private final @NonNull FileService fileService;
     private final @NonNull RoleCheckerComponent roleCheckerComponent;
@@ -82,13 +84,14 @@ public class TaskController {
     @Operation(summary = "Edit task by its id")
     @ApiEdit(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
     public TaskShortDto updateTask(
+            @AuthenticationPrincipal UserEntity user,
             @ParameterObject TaskParameters pathVars,
-            @RequestBody EditTaskDto editTaskDto
+            @RequestBody @Valid EditTaskDto editTaskDto
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
         TaskEntity editTask = TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto);
         editTask.setId(pathVars.taskId());
-        taskService.updateTask(editTask);
+        taskService.updateTask(editTask, user.getId());
         return TaskMapper.INSTANCE.taskViewToTaskShortDto(taskService.getTaskById(pathVars.taskId()));
     }
 

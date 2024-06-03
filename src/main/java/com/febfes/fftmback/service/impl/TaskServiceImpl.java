@@ -27,7 +27,7 @@ import static com.febfes.fftmback.service.order.OrderServiceImpl.ORDER_FIELD_NAM
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-@Service
+@Service("taskService")
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
@@ -91,7 +91,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void updateTask(TaskEntity editTask) {
+    public void updateTask(TaskEntity editTask, Long userId) {
         Long id = editTask.getId();
         TaskEntity task = taskRepository.findById(id).orElseThrow(Exceptions.taskNotFound(id));
         task.setName(editTask.getName());

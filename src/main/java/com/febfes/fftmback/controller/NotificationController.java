@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("v1/notifications")
 @RequiredArgsConstructor
 @ProtectedApi
 @Tag(name = "Notification")
+@RequestMapping("v1/notifications")
 public class NotificationController {
 
     private final NotificationService notificationService;
