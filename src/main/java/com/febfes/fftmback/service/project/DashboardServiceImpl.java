@@ -11,6 +11,7 @@ import com.febfes.fftmback.service.TaskService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 public class DashboardServiceImpl implements DashboardService {
 
     private final ColumnService columnService;
+
+    @Qualifier("taskServiceDecorator")
     private final TaskService taskService;
     private final ColumnWithTasksMapper columnWithTasksMapper;
 

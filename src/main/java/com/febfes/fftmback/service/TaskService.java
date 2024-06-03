@@ -24,7 +24,7 @@ public interface TaskService {
      */
     Long createTask(TaskEntity task, Long userId);
 
-    void updateTask(TaskEntity editTask);
+    void updateTask(TaskEntity editTask, Long userId);
 
     void deleteTask(Long id);
 }

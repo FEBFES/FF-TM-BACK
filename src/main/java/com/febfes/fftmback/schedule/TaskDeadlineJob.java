@@ -24,10 +24,8 @@ import static com.febfes.fftmback.service.impl.TaskServiceDecorator.USER_ID;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-//@NoArgsConstructor(force = true)
 @Transactional
 @DisallowConcurrentExecution
-//public class TaskDeadlineJob extends QuartzJobBean {
 public class TaskDeadlineJob implements Job {
 
     private final NotificationService notificationService;
@@ -58,15 +56,8 @@ public class TaskDeadlineJob implements Job {
         }
     }
 
-//    @Override
-//    protected void executeInternal(JobExecutionContext context) {
-//        JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
-//        Long userId = jobDataMap.getLong(USER_ID);
-//        Long taskId = jobDataMap.getLong(TASK_ID);
-//    }
-
     private String createDeadlineNotificationMessage(Long taskId, String projectName) {
-        return String.format("The deadline has arrived for completing task with ID %s on the \"%s\" project",
+        return String.format("Наступил дедлайн для задачи %s на проекте \"%s\"",
                 taskId, projectName);
     }
 }
