@@ -23,6 +23,15 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<NotificationEntity> getNotificationsByUserIdAndIsRead(Long userId, Boolean isRead) {
-        return notificationRepository.findByUserIdToAndRead(userId, isRead);
+        return notificationRepository.findByUserIdToAndIsRead(userId, isRead);
+    }
+
+    @Override
+    public void createNotification(String message, Long userIdTo) {
+        NotificationEntity notification = NotificationEntity.builder()
+                .message(message)
+                .userIdTo(userIdTo)
+                .build();
+        notificationRepository.save(notification);
     }
 }
