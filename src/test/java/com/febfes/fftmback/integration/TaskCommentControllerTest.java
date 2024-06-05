@@ -14,13 +14,13 @@ import java.util.Optional;
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TaskCommentController extends BasicTestClass {
+class TaskCommentControllerTest extends BasicTestClass {
 
     @Autowired
     private TaskCommentService taskCommentService;
 
     @Test
-    public void createTaskCommentTest() {
+    void createTaskCommentTest() {
         Long userId = createNewUser();
         Long projectId = createNewProject();
         Long taskId = createNewTask(projectId, userId);
@@ -41,7 +41,7 @@ public class TaskCommentController extends BasicTestClass {
     }
 
     @Test
-    public void getTaskCommentTest() {
+    void getTaskCommentTest() {
         Long userId = createNewUser();
         Long projectId = createNewProject();
         Long taskId = createNewTask(projectId, userId);
