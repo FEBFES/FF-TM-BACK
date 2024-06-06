@@ -1,6 +1,6 @@
 package com.febfes.fftmback.dto.error;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public record ErrorDto(
@@ -8,7 +8,7 @@ public record ErrorDto(
         Integer statusCode,
         StatusError status,
         ErrorType errorType,
-        Date timestamp,
+        LocalDateTime timestamp,
         String message,
         Map<String, ?> error
 ) {

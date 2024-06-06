@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "refresh_token")
@@ -29,6 +29,6 @@ public class RefreshTokenEntity extends BaseEntity {
     private String token;
 
     @Column(name = "expiry_date", nullable = false)
-    private Date expiryDate;
+    private LocalDateTime expiryDate;
 
 }

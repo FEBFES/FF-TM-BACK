@@ -1,13 +1,13 @@
 package com.febfes.fftmback.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record OneProjectDto(
         Long id,
         String name,
         String description,
-        Date createDate,
+        LocalDateTime createDate,
         Boolean isFavourite,
         List<MemberDto> members,
         RoleDto userRoleOnProject

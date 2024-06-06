@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static com.febfes.fftmback.util.DateUtils.getCurrentLocalDateTimePlusSeconds;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -49,7 +51,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshTokenEntity updateRefreshToken(RefreshTokenEntity refreshToken) {
         refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiryDate(DateUtils.getCurrentDatePlusSeconds(jwtRefreshExpirationDateInSeconds));
+        refreshToken.setExpiryDate(getCurrentLocalDateTimePlusSeconds(jwtRefreshExpirationDateInSeconds));
         RefreshTokenEntity updatedRefreshToken = refreshTokenRepository.save(refreshToken);
         log.info("Updated refresh token entity: {}", updatedRefreshToken);
         return updatedRefreshToken;
@@ -60,7 +62,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshTokenEntity refreshToken = refreshTokenRepository.save(
                 RefreshTokenEntity.builder()
                         .userEntity(userService.getUserById(userId))
-                        .expiryDate(DateUtils.getCurrentDatePlusSeconds(jwtRefreshExpirationDateInSeconds))
+                        .expiryDate(getCurrentLocalDateTimePlusSeconds(jwtRefreshExpirationDateInSeconds))
                         .token(UUID.randomUUID().toString())
                         .build()
         );

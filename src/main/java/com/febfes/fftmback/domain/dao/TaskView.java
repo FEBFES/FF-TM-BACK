@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "v_task")
@@ -51,5 +51,8 @@ public class TaskView extends OrderedView {
     private Long filesCounter;
 
     @Column(name = "\"updateDate\"")
-    private Date updateDate;
+    private LocalDateTime updateDate;
+
+    @Column(name = "\"deadlineDate\"")
+    private LocalDateTime deadlineDate;
 }
