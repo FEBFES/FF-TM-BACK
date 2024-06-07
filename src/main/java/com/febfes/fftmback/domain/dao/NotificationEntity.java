@@ -17,6 +17,8 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class NotificationEntity extends BaseEntity {
 
+    public static final String ENTITY_NAME = "Notification";
+
     @Column(name = "user_id_to")
     private Long userIdTo;
 
