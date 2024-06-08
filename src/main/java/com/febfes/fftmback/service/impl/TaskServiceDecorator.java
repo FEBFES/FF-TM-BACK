@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.febfes.fftmback.service.impl.ScheduleServiceImpl.JOB;
+import static com.febfes.fftmback.service.impl.ScheduleServiceImpl.TRIGGER;
 import static com.febfes.fftmback.util.DateUtils.convertLocalDateTimeToDate;
 
 @Service("taskServiceDecorator")
@@ -29,8 +31,6 @@ public class TaskServiceDecorator implements TaskService {
     public static final String USER_ID = "userId";
     public static final String TASK_ID = "taskId";
     public static final String DEADLINE = "deadline";
-    public static final String JOB = "job";
-    public static final String TRIGGER = "trigger";
 
     @Override
     public List<TaskView> getTasks(int page, int limit, Long columnId, TaskSpec taskSpec) {
