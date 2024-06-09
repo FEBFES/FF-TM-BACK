@@ -3,6 +3,7 @@ package com.febfes.fftmback.service.impl;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
+import com.febfes.fftmback.schedule.TaskDeadlineJob;
 import com.febfes.fftmback.service.ScheduleService;
 import com.febfes.fftmback.service.TaskService;
 import lombok.RequiredArgsConstructor;
@@ -77,6 +78,7 @@ public class TaskServiceDecorator implements TaskService {
         jobDataMap.put(TASK_ID, taskId);
         String jobIdentity = String.format("%s-%s-%s", DEADLINE, JOB, UUID.randomUUID());
         String triggerIdentity = String.format("%s-%s-%s", DEADLINE, TRIGGER, UUID.randomUUID());
-        scheduleService.startNewJobAt(convertLocalDateTimeToDate(deadlineDate), jobDataMap, jobIdentity, triggerIdentity);
+        scheduleService.startNewJobAt(TaskDeadlineJob.class, convertLocalDateTimeToDate(deadlineDate),
+                jobDataMap, jobIdentity, triggerIdentity);
     }
 }
