@@ -4,9 +4,7 @@ import com.febfes.fftmback.domain.common.specification.UserSpec;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.UserView;
 import com.febfes.fftmback.domain.projection.MemberProjection;
-import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.exception.Exceptions;
-import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.repository.UserViewRepository;
 import com.febfes.fftmback.service.UserService;
@@ -18,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.nonNull;
 
@@ -56,12 +55,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(UserEntity user, Long id) {
-        UserEntity userToUpdate = userRepository.findById(id)
-                .orElseThrow(Exceptions.userNotFoundById(id));
+        UserEntity userToUpdate = userRepository.findById(id).orElseThrow(Exceptions.userNotFoundById(id));
         userToUpdate.setFirstName(user.getFirstName());
         userToUpdate.setLastName(user.getLastName());
         userToUpdate.setDisplayName(user.getDisplayName());
-        if (nonNull(user.getPassword())) {  // password can't be null, but front can send null password as it doesn't have it
+        // password can't be null, but front can send null password as it doesn't have it
+        if (nonNull(user.getPassword())) {
             userToUpdate.setEncryptedPassword(passwordEncoder.encode(user.getPassword()));
         }
         userRepository.save(userToUpdate);
@@ -74,23 +73,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<MemberDto> getProjectMembersWithRole(Long projectId) {
-        return userViewRepository.getProjectMembersWithRole(projectId).stream()
-                .map(UserMapper.INSTANCE::memberProjectionToMemberDto)
-                .toList();
+    public List<MemberProjection> getProjectMembersWithRole(Long projectId) {
+        return userViewRepository.getProjectMembersWithRole(projectId);
     }
 
     @Override
-    public MemberDto getProjectMemberWithRole(Long projectId, Long memberId) {
-        MemberProjection member = userViewRepository.getProjectMemberWithRole(projectId, memberId)
+    public MemberProjection getProjectMemberWithRole(Long projectId, Long memberId) {
+        return userViewRepository.getProjectMemberWithRole(projectId, memberId)
                 .orElseThrow(Exceptions.userNotFoundById(memberId));
-        return UserMapper.INSTANCE.memberProjectionToMemberDto(member);
     }
 
     @Override
-    public List<MemberDto> getProjectMembersWithRole(Long projectId, List<Long> membersIds) {
-        return membersIds.stream()
-                .map(memberId -> getProjectMemberWithRole(projectId, memberId))
-                .toList();
+    public List<MemberProjection> getProjectMembersWithRole(Long projectId, Set<Long> membersIds) {
+        return userViewRepository.getProjectMembersWithRole(projectId, membersIds);
     }
 }

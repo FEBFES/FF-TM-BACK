@@ -20,7 +20,6 @@ import com.febfes.fftmback.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,9 +39,10 @@ import java.util.List;
 public class TaskController {
 
     @Qualifier("taskServiceDecorator")
-    private final @NonNull TaskService taskService;
-    private final @NonNull FileService fileService;
-    private final @NonNull RoleCheckerComponent roleCheckerComponent;
+    private final TaskService taskService;
+    private final FileService fileService;
+    private final RoleCheckerComponent roleCheckerComponent;
+    private final TaskMapper taskMapper;
 
     @Operation(summary = "Get tasks with pagination")
     @ApiGet(path = "{projectId}/columns/{columnId}/tasks")
@@ -54,7 +54,7 @@ public class TaskController {
     ) {
         List<TaskView> tasks = taskService.getTasks(page, limit, pathVars.columnId(), taskSpec);
         return tasks.stream()
-                .map(TaskMapper.INSTANCE::taskViewToTaskShortDto)
+                .map(taskMapper::taskViewToTaskShortDto)
                 .toList();
     }
 
@@ -63,7 +63,7 @@ public class TaskController {
     public TaskDto getTaskById(@ParameterObject TaskParameters pathVars) {
         TaskView task = taskService.getTaskById(pathVars.taskId());
         List<FileEntity> files = fileService.getFilesByEntityId(pathVars.taskId(), EntityType.TASK);
-        return TaskMapper.INSTANCE.taskViewToTaskDto(task, files);
+        return taskMapper.taskViewToTaskDto(task, files);
     }
 
     @Operation(summary = "Create new task")
@@ -75,10 +75,10 @@ public class TaskController {
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
         Long createdTaskId = taskService.createTask(
-                TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto),
+                taskMapper.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto),
                 user.getId()
         );
-        return TaskMapper.INSTANCE.taskViewToTaskShortDto(taskService.getTaskById(createdTaskId));
+        return taskMapper.taskViewToTaskShortDto(taskService.getTaskById(createdTaskId));
     }
 
     @Operation(summary = "Edit task by its id")
@@ -89,10 +89,10 @@ public class TaskController {
             @RequestBody @Valid EditTaskDto editTaskDto
     ) {
         roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
-        TaskEntity editTask = TaskMapper.INSTANCE.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto);
+        TaskEntity editTask = taskMapper.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto);
         editTask.setId(pathVars.taskId());
         taskService.updateTask(editTask, user.getId());
-        return TaskMapper.INSTANCE.taskViewToTaskShortDto(taskService.getTaskById(pathVars.taskId()));
+        return taskMapper.taskViewToTaskShortDto(taskService.getTaskById(pathVars.taskId()));
     }
 
     @Operation(summary = "Delete task by its id")

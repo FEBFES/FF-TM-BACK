@@ -13,5 +13,5 @@ public class SubscriptionData {
 
     private String username;
 
-    private FluxSink<ServerSentEvent<?>> fluxSink;
+    private FluxSink<ServerSentEvent<String>> fluxSink;
 }

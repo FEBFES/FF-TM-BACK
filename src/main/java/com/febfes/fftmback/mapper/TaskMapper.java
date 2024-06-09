@@ -8,14 +8,11 @@ import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.TaskShortDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(uses = {FileMapper.class, UserMapper.class})
+@Mapper(componentModel = "spring", uses = {FileMapper.class, UserMapper.class})
 public interface TaskMapper {
-
-    TaskMapper INSTANCE = Mappers.getMapper(TaskMapper.class);
 
     @Mapping(target = "type", source = "task.taskType.name")
     @Mapping(target = "files", source = "files")

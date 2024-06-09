@@ -2,7 +2,7 @@ package com.febfes.fftmback.domain.projection;
 
 import java.time.LocalDateTime;
 
-public interface ProjectWithMembersProjection {
+public interface ProjectForUserProjection {
 
     Long getId();
 

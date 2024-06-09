@@ -5,12 +5,13 @@ import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TaskService {
 
     List<TaskView> getTasks(int page, int limit, Long columnId, TaskSpec taskSpec);
 
-    List<TaskView> getTasks(Long columnId, TaskSpec taskSpec);
+    List<TaskView> getTasks(Set<Long> columnId, TaskSpec taskSpec);
 
     TaskView getTaskById(Long id);
 

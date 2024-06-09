@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.febfes.fftmback.service.impl.ScheduleServiceImpl.JOB;
@@ -38,7 +39,7 @@ public class TaskServiceDecorator implements TaskService {
     }
 
     @Override
-    public List<TaskView> getTasks(Long columnId, TaskSpec taskSpec) {
+    public List<TaskView> getTasks(Set<Long> columnId, TaskSpec taskSpec) {
         return taskService.getTasks(columnId, taskSpec);
     }
 

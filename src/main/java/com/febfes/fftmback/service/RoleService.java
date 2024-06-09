@@ -12,8 +12,6 @@ public interface RoleService {
 
     RoleEntity getRoleByName(RoleName roleName);
 
-    RoleEntity getRoleByProjectAndUser(Long projectId, UserEntity user);
-
     void changeUserRoleOnProject(Long projectId, Long userId, RoleName roleName);
 
     void changeUserRoleOnProject(Long projectId, UserEntity user, RoleName roleName);

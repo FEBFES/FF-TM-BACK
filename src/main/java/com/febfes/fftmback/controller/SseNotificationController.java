@@ -24,7 +24,7 @@ public class SseNotificationController {
     private final Map<UUID, SubscriptionData> subscriptions = new ConcurrentHashMap<>();
 
     @GetMapping(path = "/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<?>> openSseStream(@PathVariable String username) {
+    public Flux<ServerSentEvent<String>> openSseStream(@PathVariable String username) {
 
         return Flux.create(fluxSink -> {
             log.info("Creating SSE subscription for user {}", username);

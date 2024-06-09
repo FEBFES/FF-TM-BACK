@@ -6,17 +6,19 @@ import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
+import com.febfes.fftmback.domain.projection.MemberProjection;
+import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.TaskTypeService;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,10 +36,13 @@ import static com.febfes.fftmback.util.SortUtils.getOrderFromParams;
 public class ProjectController {
 
     @Qualifier("projectManagementServiceDecorator")
-    private final @NonNull ProjectManagementService projectManagementService;
-    private final @NonNull ProjectMemberService projectMemberService;
-    private final @NonNull TaskTypeService taskTypeService;
-    private final @NonNull RoleCheckerComponent roleCheckerComponent;
+    private final ProjectManagementService projectManagementService;
+    private final ProjectMemberService projectMemberService;
+    private final TaskTypeService taskTypeService;
+    private final RoleCheckerComponent roleCheckerComponent;
+    private final ProjectMapper projectMapper;
+    private final UserService userService;
+
 
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
@@ -45,7 +50,9 @@ public class ProjectController {
             @SortParam @RequestParam(defaultValue = "-createDate") String[] sort,
             @AuthenticationPrincipal UserEntity user
     ) {
-        return projectMemberService.getProjectsForUser(user.getId(), getOrderFromParams(sort));
+        return projectMapper.projectProjectionToProjectDto(
+                projectMemberService.getProjectsForUser(user.getId(), getOrderFromParams(sort))
+        );
     }
 
     @Operation(summary = "Create new project")
@@ -55,16 +62,18 @@ public class ProjectController {
             @RequestBody @Valid ProjectDto projectDto
     ) {
         ProjectEntity project = projectManagementService.createProject(
-                ProjectMapper.INSTANCE.projectDtoToProject(projectDto), user.getId()
+                projectMapper.projectDtoToProject(projectDto), user.getId()
         );
-        return ProjectMapper.INSTANCE.projectToProjectDto(project);
+        return projectMapper.projectToProjectDto(project);
     }
 
     @Operation(summary = "Get project by its id")
     @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public OneProjectDto getProject(@AuthenticationPrincipal UserEntity user, @PathVariable Long id) {
-        return projectMemberService.getProjectForUser(id, user.getId());
+        ProjectForUserProjection project = projectMemberService.getProjectForUser(id, user.getId());
+        List<MemberProjection> members =  userService.getProjectMembersWithRole(id);
+        return projectMapper.projectWithMembersProjectionToOneProjectDto(project, members);
     }
 
     @Operation(summary = "Edit project by its id")
@@ -74,7 +83,9 @@ public class ProjectController {
             @RequestBody ProjectDto projectDto
     ) {
         roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
-        return projectManagementService.editProject(id, ProjectMapper.INSTANCE.projectDtoToProject(projectDto));
+        return projectMapper.projectToProjectDto(
+                projectManagementService.editProject(id, projectMapper.projectDtoToProject(projectDto))
+        );
     }
 
     @Operation(summary = "Delete project by its id")

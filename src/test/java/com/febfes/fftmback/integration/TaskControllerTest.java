@@ -208,6 +208,7 @@ class TaskControllerTest extends BasicTestClass {
         taskTypeService.createTaskType(taskType);
         TaskDto taskDto = Instancio.of(TaskDto.class)
                 .set(field(TaskDto::type), taskType.getName())
+                .set(field(TaskDto::deadlineDate), null)
                 .create();
         createNewTask(taskDto)
                 .then()
