@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: VladisStep
+      comment: add task comment table
+      changes:
+        - createTable:
+            tableName: task_comment
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: creator_id
+                  type: bigint
+              - column:
+                  name: task_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: varchar(1000)
+  - changeSet:
+      id: 1
+      author: VladisStep
+      comment: add foreign keys
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: fk_creator_id
+            baseTableName: task_comment
+            baseColumnNames: creator_id
+            referencedTableName: user_entity
+            referencedColumnNames: id
+            onDelete: set null
+        - addForeignKeyConstraint:
+            constraintName: fk_task_id
+            baseTableName: task_comment
+            baseColumnNames: task_id
+            referencedTableName: task
+            referencedColumnNames: id
+            onDelete: cascade
+  - changeSet:
+      id: 2
+      author: VladisStep
+      comment: change text column type
+      changes:
+        - modifyDataType:
+            tableName: task_comment
+            columnName: text
+            newDataType: text

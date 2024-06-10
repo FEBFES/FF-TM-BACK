@@ -2,11 +2,10 @@ package com.febfes.fftmback.integration;
 
 
 import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.ColumnService;
-import com.febfes.fftmback.service.TaskTypeService;
-import com.febfes.fftmback.service.UserService;
+import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
+import com.febfes.fftmback.service.*;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.febfes.fftmback.util.DatabaseCleanup;
@@ -59,6 +58,9 @@ public class BasicTestClass {
     @Qualifier("projectManagementService")
     protected ProjectManagementService projectManagementService;
 
+    @Autowired
+    protected TaskService taskService;
+
     @LocalServerPort
     private Integer port;
 
@@ -108,6 +110,18 @@ public class BasicTestClass {
         taskTypeService.createDefaultTaskTypesForProject(projectId);
         projectMemberService.addUserToProjectAndChangeRole(projectId, createdUserId, RoleName.OWNER);
         return projectId;
+    }
+
+    protected Long createNewTask(Long projectId, Long userId) {
+        Long columnId = columnService.getOrderedColumns(projectId)
+                .stream()
+                .findAny()
+                .map(BaseEntity::getId)
+                .orElseThrow(() -> new IllegalArgumentException("Project with id=%d doesn't have task columns"));
+        return taskService.createTask(
+                TaskEntity.builder().projectId(projectId).columnId(columnId).name("SomeTask").build(),
+                userId
+        );
     }
 }
 
