@@ -49,3 +49,12 @@ databaseChangeLog:
             referencedTableName: task
             referencedColumnNames: id
             onDelete: cascade
+  - changeSet:
+      id: 2
+      author: VladisStep
+      comment: change text column type
+      changes:
+        - modifyDataType:
+            tableName: task_comment
+            columnName: text
+            newDataType: text

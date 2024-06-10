@@ -35,7 +35,7 @@ class TaskCommentControllerTest extends BasicTestClass {
                 .contentType(ContentType.JSON)
                 .body(comment)
                 .when()
-                .post("%s/task/add-comment".formatted(PATH_TO_PROJECTS_API))
+                .post("%s/task/comment".formatted(PATH_TO_PROJECTS_API))
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }

@@ -3,7 +3,10 @@ package com.febfes.fftmback.domain.dao;
 
 import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -22,6 +25,6 @@ public class TaskCommentEntity extends BaseEntity {
     @Column(name = "task_id")
     private Long taskId;
 
-    @Column(name = "text", length = 1000)
+    @Column(name = "text")
     private String text;
 }

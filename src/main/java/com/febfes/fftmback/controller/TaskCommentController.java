@@ -27,7 +27,7 @@ public class TaskCommentController {
     private final TaskCommentMapper taskCommentMapper;
 
     @Operation(summary = "Create new task comment")
-    @ApiCreate(path = "add-comment")
+    @ApiCreate(path = "comment")
     public TaskCommentDto createTask(
             @RequestBody TaskCommentDto taskCommentDto
     ) {
