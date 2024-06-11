@@ -28,9 +28,7 @@ public class SseNotificationController {
 
         return Flux.create(fluxSink -> {
             log.info("Creating SSE subscription for user {}", username);
-
             UUID uuid = UUID.randomUUID();
-
             fluxSink.onCancel(
                     () -> {
                         subscriptions.remove(uuid);
@@ -40,7 +38,6 @@ public class SseNotificationController {
 
             SubscriptionData subscriptionData = new SubscriptionData(username, fluxSink);
             subscriptions.put(uuid, subscriptionData);
-
             ServerSentEvent<String> helloEvent = ServerSentEvent.builder("Hello, " + username).build();
             fluxSink.next(helloEvent);
         });
@@ -48,10 +45,10 @@ public class SseNotificationController {
 
     @GetMapping(path = "/{username}/test")
     public void test(@PathVariable String username) {
-        sendMessageToTheUser("TEST MESSAGE", username);
+        sendMessageToUser("TEST MESSAGE", username);
     }
 
-    public void sendMessageToTheUser(String message, String username) {
+    public void sendMessageToUser(String message, String username) {
         ServerSentEvent<String> event = ServerSentEvent
                 .builder(message)
                 .build();

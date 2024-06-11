@@ -50,7 +50,7 @@ public class TaskDeadlineJob implements Job {
             String message = createDeadlineNotificationMessage(taskId, project.getName());
             notificationService.createNotification(message, userId);
             String username = userService.getUserById(userId).getUsername();
-            sseNotificationController.sendMessageToTheUser(message, username);
+            sseNotificationController.sendMessageToUser(message, username);
         } catch (EntityNotFoundException ex) {
             log.warn("Can't find task with id = {}, so notification about deadline date won't be send", taskId);
         }
