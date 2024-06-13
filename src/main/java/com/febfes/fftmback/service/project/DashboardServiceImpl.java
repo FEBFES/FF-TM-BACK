@@ -11,13 +11,13 @@ import com.febfes.fftmback.service.TaskService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -26,7 +26,6 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final ColumnService columnService;
 
-    @Qualifier("taskServiceDecorator")
     private final TaskService taskService;
     private final ColumnWithTasksMapper columnWithTasksMapper;
 
@@ -34,9 +33,9 @@ public class DashboardServiceImpl implements DashboardService {
     public DashboardDto getDashboard(Long id, TaskSpec taskSpec) {
         List<TaskColumnEntity> columns = columnService.getOrderedColumns(id);
         Map<Long, List<TaskView>> columnIdToTaskListMap = taskService.getTasks(
-                columns.stream().map(TaskColumnEntity::getId).collect(Collectors.toSet()),
-                taskSpec
-        )
+                        columns.stream().map(TaskColumnEntity::getId).collect(Collectors.toSet()),
+                        taskSpec
+                )
                 .stream()
                 .collect(Collectors.groupingBy(TaskView::getColumnId, Collectors.toList()));
         List<ColumnWithTasksDto> columnsWithTasks = columns.stream()

@@ -29,7 +29,7 @@ import static com.febfes.fftmback.service.order.OrderServiceImpl.ORDER_FIELD_NAM
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-@Service("taskService")
+@Service
 @Slf4j
 @Transactional
 @RequiredArgsConstructor

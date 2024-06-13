@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.febfes.fftmback.service.impl.TaskServiceDecorator.TASK_ID;
-import static com.febfes.fftmback.service.impl.TaskServiceDecorator.USER_ID;
+import static com.febfes.fftmback.service.TaskServiceDeadlineAspect.TASK_ID;
+import static com.febfes.fftmback.service.TaskServiceDeadlineAspect.USER_ID;
 
 @Slf4j
 @Component
@@ -35,7 +35,6 @@ public class TaskDeadlineJob implements Job {
     @Qualifier("projectManagementServiceDecorator")
     private final ProjectManagementService projectManagementService;
 
-    @Qualifier("taskServiceDecorator")
     private final TaskService taskService;
 
     @Override
