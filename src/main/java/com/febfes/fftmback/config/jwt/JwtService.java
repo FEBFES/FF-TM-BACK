@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +25,8 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expirationDateInSeconds}")
-    private int jwtExpirationDateInSeconds;
+    @Value("${jwt.expirationDateDuration}")
+    private Duration jwtExpirationDateDuration;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -52,7 +53,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(DateUtils.getCurrentDate())
-                .setExpiration(DateUtils.getCurrentDatePlusSeconds(jwtExpirationDateInSeconds))
+                .setExpiration(DateUtils.getCurrentDatePlusDuration(jwtExpirationDateDuration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -25,6 +25,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +106,9 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulCreateTaskTest() {
-        TaskDto taskDto = Instancio.create(TaskDto.class);
+        TaskDto taskDto = Instancio.of(TaskDto.class)
+                .set(field(TaskDto::deadlineDate), LocalDateTime.now().plusDays(1L))
+                .create();
 
         createNewTask(taskDto)
                 .then()
@@ -129,6 +132,7 @@ class TaskControllerTest extends BasicTestClass {
         UserEntity newUser = userService.getUserById(newUserId);
         EditTaskDto editTaskDto = Instancio.of(EditTaskDto.class)
                 .set(field(EditTaskDto::assigneeId), newUserId)
+                .set(field(EditTaskDto::deadlineDate), LocalDateTime.now().plusDays(1L))
                 .create();
 
         TaskShortDto taskShortDto = requestWithBearerToken()
@@ -158,7 +162,9 @@ class TaskControllerTest extends BasicTestClass {
     @Test
     void failedEditOfTaskTest() {
         String wrongTaskId = "54731584";
-        TaskDto createTaskDto = Instancio.create(TaskDto.class);
+        TaskDto createTaskDto = Instancio.of(TaskDto.class)
+                .set(field(TaskDto::deadlineDate), null)
+                .create();
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -202,6 +208,7 @@ class TaskControllerTest extends BasicTestClass {
         taskTypeService.createTaskType(taskType);
         TaskDto taskDto = Instancio.of(TaskDto.class)
                 .set(field(TaskDto::type), taskType.getName())
+                .set(field(TaskDto::deadlineDate), null)
                 .create();
         createNewTask(taskDto)
                 .then()
@@ -213,6 +220,7 @@ class TaskControllerTest extends BasicTestClass {
     void createTaskWithPriorityTest() {
         TaskDto taskDto = Instancio.of(TaskDto.class)
                 .set(field(TaskDto::priority), TaskPriority.LOW)
+                .set(field(TaskDto::deadlineDate), null)
                 .create();
         createNewTask(taskDto)
                 .then()
@@ -223,7 +231,9 @@ class TaskControllerTest extends BasicTestClass {
     @Test
     void createTaskWithWrongColumnIdTest() {
         long wrongColumnId = 20L;
-        TaskDto taskDto = Instancio.create(TaskDto.class);
+        TaskDto taskDto = Instancio.of(TaskDto.class)
+                .set(field(TaskDto::deadlineDate), null)
+                .create();
         ErrorDto errorDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(taskDto)

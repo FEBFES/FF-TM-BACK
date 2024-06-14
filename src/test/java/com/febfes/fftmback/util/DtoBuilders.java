@@ -8,6 +8,7 @@ import org.instancio.Instancio;
 import org.instancio.InstancioApi;
 import org.springframework.context.annotation.Profile;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static com.febfes.fftmback.integration.AuthenticationControllerTest.EMAIL_PATTERN;
@@ -73,6 +74,7 @@ public class DtoBuilders {
     public static EditTaskDto createEditTaskDto(Integer order) {
         return commonEditTask()
                 .set(field(EditTaskDto::order), order)
+                .set(field(EditTaskDto::deadlineDate), LocalDateTime.now().plusDays(1L))
                 .create();
     }
 

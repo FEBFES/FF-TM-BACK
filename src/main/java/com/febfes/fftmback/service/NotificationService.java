@@ -9,4 +9,6 @@ public interface NotificationService {
     List<NotificationEntity> getNotificationsByUserId(Long userId);
 
     List<NotificationEntity> getNotificationsByUserIdAndIsRead(Long userId, Boolean isRead);
+
+    void createNotification(String message, Long userIdTo);
 }

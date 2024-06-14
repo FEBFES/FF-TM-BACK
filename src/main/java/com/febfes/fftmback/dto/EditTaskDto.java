@@ -1,6 +1,7 @@
 package com.febfes.fftmback.dto;
 
 import com.febfes.fftmback.domain.common.TaskPriority;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ public record EditTaskDto(
         TaskPriority priority,
         String type,
         Integer order,
+        @Future
         LocalDateTime deadlineDate
 ) {
 }
