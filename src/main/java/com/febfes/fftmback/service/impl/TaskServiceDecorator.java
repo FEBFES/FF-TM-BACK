@@ -3,6 +3,7 @@ package com.febfes.fftmback.service.impl;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
+import com.febfes.fftmback.schedule.TaskDeadlineJob;
 import com.febfes.fftmback.service.ScheduleService;
 import com.febfes.fftmback.service.TaskService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.febfes.fftmback.service.impl.ScheduleServiceImpl.JOB;
+import static com.febfes.fftmback.service.impl.ScheduleServiceImpl.TRIGGER;
 import static com.febfes.fftmback.util.DateUtils.convertLocalDateTimeToDate;
 
 @Service("taskServiceDecorator")
@@ -30,8 +33,6 @@ public class TaskServiceDecorator implements TaskService {
     public static final String USER_ID = "userId";
     public static final String TASK_ID = "taskId";
     public static final String DEADLINE = "deadline";
-    public static final String JOB = "job";
-    public static final String TRIGGER = "trigger";
 
     @Override
     public List<TaskView> getTasks(int page, int limit, Long columnId, TaskSpec taskSpec) {
@@ -77,6 +78,7 @@ public class TaskServiceDecorator implements TaskService {
         jobDataMap.put(TASK_ID, taskId);
         String jobIdentity = String.format("%s-%s-%s", DEADLINE, JOB, UUID.randomUUID());
         String triggerIdentity = String.format("%s-%s-%s", DEADLINE, TRIGGER, UUID.randomUUID());
-        scheduleService.startNewJobAt(convertLocalDateTimeToDate(deadlineDate), jobDataMap, jobIdentity, triggerIdentity);
+        scheduleService.startNewJobAt(TaskDeadlineJob.class, convertLocalDateTimeToDate(deadlineDate),
+                jobDataMap, jobIdentity, triggerIdentity);
     }
 }

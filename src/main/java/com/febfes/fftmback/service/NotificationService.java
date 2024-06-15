@@ -8,7 +8,11 @@ public interface NotificationService {
 
     List<NotificationEntity> getNotificationsByUserId(Long userId);
 
-    List<NotificationEntity> getNotificationsByUserIdAndIsRead(Long userId, Boolean isRead);
+    NotificationEntity getNotificationById(Long id);
 
     void createNotification(String message, Long userIdTo);
+
+    void changeIsRead(Long notificationId, boolean isRead);
+
+    void deleteNotification(Long id);
 }

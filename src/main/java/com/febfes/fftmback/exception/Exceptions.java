@@ -49,4 +49,8 @@ public class Exceptions {
     public Supplier<EntityNotFoundException> taskNotFound(Long id) {
         return () -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id);
     }
+
+    public Supplier<EntityNotFoundException> notificationNotFound(Long id) {
+        return () -> new EntityNotFoundException(NotificationEntity.ENTITY_NAME, id);
+    }
 }
