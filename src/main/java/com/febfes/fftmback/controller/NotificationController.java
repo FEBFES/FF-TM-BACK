@@ -43,7 +43,7 @@ public class NotificationController {
 
     @Operation(summary = "Delete notification by id")
     @ApiDelete("/{notificationId}")
-    public void changeIsRead(@PathVariable Long notificationId) {
+    public void deleteNotification(@PathVariable Long notificationId) {
         notificationService.deleteNotification(notificationId);
     }
 }
