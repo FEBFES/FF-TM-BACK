@@ -1,4 +1,4 @@
-package com.febfes.fftmback.config;
+package com.fftmback.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -21,8 +21,8 @@ public class OpenApiConfiguration {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI().info(new Info()
-                .title("FF-TM-BACK Monolith")
-                .description("FF-TM-BACK Monolith Swagger UI")
+                .title("FF-TM-BACK Notification service")
+                .description("FF-TM-BACK Notification service Swagger UI")
                 .version("1.0.0"));
     }
 }

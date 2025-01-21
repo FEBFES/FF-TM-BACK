@@ -1,6 +1,7 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiCreate;
+import com.febfes.fftmback.dto.SendNotificationDto;
 import com.febfes.fftmback.dto.auth.*;
 import com.febfes.fftmback.mapper.UserMapper;
 import com.febfes.fftmback.service.AuthenticationService;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,9 @@ public class AuthenticationController {
     private final RefreshTokenService refreshTokenService;
     private final UserMapper userMapper;
 
+    // TODO: delete
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
     @Operation(summary = "Register new user")
     @ApiCreate(path = "register")
     @ApiResponse(responseCode = "409", description = "User already exists", content = @Content)
@@ -37,6 +42,8 @@ public class AuthenticationController {
     @ApiCreate(path = "authenticate")
     @ApiResponse(responseCode = "404", description = "User not found by username", content = @Content)
     public GetAuthDto authenticate(@RequestBody @Valid AuthenticationDto authenticationDto) {
+        // TODO: delete
+        kafkaTemplate.send("notification-topic", new SendNotificationDto("HELLO FROM AUTH!!", 1L));
         return authenticationService.authenticateUser(userMapper.authenticationDtoToUser(authenticationDto));
     }
 

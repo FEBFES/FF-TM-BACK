@@ -29,7 +29,6 @@ management:
       probability: 1.0
 
 springdoc:
-#  enable-native-support: true
   api-docs:
     enabled: true
     path: /v3/api-docs
@@ -41,8 +40,4 @@ springdoc:
         url: /api/v1/notifications/v3/api-docs
     enabled: true
     config-url: /v3/api-docs/swagger-config
-#    path: /swagger-ui/index.html
-#      - name: api-monolith
-#        url: /monolith/v3/api-docs
-#      - name: api-notification
-#        url: /notifications/v3/api-docs
+    tagsSorter: alpha

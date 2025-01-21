@@ -1,10 +1,9 @@
-package com.febfes.fftmback.config;
+package com.fftmback.config;
 
-import com.febfes.fftmback.config.jwt.JwtAuthenticationFilter;
+import com.fftmback.config.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -45,19 +44,9 @@ public class WebSecurity {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(
-                        "/v1/auth/register",
-                        "/v1/auth/authenticate",
-                        "/v1/auth/refresh-token",
-                        "/v1/auth/check-token-expiration",
-                        "/v1/roles",
-                        // TODO: remove unnecessary
-                        "/swagger-ui/**",
-                        "/v1/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/v1/v3/api-docs/**"
+                        "/v1/notifications/swagger-ui/**",
+                        "/v1/notifications/v3/api-docs/**"
                 )
-                .permitAll()
-                .requestMatchers(HttpMethod.GET, "/v1/files/user-pic/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

@@ -29,6 +29,9 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     @Qualifier("projectPatchCommonProcessor")
     private final ProjectPatchFieldProcessor patchCommonProcessor;
 
+//    @Value("${test.a}")
+//    private String testValue;
+
     @PostConstruct
     private void postConstruct() {
         patchIsFavouriteProcessor.setNextProcessor(patchCommonProcessor);
