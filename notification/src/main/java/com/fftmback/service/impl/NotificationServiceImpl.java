@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,6 +18,8 @@ import java.util.List;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+
+    private static final Long NOTIFICATION_LIFE_DAYS = 30L;
 
     @Override
     public List<NotificationEntity> getNotificationsByUserId(Long userId) {
@@ -54,5 +57,16 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationEntity notification = getNotificationById(id);
         notificationRepository.deleteById(notification.getId());
         log.info("Deleted notification with ID = {}", id);
+    }
+
+    @Override
+    public void deleteOutdatedNotifications() {
+        LocalDateTime now = LocalDateTime.now();
+        List<NotificationEntity> notifications = notificationRepository.findByIsReadAndCreateDateBefore(
+                true, now.minusDays(NOTIFICATION_LIFE_DAYS));
+        if (!notifications.isEmpty()) {
+            notificationRepository.deleteAll(notifications);
+            log.info("Read notifications with a creation date of {} days ago have been deleted", NOTIFICATION_LIFE_DAYS);
+        }
     }
 }

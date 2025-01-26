@@ -1,5 +1,6 @@
 package com.febfes.fftmback.config.jwt;
 
+import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -40,8 +41,10 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(UserEntity userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", userDetails.getId());
+        return generateToken(extraClaims, userDetails);
     }
 
     public String generateToken(

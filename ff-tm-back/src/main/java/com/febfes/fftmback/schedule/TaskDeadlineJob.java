@@ -5,7 +5,6 @@ import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.SendNotificationDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.service.NotificationService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
@@ -30,7 +29,6 @@ import static com.febfes.fftmback.service.TaskServiceDeadlineAspect.USER_ID;
 @DisallowConcurrentExecution
 public class TaskDeadlineJob implements Job {
 
-    private final NotificationService notificationService;
     private final UserService userService;
     private final SseNotificationController sseNotificationController;
 
@@ -38,7 +36,7 @@ public class TaskDeadlineJob implements Job {
     private final ProjectManagementService projectManagementService;
 
     private final TaskService taskService;
-    private KafkaTemplate<String, SendNotificationDto> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
@@ -51,7 +49,6 @@ public class TaskDeadlineJob implements Job {
             ProjectEntity project = projectManagementService.getProject(taskView.getProjectId());
             String message = createDeadlineNotificationMessage(taskId, project.getName());
             kafkaTemplate.send("notification-topic", new SendNotificationDto(message, userId));
-//            notificationService.createNotification(message, userId);
             String username = userService.getUserById(userId).getUsername();
             sseNotificationController.sendMessageToUser(message, username);
         } catch (EntityNotFoundException ex) {

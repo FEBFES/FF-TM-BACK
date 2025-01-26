@@ -1,11 +1,11 @@
 ## Build stage
 FROM openjdk:17-alpine AS build
 WORKDIR /home/app
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml lombok.config ./
+COPY ../ff-tm-back/.mvn/ .mvn/
+COPY ../ff-tm-back/mvnw ../ff-tm-back/pom.xml ../ff-tm-back/lombok.config ./
 
-COPY ./src ./src/
-RUN ./mvnw clean install -Dmaven.test.skip
+COPY ../ff-tm-back/src ./src/
+RUN ../ff-tm-back/mvnw clean install -Dmaven.test.skip
 
 ## Package stage
 FROM eclipse-temurin:17-jre-alpine

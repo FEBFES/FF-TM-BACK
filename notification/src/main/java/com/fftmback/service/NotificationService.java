@@ -16,4 +16,6 @@ public interface NotificationService {
     void changeIsRead(Long notificationId, boolean isRead);
 
     void deleteNotification(Long id);
+
+    void deleteOutdatedNotifications();
 }
