@@ -1,4 +1,4 @@
-package com.febfes.gateway;
+package com.febfes.gateway.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

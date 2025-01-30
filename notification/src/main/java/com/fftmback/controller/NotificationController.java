@@ -4,7 +4,7 @@ import com.fftmback.annotation.ApiDelete;
 import com.fftmback.annotation.ApiGet;
 import com.fftmback.annotation.ApiPatch;
 import com.fftmback.annotation.ProtectedApi;
-import com.fftmback.config.jwt.JwtService;
+import com.fftmback.domain.User;
 import com.fftmback.dto.NotificationDto;
 import com.fftmback.mapper.NotificationMapper;
 import com.fftmback.service.NotificationService;
@@ -29,18 +29,23 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final NotificationMapper notificationMapper;
-    private final JwtService jwtService;
 
     @Operation(summary = "Get notifications for the user they were sent to")
     @ApiGet
-//    public List<NotificationDto> getNotificationsForUser(@AuthenticationPrincipal UserEntity user) {
     public List<NotificationDto> getNotificationsForUser() {
-//        Long userId = Long.valueOf(jwt.getClaim("user_id"));
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        Long userId = jwtService.extractClaim(token.replace("Bearer ", ""), claims -> claims.get("userId", Long.class));
-        return null;
-//        return notificationMapper.notificationsToDto(notificationService.getNotificationsByUserId(user.getId()));
+        User user = (User) authentication.getPrincipal();
+        return notificationMapper.notificationsToDto(notificationService.getNotificationsByUserId(user.id()));
     }
+
+//    @Operation(summary = "Get notifications for the user they were sent to")
+//    @ApiGet("/projects/{projectId}")
+//    @PreAuthorize("hasAuthority('OWNER')")
+//    public List<NotificationDto> getNotificationsForUserProject(@PathVariable String projectId) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Long userId = (Long) authentication.getPrincipal();
+//        return notificationMapper.notificationsToDto(notificationService.getNotificationsByUserId(userId));
+//    }
 
     @Operation(summary = "Change notification isRead parameter")
     @ApiPatch("/{notificationId}")

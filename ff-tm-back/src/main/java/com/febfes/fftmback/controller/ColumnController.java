@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,11 +35,12 @@ public class ColumnController {
 
     @Operation(summary = "Create new column in a project with given id")
     @ApiCreate(path = "{projectId}/columns")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER_PLUS.name())")
     public ColumnDto crateNewColumn(
             @PathVariable Long projectId,
             @RequestBody @Valid ColumnDto columnDto
     ) {
-        roleCheckerComponent.checkIfHasRole(projectId, RoleName.MEMBER_PLUS);
+//        roleCheckerComponent.checkIfHasRole(projectId, RoleName.MEMBER_PLUS);
         TaskColumnEntity newColumn = columnService.createColumn(
                 columnMapper.columnDtoToColumn(columnDto, projectId)
         );

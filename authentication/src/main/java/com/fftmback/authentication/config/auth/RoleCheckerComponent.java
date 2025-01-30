@@ -65,4 +65,9 @@ public class RoleCheckerComponent {
         Set<RoleName> belowNecessary = ROLE_HIERARCHY.tailSet(roleName);
         return belowNecessary.contains(userRole.getName());
     }
+
+    private Set<RoleName> getRoles(String roleName) {
+        var role = RoleName.valueOf(roleName);
+        return ROLE_HIERARCHY.tailSet(role);
+    }
 }
