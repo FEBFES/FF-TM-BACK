@@ -1,8 +1,7 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
-import com.febfes.fftmback.config.auth.RoleCheckerComponent;
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
@@ -21,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +39,6 @@ public class ProjectController {
     private final ProjectManagementService projectManagementService;
     private final ProjectMemberService projectMemberService;
     private final TaskTypeService taskTypeService;
-    private final RoleCheckerComponent roleCheckerComponent;
     private final ProjectMapper projectMapper;
     private final UserService userService;
 
@@ -48,21 +47,21 @@ public class ProjectController {
     @ApiGet
     public List<ProjectDto> getProjectsForUser(
             @SortParam @RequestParam(defaultValue = "-createDate") String[] sort,
-            @AuthenticationPrincipal UserEntity user
+            @AuthenticationPrincipal User user
     ) {
         return projectMapper.projectProjectionToProjectDto(
-                projectMemberService.getProjectsForUser(user.getId(), getOrderFromParams(sort))
+                projectMemberService.getProjectsForUser(user.id(), getOrderFromParams(sort))
         );
     }
 
     @Operation(summary = "Create new project")
     @ApiCreate
     public ProjectDto createNewProject(
-            @AuthenticationPrincipal UserEntity user,
+            @AuthenticationPrincipal User user,
             @RequestBody @Valid ProjectDto projectDto
     ) {
         ProjectEntity project = projectManagementService.createProject(
-                projectMapper.projectDtoToProject(projectDto), user.getId()
+                projectMapper.projectDtoToProject(projectDto), user.id()
         );
         return projectMapper.projectToProjectDto(project);
     }
@@ -72,17 +71,17 @@ public class ProjectController {
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public OneProjectDto getProject(@AuthenticationPrincipal UserEntity user, @PathVariable Long id) {
         ProjectForUserProjection project = projectMemberService.getProjectForUser(id, user.getId());
-        List<MemberProjection> members =  userService.getProjectMembersWithRole(id);
+        List<MemberProjection> members = userService.getProjectMembersWithRole(id);
         return projectMapper.projectWithMembersProjectionToOneProjectDto(project, members);
     }
 
     @Operation(summary = "Edit project by its id")
     @ApiEdit(path = "{id}")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER_PLUS.name())")
     public ProjectDto editProject(
             @PathVariable Long id,
             @RequestBody ProjectDto projectDto
     ) {
-        roleCheckerComponent.checkIfHasRole(id, RoleName.MEMBER_PLUS);
         return projectMapper.projectToProjectDto(
                 projectManagementService.editProject(id, projectMapper.projectDtoToProject(projectDto))
         );
@@ -90,19 +89,19 @@ public class ProjectController {
 
     @Operation(summary = "Delete project by its id")
     @ApiDelete(path = "{id}")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).OWNER.name())")
     public void deleteProject(@PathVariable Long id) {
-        roleCheckerComponent.checkIfHasRole(id, RoleName.OWNER);
         projectManagementService.deleteProject(id);
     }
 
     @Operation(summary = "Edit project partially")
     @ApiPatch(path = "{id}")
     public void editProjectPartially(
-            @AuthenticationPrincipal UserEntity user,
+            @AuthenticationPrincipal User user,
             @PathVariable Long id,
             @RequestBody List<PatchDto> patchDtoList
     ) {
-        projectManagementService.editProjectPartially(id, user.getId(), patchDtoList);
+        projectManagementService.editProjectPartially(id, user.id(), patchDtoList);
     }
 
     @Operation(summary = "Get task types for project")

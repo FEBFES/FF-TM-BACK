@@ -11,8 +11,7 @@ import com.fftmback.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,20 +31,9 @@ public class NotificationController {
 
     @Operation(summary = "Get notifications for the user they were sent to")
     @ApiGet
-    public List<NotificationDto> getNotificationsForUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+    public List<NotificationDto> getNotificationsForUser(@AuthenticationPrincipal User user) {
         return notificationMapper.notificationsToDto(notificationService.getNotificationsByUserId(user.id()));
     }
-
-//    @Operation(summary = "Get notifications for the user they were sent to")
-//    @ApiGet("/projects/{projectId}")
-//    @PreAuthorize("hasAuthority('OWNER')")
-//    public List<NotificationDto> getNotificationsForUserProject(@PathVariable String projectId) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        Long userId = (Long) authentication.getPrincipal();
-//        return notificationMapper.notificationsToDto(notificationService.getNotificationsByUserId(userId));
-//    }
 
     @Operation(summary = "Change notification isRead parameter")
     @ApiPatch("/{notificationId}")

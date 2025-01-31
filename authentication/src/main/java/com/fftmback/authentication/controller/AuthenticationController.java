@@ -1,6 +1,7 @@
 package com.fftmback.authentication.controller;
 
 import com.fftmback.authentication.annotation.ApiCreate;
+import com.fftmback.authentication.annotation.ApiGet;
 import com.fftmback.authentication.dto.*;
 import com.fftmback.authentication.mapper.UserMapper;
 import com.fftmback.authentication.service.AuthenticationService;
@@ -12,7 +13,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("v1/auth")
@@ -54,7 +58,7 @@ public class AuthenticationController {
     }
 
     @Operation(summary = "Validate JWT token")
-    @GetMapping("validate-token")
+    @ApiGet("validate-token")
     public ConnValidationResponse validateToken(
             HttpServletRequest request
     ) {

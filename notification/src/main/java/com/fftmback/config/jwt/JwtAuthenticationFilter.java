@@ -1,6 +1,5 @@
 package com.fftmback.config.jwt;
 
-import com.fftmback.domain.Role;
 import com.fftmback.domain.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,8 +15,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
+import static com.fftmback.util.RoleUtils.getRoles;
 import static java.util.Objects.isNull;
 
 @Component
@@ -47,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 new User(userId, role),
                 null,
-                List.of(new Role(role))
+                getRoles(role)
         );
         authToken.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)

@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,7 +28,6 @@ public class WebSecurity {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
-    private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -47,14 +45,10 @@ public class WebSecurity {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(
-                        "/v1/auth/register",
-                        "/v1/auth/authenticate",
-                        "/v1/auth/refresh-token",
-                        "/v1/auth/check-token-expiration",
                         "/v1/roles",
                         // TODO: remove unnecessary
-                        "/swagger-ui/**",
-                        "/v1/swagger-ui/**",
+//                        "/swagger-ui/**",
+//                        "/v1/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/v1/v3/api-docs/**"
                 )
@@ -67,7 +61,6 @@ public class WebSecurity {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-//                .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

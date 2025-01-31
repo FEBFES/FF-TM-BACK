@@ -22,8 +22,6 @@ spring:
           uri: http://localhost:8092
           predicates:
             - Path=/api/v1/auth/**
-#          filters:
-#            - RewritePath=/api/v1/auth/authenticate, /authenticate
         - id: monolith
           uri: http://localhost:8090
           predicates:

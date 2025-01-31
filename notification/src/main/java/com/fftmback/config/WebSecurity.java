@@ -27,7 +27,6 @@ public class WebSecurity {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
-//    private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

@@ -4,8 +4,6 @@ import com.febfes.fftmback.annotation.ApiCreate;
 import com.febfes.fftmback.annotation.ApiDelete;
 import com.febfes.fftmback.annotation.ApiEdit;
 import com.febfes.fftmback.annotation.ProtectedApi;
-import com.febfes.fftmback.config.auth.RoleCheckerComponent;
-import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
@@ -30,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ColumnController {
 
     private final ColumnService columnService;
-    private final RoleCheckerComponent roleCheckerComponent;
     private final ColumnMapper columnMapper;
 
     @Operation(summary = "Create new column in a project with given id")
@@ -40,7 +37,6 @@ public class ColumnController {
             @PathVariable Long projectId,
             @RequestBody @Valid ColumnDto columnDto
     ) {
-//        roleCheckerComponent.checkIfHasRole(projectId, RoleName.MEMBER_PLUS);
         TaskColumnEntity newColumn = columnService.createColumn(
                 columnMapper.columnDtoToColumn(columnDto, projectId)
         );
@@ -49,19 +45,19 @@ public class ColumnController {
 
     @Operation(summary = "Edit column by its columnId")
     @ApiEdit(path = "{projectId}/columns/{columnId}")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER_PLUS.name())")
     public ColumnDto editColumn(
             @ParameterObject ColumnParameters pathVars,
             @RequestBody ColumnDto columnDto
     ) {
-        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER_PLUS);
         TaskColumnEntity updatedColumn = columnService.editColumn(columnDto, pathVars.columnId());
         return columnMapper.columnToColumnDto(updatedColumn);
     }
 
     @Operation(summary = "Delete column by its columnId")
     @ApiDelete(path = "{projectId}/columns/{columnId}")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER_PLUS.name())")
     public void deleteColumn(@ParameterObject ColumnParameters pathVars) {
-        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER_PLUS);
         columnService.deleteColumn(pathVars.columnId());
     }
 }

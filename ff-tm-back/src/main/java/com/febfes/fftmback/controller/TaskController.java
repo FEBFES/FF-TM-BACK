@@ -1,14 +1,12 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
-import com.febfes.fftmback.config.auth.RoleCheckerComponent;
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.EntityType;
-import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.TaskShortDto;
@@ -22,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +38,6 @@ public class TaskController {
 
     private final TaskService taskService;
     private final FileService fileService;
-    private final RoleCheckerComponent roleCheckerComponent;
     private final TaskMapper taskMapper;
 
     @Operation(summary = "Get tasks with pagination")
@@ -66,37 +64,37 @@ public class TaskController {
 
     @Operation(summary = "Create new task")
     @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER.name())")
     public TaskShortDto createTask(
-            @AuthenticationPrincipal UserEntity user,
+            @AuthenticationPrincipal User user,
             @ParameterObject ColumnParameters pathVars,
             @RequestBody @Valid EditTaskDto editTaskDto
     ) {
-        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
         Long createdTaskId = taskService.createTask(
                 taskMapper.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto),
-                user.getId()
+                user.id()
         );
         return taskMapper.taskViewToTaskShortDto(taskService.getTaskById(createdTaskId));
     }
 
     @Operation(summary = "Edit task by its id")
     @ApiEdit(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER.name())")
     public TaskShortDto updateTask(
-            @AuthenticationPrincipal UserEntity user,
+            @AuthenticationPrincipal User user,
             @ParameterObject TaskParameters pathVars,
             @RequestBody @Valid EditTaskDto editTaskDto
     ) {
-        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
         TaskEntity editTask = taskMapper.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto);
         editTask.setId(pathVars.taskId());
-        taskService.updateTask(editTask, user.getId());
+        taskService.updateTask(editTask, user.id());
         return taskMapper.taskViewToTaskShortDto(taskService.getTaskById(pathVars.taskId()));
     }
 
     @Operation(summary = "Delete task by its id")
     @ApiDelete(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER.name())")
     public void deleteTask(@ParameterObject TaskParameters pathVars) {
-        roleCheckerComponent.checkIfHasRole(pathVars.projectId(), RoleName.MEMBER);
         taskService.deleteTask(pathVars.taskId());
     }
 }

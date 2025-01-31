@@ -1,6 +1,5 @@
 package com.febfes.fftmback.config.jwt;
 
-import com.febfes.fftmback.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +25,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER = "Bearer ";
 
     private final JwtService jwtService;
-    private final UserService userService;
 
     @Override
     protected void doFilterInternal(
@@ -53,22 +51,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 new WebAuthenticationDetailsSource().buildDetails(request)
         );
         SecurityContextHolder.getContext().setAuthentication(authToken);
-//        final String username = jwtService.extractUsername(jwt);
-//        if (nonNull(username) && isNull(SecurityContextHolder.getContext().getAuthentication())) {
-//            // user is not authenticated yet
-//            UserDetails userDetails = userService.loadUserByUsername(username);
-//            if (jwtService.isTokenValid(jwt, userDetails)) {
-//                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-//                        userDetails,
-//                        null,
-//                        userDetails.getAuthorities()
-//                );
-//                authToken.setDetails(
-//                        new WebAuthenticationDetailsSource().buildDetails(request)
-//                );
-//                SecurityContextHolder.getContext().setAuthentication(authToken);
-//            }
-//        }
 
         filterChain.doFilter(request, response);
     }

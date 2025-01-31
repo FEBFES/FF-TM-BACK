@@ -3,6 +3,7 @@ package com.fftmback.authentication.exception;
 import com.fftmback.authentication.dto.error.ErrorDto;
 import com.fftmback.authentication.dto.error.ErrorType;
 import com.fftmback.authentication.dto.error.StatusError;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,26 @@ public class ControllerAdvisor {
     ) {
         log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
         return createExceptionResponseBody(HttpStatus.NOT_FOUND, ex);
+    }
+
+    @ExceptionHandler(EntityAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @Hidden
+    public ErrorDto handleEntityAlreadyExistsException(
+            EntityAlreadyExistsException ex
+    ) {
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createExceptionResponseBody(HttpStatus.CONFLICT, ex);
+    }
+
+    @ExceptionHandler({ExpiredJwtException.class, TokenExpiredException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @Hidden
+    public ErrorDto handleExpiredJwtException(
+            RuntimeException ex
+    ) {
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createExceptionResponseBody(HttpStatus.UNAUTHORIZED, ex);
     }
 
     @ExceptionHandler(Exception.class)

@@ -2,9 +2,9 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiDelete;
 import com.febfes.fftmback.annotation.ProtectedApi;
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.TaskFileDto;
 import com.febfes.fftmback.dto.UserPicDto;
 import com.febfes.fftmback.mapper.FileMapper;
@@ -67,12 +67,12 @@ public class FileController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public List<TaskFileDto> saveTaskFiles(
-            @AuthenticationPrincipal UserEntity user,
+            @AuthenticationPrincipal User user,
             @PathVariable Long taskId,
             @RequestParam("files") MultipartFile[] files
     ) {
         return Arrays.stream(files)
-                .map(file -> saveTaskFile(user.getId(), taskId, file))
+                .map(file -> saveTaskFile(user.id(), taskId, file))
                 .flatMap(Optional::stream)
                 .map(fileMapper::fileToTaskFileDto)
                 .toList();
