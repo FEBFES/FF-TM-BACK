@@ -1,0 +1,33 @@
+version: '3.9'
+
+name: ff-tm-back
+services:
+  postgres:
+    image: postgres:13.3
+    container_name: postgres-ff-tm
+    restart: always
+    env_file:
+      .env
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8090:8090"
+    env_file:
+      .env
+    volumes:
+      - febfes-files:/home/app/files
+      - febfes-userPics:/home/app/files/userPics
+    depends_on:
+      - postgres
+
+volumes:
+  febfes-files:
+  febfes-userPics:
+  db-data:

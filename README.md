@@ -67,3 +67,11 @@ new file must be created in the folder [view](src%2Fmain%2Fresources%2Fdb%2Fchan
 ### Rollback migrations
 
 Not currently supported
+
+## Docker
+
+build: `docker build . --tag=ff-tm-back:latest -f docker/Dockerfile`
+
+run: `docker run -p 8090:8090 --env-file docker/.env --name ff-tm-back ff-tm-back:latest`
+
+docker-compose: `docker-compose --env-file ./docker/.env -f docker/docker-compose.yml up`
