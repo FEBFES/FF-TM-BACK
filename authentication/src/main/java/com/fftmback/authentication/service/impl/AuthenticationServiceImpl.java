@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -52,6 +53,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private static final String BEARER = "Bearer ";
     private static final String PROJECTS_REGEX = "/projects/(\\d+).*";
+
+    @Value("${gateway.uri-header}")
+    private String initUriHeader;
 
     private String generateDisplayName() {
         return USER_STRING + generator.generate(6); // generate a 6-character username
@@ -111,7 +115,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ConnValidationResponse validateToken(HttpServletRequest request) {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String initUri = request.getHeader("X-init-uri");
+//        final String initUri = request.getHeader("X-init-uri");
+        final String initUri = request.getHeader(initUriHeader);
         final String jwt = authHeader.substring(BEARER.length());
         final String username = jwtService.extractUsername(jwt);
         UserEntity userDetails = getUserByUsername(username);
@@ -121,7 +126,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return ConnValidationResponse.builder()
                 .status("OK")
                 .methodType(HttpMethod.GET.name())
-                .username("username")
+                .username(username)
                 .isAuthenticated(isAuthenticated)
                 .role(role)
                 .build();

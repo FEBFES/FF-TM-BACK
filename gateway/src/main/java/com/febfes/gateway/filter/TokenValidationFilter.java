@@ -3,6 +3,7 @@ package com.febfes.gateway.filter;
 import com.febfes.gateway.data.ConnValidationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -20,6 +21,12 @@ public class TokenValidationFilter extends AbstractGatewayFilterFactory<TokenVal
 
     private final List<String> excludedUrls;
     private final WebClient.Builder webClientBuilder;
+
+    @Value("${spring.gateway.validate-token-url}")
+    private String validateTokenUrl;
+
+    @Value("${gateway.uri-header}")
+    private String initUriHeader;
 
     @Autowired
     public TokenValidationFilter(
@@ -51,9 +58,11 @@ public class TokenValidationFilter extends AbstractGatewayFilterFactory<TokenVal
 
         return webClientBuilder.build()
                 .get()
-                .uri("http://localhost:8092/api/v1/auth/validate-token")
+//                .uri("http://localhost:8092/api/v1/auth/validate-token")
+                .uri(validateTokenUrl)
                 .header(HttpHeaders.AUTHORIZATION, bearerToken)
-                .header("X-init-uri", exchange.getRequest().getURI().getPath())
+//                .header("X-init-uri", exchange.getRequest().getURI().getPath())
+                .header(initUriHeader, exchange.getRequest().getURI().getPath())
                 .retrieve()
                 .bodyToMono(ConnValidationResponse.class)
                 .flatMap(json -> processValidationResponse(json, exchange, chain))
