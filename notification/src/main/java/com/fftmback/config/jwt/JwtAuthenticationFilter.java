@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
+    @Value("${custom-headers.user-role}")
+    private String userRoleHeader;
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -41,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(BEARER.length());
-        String role = request.getHeader("X-user-role");
+        String role = request.getHeader(userRoleHeader);
         Long userId = jwtService.extractClaim(jwt, claims -> claims.get("userId", Long.class));
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 new User(userId, role),

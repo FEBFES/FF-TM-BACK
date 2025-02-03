@@ -1,4 +1,4 @@
-package com.febfes.fftmback.service.impl;
+package com.febfes.fftmback.service;
 
 import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
@@ -6,8 +6,6 @@ import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.repository.RefreshTokenRepository;
-import com.febfes.fftmback.service.RefreshTokenService;
-import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

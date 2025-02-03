@@ -4,7 +4,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.exception.TokenExpiredException;
-import com.febfes.fftmback.service.impl.AuthenticationServiceImpl;
+import com.febfes.fftmback.service.AuthenticationServiceImpl;
 import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

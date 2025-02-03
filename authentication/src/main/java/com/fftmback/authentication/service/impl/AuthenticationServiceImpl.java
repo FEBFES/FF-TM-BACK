@@ -44,8 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
 
-    private final RandomStringGenerator generator = new RandomStringGenerator
-            .Builder()
+    private final RandomStringGenerator generator = new RandomStringGenerator.Builder()
             .selectFrom('0', '9')
             .build();
 
@@ -54,7 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private static final String BEARER = "Bearer ";
     private static final String PROJECTS_REGEX = "/projects/(\\d+).*";
 
-    @Value("${gateway.uri-header}")
+    @Value("${custom-headers.init-uri}")
     private String initUriHeader;
 
     private String generateDisplayName() {
@@ -115,7 +114,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ConnValidationResponse validateToken(HttpServletRequest request) {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-//        final String initUri = request.getHeader("X-init-uri");
         final String initUri = request.getHeader(initUriHeader);
         final String jwt = authHeader.substring(BEARER.length());
         final String username = jwtService.extractUsername(jwt);

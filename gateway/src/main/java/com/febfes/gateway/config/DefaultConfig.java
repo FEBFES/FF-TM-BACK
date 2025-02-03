@@ -32,10 +32,8 @@ public class DefaultConfig {
         factory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
 
         ObjectMapper objectMapper = new ObjectMapper(factory);
-//        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//        objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
         return objectMapper;

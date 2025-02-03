@@ -1,5 +1,6 @@
 package com.febfes.gateway.filter;
 
+import com.febfes.gateway.config.CustomHeadersConfig;
 import com.febfes.gateway.data.ConnValidationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,21 +22,21 @@ public class TokenValidationFilter extends AbstractGatewayFilterFactory<TokenVal
 
     private final List<String> excludedUrls;
     private final WebClient.Builder webClientBuilder;
+    private final CustomHeadersConfig customHeadersConfig;
 
     @Value("${spring.gateway.validate-token-url}")
     private String validateTokenUrl;
 
-    @Value("${gateway.uri-header}")
-    private String initUriHeader;
-
     @Autowired
     public TokenValidationFilter(
             @Qualifier("excludedUrls") List<String> excludedUrls,
-            WebClient.Builder webClientBuilder
+            WebClient.Builder webClientBuilder,
+            CustomHeadersConfig customHeadersConfig
     ) {
         super(Config.class);
         this.excludedUrls = excludedUrls;
         this.webClientBuilder = webClientBuilder;
+        this.customHeadersConfig = customHeadersConfig;
     }
 
     @Override
@@ -62,7 +63,7 @@ public class TokenValidationFilter extends AbstractGatewayFilterFactory<TokenVal
                 .uri(validateTokenUrl)
                 .header(HttpHeaders.AUTHORIZATION, bearerToken)
 //                .header("X-init-uri", exchange.getRequest().getURI().getPath())
-                .header(initUriHeader, exchange.getRequest().getURI().getPath())
+                .header(customHeadersConfig.getInitUri(), exchange.getRequest().getURI().getPath())
                 .retrieve()
                 .bodyToMono(ConnValidationResponse.class)
                 .flatMap(json -> processValidationResponse(json, exchange, chain))
@@ -75,8 +76,8 @@ public class TokenValidationFilter extends AbstractGatewayFilterFactory<TokenVal
             GatewayFilterChain chain
     ) {
         exchange.getRequest().mutate()
-                .header("X-username", response.username())
-                .header("X-user-role", response.role());
+                .header(customHeadersConfig.getUsername(), response.username())
+                .header(customHeadersConfig.getUserRole(), response.role());
         return chain.filter(exchange);
     }
 

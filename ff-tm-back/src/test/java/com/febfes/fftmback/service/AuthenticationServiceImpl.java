@@ -1,9 +1,8 @@
-package com.febfes.fftmback.service.impl;
+package com.febfes.fftmback.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.auth.GetAuthDto;
@@ -12,8 +11,6 @@ import com.febfes.fftmback.exception.EntityAlreadyExistsException;
 import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.exception.TokenExpiredException;
 import com.febfes.fftmback.repository.UserRepository;
-import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.service.RefreshTokenService;
 import com.febfes.fftmback.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

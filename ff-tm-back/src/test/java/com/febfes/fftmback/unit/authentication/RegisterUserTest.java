@@ -3,7 +3,7 @@ package com.febfes.fftmback.unit.authentication;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.exception.EntityAlreadyExistsException;
 import com.febfes.fftmback.repository.UserRepository;
-import com.febfes.fftmback.service.impl.AuthenticationServiceImpl;
+import com.febfes.fftmback.service.AuthenticationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
