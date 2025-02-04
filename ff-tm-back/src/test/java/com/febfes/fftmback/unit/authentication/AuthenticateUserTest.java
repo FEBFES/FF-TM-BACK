@@ -1,11 +1,11 @@
 package com.febfes.fftmback.unit.authentication;
 
-import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.auth.GetAuthDto;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.AuthenticationServiceImpl;
+import com.febfes.fftmback.service.JwtTestService;
 import com.febfes.fftmback.service.RefreshTokenService;
 import com.febfes.fftmback.util.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +43,7 @@ class AuthenticateUserTest {
     private AuthenticationManager authenticationManager;
 
     @Mock
-    private JwtService jwtService;
+    private JwtTestService jwtTestService;
 
     @Mock
     private RefreshTokenService refreshTokenService;
@@ -75,7 +75,7 @@ class AuthenticateUserTest {
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(null);
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(passwordEncoder.encode(user.getPassword())).thenReturn(USER_ENCODED_PASS);
-        when(jwtService.generateToken(any(UserEntity.class))).thenReturn(JWT_TOKEN);
+        when(jwtTestService.generateToken(any(UserEntity.class))).thenReturn(JWT_TOKEN);
         when(refreshTokenService.getRefreshTokenByUserId(anyLong())).thenReturn(refreshToken);
 
         // Call the registerUser method
@@ -93,7 +93,7 @@ class AuthenticateUserTest {
         verify(authenticationManager).authenticate(any(Authentication.class));
         verify(userRepository).findByUsername(anyString());
         verify(passwordEncoder).encode(anyString());
-        verify(jwtService).generateToken(any(UserEntity.class));
+        verify(jwtTestService).generateToken(any(UserEntity.class));
         verify(refreshTokenService).getRefreshTokenByUserId(anyLong());
     }
 

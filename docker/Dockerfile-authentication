@@ -1,0 +1,20 @@
+## Build stage
+FROM amazoncorretto:17-alpine AS build
+WORKDIR /home/authentication
+
+COPY ./authentication/.mvn/ .mvn/
+COPY ./authentication/mvnw ./authentication/pom.xml ./authentication/lombok.config ./
+COPY ./authentication/src ./src/
+
+RUN chmod +x mvnw
+# clean up the file
+RUN sed -i 's/\r$//' mvnw
+RUN ./mvnw clean install -Dmaven.test.skip
+
+## Package stage
+FROM amazoncorretto:17-alpine
+WORKDIR /home/authentication
+
+COPY --from=build /home/authentication/target/*.jar /home/authentication/*.jar
+EXPOSE 8092
+ENTRYPOINT ["java", "-jar", "/home/authentication/*.jar"]

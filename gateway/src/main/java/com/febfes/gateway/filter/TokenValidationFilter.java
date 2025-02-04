@@ -59,10 +59,8 @@ public class TokenValidationFilter extends AbstractGatewayFilterFactory<TokenVal
 
         return webClientBuilder.build()
                 .get()
-//                .uri("http://localhost:8092/api/v1/auth/validate-token")
                 .uri(validateTokenUrl)
                 .header(HttpHeaders.AUTHORIZATION, bearerToken)
-//                .header("X-init-uri", exchange.getRequest().getURI().getPath())
                 .header(customHeadersConfig.getInitUri(), exchange.getRequest().getURI().getPath())
                 .retrieve()
                 .bodyToMono(ConnValidationResponse.class)

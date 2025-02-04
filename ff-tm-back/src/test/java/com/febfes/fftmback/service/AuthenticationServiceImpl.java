@@ -31,7 +31,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final JwtTestService jwtTestService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
 
@@ -74,7 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
         Long userId = receivedUser.getId();
 
-        String jwtToken = jwtService.generateToken(receivedUser);
+        String jwtToken = jwtTestService.generateToken(receivedUser);
 
         RefreshTokenEntity refreshToken = refreshTokenService.getRefreshTokenByUserId(userId);
         return GetAuthDto.builder()

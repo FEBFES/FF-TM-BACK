@@ -46,9 +46,6 @@ public class WebSecurity {
                 .authorizeHttpRequests()
                 .requestMatchers(
                         "/v1/roles",
-                        // TODO: remove unnecessary
-//                        "/swagger-ui/**",
-//                        "/v1/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/v1/v3/api-docs/**"
                 )

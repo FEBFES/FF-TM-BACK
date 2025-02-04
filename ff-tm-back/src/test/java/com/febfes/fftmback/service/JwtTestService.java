@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class JwtService {
+public class JwtTestService {
 
     @Value("${jwt.secret}")
     private String secret;

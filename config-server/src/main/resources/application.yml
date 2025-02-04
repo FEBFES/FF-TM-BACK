@@ -9,5 +9,6 @@ spring:
   cloud:
     config:
       server:
+        bootstrap: false
         native:
           search-locations: classpath:/configurations/

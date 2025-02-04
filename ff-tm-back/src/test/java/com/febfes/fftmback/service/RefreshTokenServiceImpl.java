@@ -1,6 +1,5 @@
 package com.febfes.fftmback.service;
 
-import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
 import com.febfes.fftmback.dto.auth.TokenDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
@@ -29,7 +28,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserService userService;
-    private final JwtService jwtService;
+    private final JwtTestService jwtTestService;
 
     @Override
     public RefreshTokenEntity getByToken(String token) {
@@ -72,7 +71,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public TokenDto refreshToken(String token) {
         RefreshTokenEntity refreshTokenEntity = getByToken(token);
-        String accessToken = jwtService.generateToken(refreshTokenEntity.getUserEntity());
+        String accessToken = jwtTestService.generateToken(refreshTokenEntity.getUserEntity());
         RefreshTokenEntity updatedRefreshTokenEntity = updateRefreshToken(refreshTokenEntity);
         log.info("Refresh token entity with id={} was refreshed", updatedRefreshTokenEntity.getId());
         return new TokenDto(accessToken, updatedRefreshTokenEntity.getToken());

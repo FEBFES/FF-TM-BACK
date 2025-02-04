@@ -1,10 +1,10 @@
 package com.febfes.fftmback.unit.authentication;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.febfes.fftmback.config.jwt.JwtService;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.exception.TokenExpiredException;
 import com.febfes.fftmback.service.AuthenticationServiceImpl;
+import com.febfes.fftmback.service.JwtTestService;
 import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 class AccessTokenExpirationTest {
 
     @Mock
-    private JwtService jwtService;
+    private JwtTestService jwtTestService;
 
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
@@ -47,7 +47,7 @@ class AccessTokenExpirationTest {
     @Test
     void testCheckAccessTokenExpirationWithExpiredToken() {
         SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        when(jwtService.generateToken(anyMap(), any(UserEntity.class))).thenReturn(
+        when(jwtTestService.generateToken(anyMap(), any(UserEntity.class))).thenReturn(
                 Jwts
                         .builder()
                         .setClaims(new HashMap<>())
@@ -57,14 +57,14 @@ class AccessTokenExpirationTest {
                         .signWith(secretKey, SignatureAlgorithm.HS256)
                         .compact()
         );
-        String token = jwtService.generateToken(new HashMap<>(), new UserEntity());
+        String token = jwtTestService.generateToken(new HashMap<>(), new UserEntity());
         assertThrows(TokenExpiredException.class, () -> authenticationService.checkAccessTokenExpiration(token));
     }
 
     @Test
     void testCheckAccessTokenExpirationWithValidToken() {
         SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        when(jwtService.generateToken(anyMap(), any(UserEntity.class))).thenReturn(
+        when(jwtTestService.generateToken(anyMap(), any(UserEntity.class))).thenReturn(
                 Jwts
                         .builder()
                         .setClaims(new HashMap<>())
@@ -74,7 +74,7 @@ class AccessTokenExpirationTest {
                         .signWith(secretKey, SignatureAlgorithm.HS256)
                         .compact()
         );
-        String token = jwtService.generateToken(new HashMap<>(), new UserEntity());
+        String token = jwtTestService.generateToken(new HashMap<>(), new UserEntity());
         assertDoesNotThrow(() -> authenticationService.checkAccessTokenExpiration(token));
     }
 
