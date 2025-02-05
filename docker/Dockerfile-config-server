@@ -6,6 +6,7 @@ COPY ./config-server/.mvn/ .mvn/
 COPY ./config-server/mvnw ./config-server/pom.xml ./
 COPY ./config-server/src ./src/
 
+RUN apk add --no-cache curl
 RUN chmod +x mvnw
 # clean up the file
 RUN sed -i 's/\r$//' mvnw
