@@ -12,7 +12,6 @@ RUN chmod +x mvnw
 # clean up the file
 RUN sed -i 's/\r$//' mvnw
 # run with the SH path
-RUN /bin/sh mvnw dependency:resolve
 RUN ./mvnw clean install -DskipTests
 
 ## Package stage

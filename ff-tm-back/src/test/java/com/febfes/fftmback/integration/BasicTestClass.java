@@ -17,6 +17,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -67,6 +68,9 @@ public class BasicTestClass {
     @Container
     static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14-alpine");
 
+    @Value("${custom-headers.user-role}")
+    private String userRoleHeader;
+
     protected String token;
     protected Long createdUserId;
 
@@ -94,7 +98,8 @@ public class BasicTestClass {
     }
 
     protected RequestSpecification requestWithBearerToken() {
-        return given().header("Authorization", "Bearer " + token);
+        return given().header("Authorization", "Bearer " + token)
+                .header(userRoleHeader, RoleName.OWNER.name());
     }
 
     protected Long createNewUser() {

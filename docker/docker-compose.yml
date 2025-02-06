@@ -13,93 +13,6 @@ services:
     ports:
       - "5434:5432"
 
-  config-server:
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile-config-server
-    ports:
-      - "8888:8888"
-    env_file:
-      .env
-    depends_on:
-      - postgres
-#    healthcheck:
-##      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
-#      test: ["CMD-SHELL", "curl -f http://localhost:8888/actuator/health || exit 1"]
-#      interval: 5s
-#      timeout: 5s
-#      retries: 5
-#      start_period: 10s
-
-  authentication:
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile-authentication
-    ports:
-      - "8092:8092"
-    env_file:
-      .env
-    restart: on-failure
-#    command: wait-for $config.server -- java $JVM_OPTIONS -jar client.war $SPRING_OPTIONS
-    depends_on:
-      - postgres
-      - config-server
-#    config-server:
-#      condition: service_healthy
-#    postgres:
-#      condition: service_started
-
-  gateway:
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile-gateway
-    ports:
-      - "8061:8061"
-    env_file:
-      .env
-    restart: on-failure
-    depends_on:
-      - postgres
-      - config-server
-
-#  notification:
-#    build:
-#      context: ../
-#      dockerfile: docker/Dockerfile-notification
-#    ports:
-#      - "8091:8091"
-#    env_file:
-#      .env
-#    restart: on-failure
-#    depends_on:
-#      - postgres
-#      - config-server
-
-#  ff-tm-back-monolith:
-#    build:
-#      context: ../
-#      dockerfile: docker/Dockerfile
-#    ports:
-#      - "8090:8090"
-#    env_file:
-#      .env
-#    volumes:
-#      - febfes-files:/home/app/files
-#      - febfes-userPics:/home/app/files/userPics
-#    depends_on:
-#      - postgres
-#      - config-server
-
-  rabbitmq:
-    image: rabbitmq:3.10.7-management
-    hostname: rabbitmq
-    restart: always
-    environment:
-      - RABBITMQ_DEFAULT_USER=rmuser
-      - RABBITMQ_DEFAULT_PASS=rmpassword
-    ports:
-      - "15672:15672"
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
     environment:
@@ -111,18 +24,18 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
-    depends_on:
-      - zookeeper
     ports:
       - "29092:29092"
     restart: always
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://host.docker.internal:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
 
   kafka-ui:
     image: provectuslabs/kafka-ui
@@ -146,6 +59,72 @@ services:
     restart: always
     networks:
       - zipkin
+
+  config-server:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-config-server
+    ports:
+      - "8888:8888"
+    env_file:
+      .env
+    depends_on:
+      - postgres
+
+  authentication:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-authentication
+    ports:
+      - "8092:8092"
+    env_file:
+      .env
+    restart: on-failure
+    depends_on:
+      - postgres
+      - config-server
+
+  gateway:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-gateway
+    ports:
+      - "8061:8061"
+    env_file:
+      .env
+    restart: on-failure
+    depends_on:
+      - postgres
+      - config-server
+
+  notification:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-notification
+    ports:
+      - "8091:8091"
+    env_file:
+      .env
+    restart: on-failure
+    depends_on:
+      - postgres
+      - config-server
+
+  ff-tm-back-monolith:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8090:8090"
+    env_file:
+      .env
+    restart: on-failure
+    volumes:
+      - febfes-files:/home/app/files
+      - febfes-userPics:/home/app/files/userPics
+    depends_on:
+      - postgres
+      - config-server
 
 networks:
   zipkin:

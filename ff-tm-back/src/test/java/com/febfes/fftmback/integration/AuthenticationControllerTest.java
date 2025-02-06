@@ -11,12 +11,14 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.restassured.RestAssured.given;
 import static org.instancio.Select.field;
 
+@Disabled("Should be moved to authentication service")
 public class AuthenticationControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_AUTH_API = "/api/v1/auth";

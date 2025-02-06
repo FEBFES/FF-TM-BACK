@@ -5,9 +5,7 @@ WORKDIR /home/authentication
 COPY ./authentication/.mvn/ .mvn/
 COPY ./authentication/mvnw ./authentication/pom.xml ./authentication/lombok.config ./
 COPY ./authentication/src ./src/
-#COPY ./scripts/wait-for-it.sh /home/authentication/wait-for-it.sh
 
-#RUN chmod +x wait-for-it.sh
 RUN chmod +x mvnw
 # clean up the file
 RUN sed -i 's/\r$//' mvnw
@@ -20,4 +18,3 @@ WORKDIR /home/authentication
 COPY --from=build /home/authentication/target/*.jar /home/authentication/*.jar
 EXPOSE 8092
 ENTRYPOINT ["java", "-jar", "/home/authentication/*.jar"]
-#ENTRYPOINT ["/home/authentication/wait-for-it.sh", "host.docker.internal:8888", "--", "java", "-jar", "/home/authentication/*.jar"]

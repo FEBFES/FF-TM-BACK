@@ -80,7 +80,7 @@ public class ControllerAdvisor {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @Hidden
     public ErrorDto handleRoleCheckException(
-            RoleCheckException ex
+            RuntimeException ex
     ) {
         log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
         return createExceptionResponseBody(HttpStatus.FORBIDDEN, ex);

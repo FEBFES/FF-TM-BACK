@@ -1,4 +1,5 @@
 HELP.md
+INFO.md
 target/
 !ff-tm-back/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
