@@ -4,7 +4,6 @@ import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.projection.MemberProjection;
 import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
 import com.febfes.fftmback.dto.OneProjectDto;
@@ -69,8 +68,8 @@ public class ProjectController {
     @Operation(summary = "Get project by its id")
     @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
-    public OneProjectDto getProject(@AuthenticationPrincipal UserEntity user, @PathVariable Long id) {
-        ProjectForUserProjection project = projectMemberService.getProjectForUser(id, user.getId());
+    public OneProjectDto getProject(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        ProjectForUserProjection project = projectMemberService.getProjectForUser(id, user.id());
         List<MemberProjection> members = userService.getProjectMembersWithRole(id);
         return projectMapper.projectWithMembersProjectionToOneProjectDto(project, members);
     }
