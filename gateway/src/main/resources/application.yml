@@ -1,3 +1,5 @@
+config:
+  path: http://localhost
 spring:
   application:
     name: gateway

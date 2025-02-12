@@ -3,7 +3,7 @@ server:
 
 config:
   host: localhost
-  path: http://${config.host}
+  path: http://localhost
 
 spring:
   application:
