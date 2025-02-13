@@ -3,14 +3,17 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'config-server/**'
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
+    paths:
+      - 'config-server/**'
 
 jobs:
   config-server:
     name: Build and analyze Config server
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.head.ref, 'config-server') || contains(github.event.pull_request.base.ref, 'config-server')
     steps:
       - uses: actions/checkout@v3
         with:

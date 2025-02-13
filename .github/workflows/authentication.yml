@@ -3,14 +3,17 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'authentication/**'
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
+    paths:
+      - 'authentication/**'
 
 jobs:
   authentication:
     name: Build and analyze Authentication
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.head.ref, 'authentication') || contains(github.event.pull_request.base.ref, 'authentication')
     steps:
       - uses: actions/checkout@v3
         with:

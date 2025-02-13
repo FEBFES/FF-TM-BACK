@@ -3,14 +3,17 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'ff-tm-back/**'
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
+    paths:
+      - 'ff-tm-back/**'
 
 jobs:
   ff-tm-back:
     name: Build and analyze FF-TM-BACK
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.head.ref, 'ff-tm-back') || contains(github.event.pull_request.base.ref, 'ff-tm-back')
     steps:
       - uses: actions/checkout@v3
         with:
