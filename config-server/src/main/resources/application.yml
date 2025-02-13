@@ -1,0 +1,18 @@
+server:
+  port: 8888
+
+config:
+  host: localhost
+  path: http://localhost
+
+spring:
+  application:
+    name: config-service
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        bootstrap: false
+        native:
+          search-locations: classpath:/configurations/

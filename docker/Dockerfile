@@ -1,14 +1,21 @@
 ## Build stage
-FROM openjdk:17-alpine AS build
+FROM amazoncorretto:17-alpine AS build
 WORKDIR /home/app
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml lombok.config ./
 
-COPY ./src ./src/
-RUN ./mvnw clean install -Dmaven.test.skip
+COPY ./ff-tm-back/.mvn/ .mvn/
+COPY ./ff-tm-back/mvnw ./mvnw
+COPY ./ff-tm-back/pom.xml ./pom.xml
+COPY ./ff-tm-back/lombok.config ./lombok.config
+COPY ./ff-tm-back/src ./src/
+
+RUN chmod +x mvnw
+# clean up the file
+RUN sed -i 's/\r$//' mvnw
+# run with the SH path
+RUN ./mvnw clean install -DskipTests
 
 ## Package stage
-FROM eclipse-temurin:17-jre-alpine
+FROM amazoncorretto:17-alpine
 WORKDIR /home/app
 
 COPY --from=build /home/app/target/*.jar /home/app/*.jar

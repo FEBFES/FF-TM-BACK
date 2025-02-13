@@ -1,0 +1,22 @@
+## Build stage
+FROM amazoncorretto:17-alpine AS build
+WORKDIR /home/api-gateway
+
+COPY ./gateway/.mvn/ .mvn/
+COPY ./gateway/mvnw ./gateway/pom.xml ./
+COPY ./gateway/src ./src/
+
+RUN chmod +x mvnw
+# clean up the file
+RUN sed -i 's/\r$//' mvnw
+# run with the SH path
+RUN /bin/sh mvnw dependency:resolve
+RUN ./mvnw clean install -Dmaven.test.skip
+
+## Package stage
+FROM amazoncorretto:17-alpine
+WORKDIR /home/api-gateway
+
+COPY --from=build /home/api-gateway/target/*.jar /home/api-gateway/*.jar
+EXPOSE 8061
+ENTRYPOINT ["java", "-jar", "/home/api-gateway/*.jar"]

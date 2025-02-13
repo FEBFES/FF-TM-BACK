@@ -1,6 +1,7 @@
 HELP.md
+INFO.md
 target/
-!.mvn/wrapper/maven-wrapper.jar
+!ff-tm-back/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 ./out
@@ -35,6 +36,7 @@ build/
 
 ### scripts ###
 deploy.sh
+deploy/*
 
 .userPics
 .files

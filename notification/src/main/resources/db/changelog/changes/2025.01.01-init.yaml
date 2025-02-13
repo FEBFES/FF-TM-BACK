@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: IvanShish
+      comment: "Notification init"
+      changes:
+        - sql:
+            sql: CREATE SCHEMA notify;
