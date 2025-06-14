@@ -75,3 +75,8 @@ build: `docker build . --tag=ff-tm-back:latest -f docker/Dockerfile`
 run: `docker run -p 8090:8090 --env-file docker/.env --name ff-tm-back ff-tm-back:latest`
 
 docker-compose: `docker-compose -f docker/docker-compose.yml up`
+
+## Database scheme
+
+![Scheme](docs/db_scheme.png)
+

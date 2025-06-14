@@ -74,7 +74,6 @@ public class ControllerAdvisor {
                 ex.getBaseError()
         );
     }
-
     private ErrorDto createExceptionResponseBody(
             HttpStatus status,
             Exception ex
