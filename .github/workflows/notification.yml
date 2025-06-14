@@ -5,10 +5,12 @@ on:
       - main
     paths:
       - 'notification/**'
+      - 'febfes-commons/**'
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
       - 'notification/**'
+      - 'febfes-commons/**'
 
 jobs:
   notification:
@@ -30,6 +32,11 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('notification/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Install febfes-commons
+        run: |
+          cd febfes-commons
+          mvn -B install -DskipTests
+          cd ..
       - name: Build and analyze Notification
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -5,10 +5,12 @@ on:
       - main
     paths:
       - 'config-server/**'
+      - 'febfes-commons/**'
   pull_request:
     types: [ opened, synchronize, reopened ]
     paths:
       - 'config-server/**'
+      - 'febfes-commons/**'
 
 jobs:
   config-server:
@@ -30,6 +32,11 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('config-server/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Install febfes-commons
+        run: |
+          cd febfes-commons
+          mvn -B install -DskipTests
+          cd ..
       - name: Build and analyze Config server
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

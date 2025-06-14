@@ -5,10 +5,12 @@ on:
       - main
     paths:
       - 'ff-tm-back/**'
+      - 'febfes-commons/**'
   pull_request:
     types: [ opened, synchronize, reopened ]
     paths:
       - 'ff-tm-back/**'
+      - 'febfes-commons/**'
 
 jobs:
   ff-tm-back:
@@ -30,6 +32,11 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('ff-tm-back/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Install febfes-commons
+        run: |
+          cd febfes-commons
+          mvn -B install -DskipTests
+          cd ..
       - name: Build and analyze FF-TM-BACK
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
