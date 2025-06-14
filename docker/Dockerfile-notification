@@ -1,0 +1,23 @@
+## Build stage
+FROM amazoncorretto:17-alpine AS build
+WORKDIR /home/notification
+
+COPY ./notification/.mvn/ .mvn/
+COPY ./notification/mvnw ./mvnw
+COPY ./notification/pom.xml ./pom.xml
+COPY ./notification/lombok.config ./lombok.config
+COPY ./notification/src ./src/
+
+RUN chmod +x mvnw
+# clean up the file
+RUN sed -i 's/\r$//' mvnw
+# run with the SH path
+RUN ./mvnw clean install -Dmaven.test.skip
+
+## Package stage
+FROM amazoncorretto:17-alpine
+WORKDIR /home/notification
+
+COPY --from=build /home/notification/target/*.jar /home/notification/*.jar
+EXPOSE 8091
+ENTRYPOINT ["java", "-jar", "/home/notification/*.jar"]

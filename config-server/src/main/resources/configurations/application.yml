@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: ${datasource.url}
+    username: ${datasource.username}
+    password: ${datasource.password}
+
+springdoc:
+  swagger-ui:
+    tagsSorter: alpha
+
+jwt:
+  secret: ${jwt.secret}
+  # Access token is valid 6 hours
+  expirationDateDuration: 6H
+  # Refresh token is valid 24 hours
+  refreshExpirationDateDuration: 24H
+
+custom-headers:
+  init-uri: X-init-uri
+  user-role: X-user-role
+  username: X-username

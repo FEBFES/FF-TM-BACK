@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: ff-tm-back-monolith
+
+server:
+  port: 8090
+
+folders:
+  user-pic: /home/febfes/userPics/
+  task-files: /home/febfes/files/

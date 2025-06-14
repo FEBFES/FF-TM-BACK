@@ -1,0 +1,21 @@
+## Build stage
+FROM amazoncorretto:17-alpine AS build
+WORKDIR /home/config-server
+
+COPY ./config-server/.mvn/ .mvn/
+COPY ./config-server/mvnw ./config-server/pom.xml ./
+COPY ./config-server/src ./src/
+
+RUN apk add --no-cache curl
+RUN chmod +x mvnw
+# clean up the file
+RUN sed -i 's/\r$//' mvnw
+RUN ./mvnw clean install -Dmaven.test.skip
+
+## Package stage
+FROM amazoncorretto:17-alpine
+WORKDIR /home/config-server
+
+COPY --from=build /home/config-server/target/*.jar /home/config-server/*.jar
+EXPOSE 8888
+ENTRYPOINT ["java", "-jar", "/home/config-server/*.jar"]

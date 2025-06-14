@@ -1,0 +1,38 @@
+config:
+  path: http://localhost
+
+spring:
+  application:
+    name: authentication
+  jpa:
+    properties:
+      hibernate:
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  config:
+    import: optional:configserver:${config.path}:8888
+
+server:
+  port: 8092
+  servlet:
+    context-path: /api
+  tomcat:
+    remoteip:
+      remote-ip-header: x-forwarded-for
+      protocol-header: x-forwarded-proto
+    relaxed-query-chars: '|,{,},[,]'
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+    path: /v1/auth/v3/api-docs
