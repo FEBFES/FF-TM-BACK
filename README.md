@@ -1,6 +1,31 @@
 # FEBFES TASK MANAGER BACK
 
-Spring Boot 3 + Java 17. Monolith app
+## Technology stack
+
+- **Java 17** and **Spring Boot 3** for all services
+- **Spring Security**, **JPA**, **Validation**, **WebFlux** and **WebSocket**
+- **Spring Cloud** (Config Server and Gateway)
+- **JWT** based authentication
+- **PostgreSQL** with **Liquibase** migrations
+- **MapStruct** for DTO mapping
+- **Quartz** scheduler
+- **Kafka** messaging
+- **Micrometer** and **Zipkin** for tracing
+- **Docker** and **Kubernetes** deployment
+- **JUnit 5**, **Mockito**, **Testcontainers** for tests
+- Uses **Lombok** to reduce boilerplate
+
+### Folder structure
+
+- `authentication` – microservice for user authentication
+- `config-server` – centralized configuration service
+- `ff-tm-back` – main monolithic application
+- `gateway` – API gateway for routing requests
+- `notification` – service for sending notifications via Kafka and SSE
+- `docker` – Dockerfiles and compose configuration
+- `docs` – project documentation and diagrams
+- `k8s` – Kubernetes manifests
+- `scripts` – helper deployment scripts
 
 ## Running locally (IntelliJ IDEA):
 
@@ -26,47 +51,9 @@ jwt.secret = jwt secret key
 -Djwt.secret=jwt.secret
 ```
 
-## Style
-
-### Branch naming
-
-New branch: {type of task}/{task number}/{short description}
-
-For example: feature/12/added-new-entity
-
-### Commit naming
-
-New commit: {task number} - {short description}
-
-For example: 12 - added new entity
-
 ## Swagger
 
 Swagger is available at: http://localhost:8090/api/swagger-ui/index.html#/
-
-## Liquibase
-
-### Adding new migrations
-
-Create new .yaml file in [changes](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fchanges)
-
-#### New migration naming 
-
-The migration name should be like this: `<year>.<month>.<sequence_number>-<short_description>.yaml`
-
-Example: 2023.03.01-create-task-table.yaml. Year and month of 
-creation are 2023 and 3 (March). Sequence number is 1, because 
-it's the first migration in March. Short description: created 
-new table for tasks.
-
-#### View changes
-
-If changes are made in the view, or a new view is created, a 
-new file must be created in the folder [view](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fview) for this
-
-### Rollback migrations
-
-Not currently supported
 
 ## Docker
 
@@ -107,3 +94,40 @@ flowchart TD
     monolith -- SSE --> client
 ```
 
+## Style
+
+### Branch naming
+
+New branch: {type of task}/{task number}/{short description}
+
+For example: feature/12/added-new-entity
+
+### Commit naming
+
+New commit: {task number} - {short description}
+
+For example: 12 - added new entity
+
+## Liquibase
+
+### Adding new migrations
+
+Create new .yaml file in [changes](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fchanges)
+
+#### New migration naming
+
+The migration name should be like this: `<year>.<month>.<sequence_number>-<short_description>.yaml`
+
+Example: 2023.03.01-create-task-table.yaml. Year and month of
+creation are 2023 and 3 (March). Sequence number is 1, because
+it's the first migration in March. Short description: created
+new table for tasks.
+
+#### View changes
+
+If changes are made in the view, or a new view is created, a
+new file must be created in the folder [view](src%2Fmain%2Fresources%2Fdb%2Fchangelog%2Fview) for this
+
+### Rollback migrations
+
+Not currently supported
