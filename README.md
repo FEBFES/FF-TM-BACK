@@ -1,6 +1,31 @@
 # FEBFES TASK MANAGER BACK
 
-Spring Boot 3 + Java 17. Monolith app
+## Technology stack
+
+- **Java 17** and **Spring Boot 3** for all services
+- **Spring Security**, **JPA**, **Validation**, **WebFlux** and **WebSocket**
+- **Spring Cloud** (Config Server and Gateway)
+- **JWT** based authentication
+- **PostgreSQL** with **Liquibase** migrations
+- **MapStruct** for DTO mapping
+- **Quartz** scheduler
+- **Kafka** messaging
+- **Micrometer** and **Zipkin** for tracing
+- **Docker** and **Kubernetes** deployment
+- **JUnit 5**, **Mockito**, **Testcontainers** for tests
+- Uses **Lombok** to reduce boilerplate
+
+### Folder structure
+
+- `authentication` – microservice for user authentication
+- `config-server` – centralized configuration service
+- `ff-tm-back` – main monolithic application
+- `gateway` – API gateway for routing requests
+- `notification` – service for sending notifications via Kafka and SSE
+- `docker` – Dockerfiles and compose configuration
+- `docs` – project documentation and diagrams
+- `k8s` – Kubernetes manifests
+- `scripts` – helper deployment scripts
 
 ## Running locally (IntelliJ IDEA):
 
