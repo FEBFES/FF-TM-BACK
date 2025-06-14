@@ -1,7 +1,7 @@
 package com.fftmback.authentication.controller;
 
-import com.fftmback.authentication.annotation.ApiCreate;
-import com.fftmback.authentication.annotation.ApiGet;
+import com.febfes.fftmback.annotation.ApiCreate;
+import com.febfes.fftmback.annotation.ApiGet;
 import com.fftmback.authentication.dto.*;
 import com.fftmback.authentication.mapper.UserMapper;
 import com.fftmback.authentication.service.AuthenticationService;
