@@ -80,3 +80,30 @@ docker-compose: `docker-compose -f docker/docker-compose.yml up`
 
 ![Scheme](docs/db_scheme.png)
 
+## Microservice interaction scheme
+
+```mermaid
+flowchart TD
+    client[Client]
+    gateway[Gateway]
+    auth[Authentication Service]
+    monolith[FF-TM-Back Monolith]
+    notification[Notification Service]
+    config[Config Server]
+    kafka[(Kafka)]
+
+    client --> gateway
+    gateway --> auth
+    gateway --> monolith
+    gateway --> notification
+
+    config <--> gateway
+    config <--> auth
+    config <--> monolith
+    config <--> notification
+
+    monolith -- "notification events" --> kafka
+    kafka --> notification
+    monolith -- SSE --> client
+```
+
