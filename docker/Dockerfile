@@ -8,10 +8,13 @@ COPY ./ff-tm-back/pom.xml ./pom.xml
 COPY ./ff-tm-back/lombok.config ./lombok.config
 COPY ./ff-tm-back/src ./src/
 
+# build commons module first
+COPY ./febfes-commons ./febfes-commons
+
 RUN chmod +x mvnw
-# clean up the file
 RUN sed -i 's/\r$//' mvnw
-# run with the SH path
+RUN ./mvnw -f febfes-commons/pom.xml clean install -DskipTests
+
 RUN ./mvnw clean install -DskipTests
 
 ## Package stage
