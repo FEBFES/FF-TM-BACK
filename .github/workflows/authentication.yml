@@ -5,10 +5,12 @@ on:
       - main
     paths:
       - 'authentication/**'
+      - 'febfes-commons/**'
   pull_request:
     types: [ opened, synchronize, reopened ]
     paths:
       - 'authentication/**'
+      - 'febfes-commons/**'
 
 jobs:
   authentication:
@@ -30,6 +32,11 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('authentication/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Install febfes-commons
+        run: |
+          cd febfes-commons
+          mvn -B install -DskipTests
+          cd ..
       - name: Build and analyze Authentication
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -60,6 +60,12 @@ services:
     networks:
       - zipkin
 
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
   config-server:
     build:
       context: ../
@@ -83,6 +89,7 @@ services:
     depends_on:
       - postgres
       - config-server
+      - redis
 
   gateway:
     build:

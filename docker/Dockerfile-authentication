@@ -3,12 +3,18 @@ FROM amazoncorretto:17-alpine AS build
 WORKDIR /home/authentication
 
 COPY ./authentication/.mvn/ .mvn/
-COPY ./authentication/mvnw ./authentication/pom.xml ./authentication/lombok.config ./
+COPY ./authentication/mvnw ./mvnw
+COPY ./authentication/pom.xml ./pom.xml
+COPY ./authentication/lombok.config ./lombok.config
 COPY ./authentication/src ./src/
 
+# build commons module first
+COPY ./febfes-commons ./febfes-commons
+
 RUN chmod +x mvnw
-# clean up the file
 RUN sed -i 's/\r$//' mvnw
+RUN ./mvnw -f febfes-commons/pom.xml clean install -DskipTests
+
 RUN ./mvnw clean install -Dmaven.test.skip
 
 ## Package stage

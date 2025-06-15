@@ -3,12 +3,17 @@ FROM amazoncorretto:17-alpine AS build
 WORKDIR /home/api-gateway
 
 COPY ./gateway/.mvn/ .mvn/
-COPY ./gateway/mvnw ./gateway/pom.xml ./
+COPY ./gateway/mvnw ./mvnw
+COPY ./gateway/pom.xml ./pom.xml
 COPY ./gateway/src ./src/
 
+# build commons module first
+COPY ./febfes-commons ./febfes-commons
+
 RUN chmod +x mvnw
-# clean up the file
 RUN sed -i 's/\r$//' mvnw
+RUN ./mvnw -f febfes-commons/pom.xml clean install -DskipTests
+
 # run with the SH path
 RUN /bin/sh mvnw dependency:resolve
 RUN ./mvnw clean install -Dmaven.test.skip
