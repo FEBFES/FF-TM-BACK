@@ -38,7 +38,7 @@ import static io.restassured.RestAssured.given;
 @ActiveProfiles("test")
 @Slf4j
 @ImportAutoConfiguration(exclude = { KafkaAutoConfiguration.class })
-public class BasicTestClass {
+class BasicTestClass {
 
     @Autowired
     private DatabaseCleanup databaseCleanup;

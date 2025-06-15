@@ -2,7 +2,3 @@ spring:
   gateway:
     excluded-urls: /v1/notifications/swagger-ui,/v1/notifications/v3/api-docs,/v1/swagger-ui,/v1/v3/api-docs
     validate-token-url: ${config.path}:8092/api/v1/auth/validate-token
-  config:
-    import: optional:configserver:${config.path}:8888
-config:
-  path: http://localhost
