@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: VladisStep
+      comment: "auto fill refresh token create date"
+      changes:
+        - dropNotNullConstraint:
+            tableName: refresh_token
+            columnName: create_date
+  - changeSet:
+      id: 2
+      author: VladisStep
+      comment: "add default create date to refresh token"
+      changes:
+        - addDefaultValue:
+            tableName: refresh_token
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP

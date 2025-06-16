@@ -2,6 +2,7 @@ package com.fftmback.authentication.service.impl;
 
 import com.fftmback.authentication.config.jwt.JwtService;
 import com.fftmback.authentication.domain.RefreshTokenEntity;
+import com.fftmback.authentication.dto.RefreshTokenDto;
 import com.fftmback.authentication.dto.TokenDto;
 import com.fftmback.authentication.exception.EntityNotFoundException;
 import com.fftmback.authentication.repository.RefreshTokenRepository;
@@ -9,7 +10,10 @@ import com.fftmback.authentication.service.RefreshTokenService;
 import com.fftmback.authentication.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,25 +34,15 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserService userService;
     private final JwtService jwtService;
+    private final RefreshTokenCacheServiceImpl refreshTokenCacheService;
 
     @Override
-    public RefreshTokenEntity getByToken(String token) {
-        RefreshTokenEntity refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new EntityNotFoundException(RefreshTokenEntity.ENTITY_NAME, "token", token));
-        log.info("Received refresh token entity with id={} by token={}", refreshToken.getId(), token);
-        return refreshToken;
-    }
-
-    @Override
-    public RefreshTokenEntity getByUserId(Long userId) {
-        RefreshTokenEntity refreshToken = refreshTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException(RefreshTokenEntity.ENTITY_NAME, "userId", userId.toString()));
-        log.info("Received refresh token entity with id={} by user_id={}", refreshToken.getId(), userId);
-        return refreshToken;
-    }
-
-    @Override
-    public RefreshTokenEntity updateRefreshToken(RefreshTokenEntity refreshToken) {
+    @Caching(evict = {
+            @CacheEvict(value = "refreshTokens", key = "#dto.token", beforeInvocation = true),
+            @CacheEvict(value = "refreshTokensByUser", key = "#dto.userId", beforeInvocation = true)
+    })
+    public RefreshTokenEntity updateRefreshToken(RefreshTokenDto dto) {
+        val refreshToken = refreshTokenRepository.findByUserId(dto.userId());
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpiryDate(LocalDateTime.now().plus(jwtRefreshExpirationDateDuration));
         RefreshTokenEntity updatedRefreshToken = refreshTokenRepository.save(refreshToken);
@@ -71,7 +65,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public TokenDto refreshToken(String token) {
-        RefreshTokenEntity refreshTokenEntity = getByToken(token);
+        RefreshTokenDto refreshTokenEntity = refreshTokenCacheService.getByToken(token);
         String accessToken = jwtService.generateToken(refreshTokenEntity.getUserEntity());
         RefreshTokenEntity updatedRefreshTokenEntity = updateRefreshToken(refreshTokenEntity);
         log.info("Refresh token entity with id={} was refreshed", updatedRefreshTokenEntity.getId());
@@ -81,8 +75,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshTokenEntity getRefreshTokenByUserId(Long userId) {
         try {
-            RefreshTokenEntity existedRefreshToken = getByUserId(userId);
-            if (existedRefreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            RefreshTokenDto existedRefreshToken = refreshTokenCacheService.getByUserId(userId);
+            if (existedRefreshToken.expiryDate().isBefore(LocalDateTime.now())) {
                 RefreshTokenEntity updatedRefreshToken = updateRefreshToken(existedRefreshToken);
                 log.info("User with id={} authenticated with updated refresh token", userId);
                 return updatedRefreshToken;
