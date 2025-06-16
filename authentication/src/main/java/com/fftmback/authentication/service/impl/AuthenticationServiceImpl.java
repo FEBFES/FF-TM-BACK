@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fftmback.authentication.config.jwt.JwtService;
-import com.fftmback.authentication.domain.RefreshTokenEntity;
 import com.fftmback.authentication.domain.UserEntity;
 import com.fftmback.authentication.dto.ConnValidationResponse;
 import com.fftmback.authentication.dto.GetAuthDto;
@@ -89,11 +88,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         String jwtToken = jwtService.generateToken(receivedUser);
 
-        RefreshTokenEntity refreshToken = refreshTokenService.getRefreshTokenByUserId(userId);
+        String refreshToken = refreshTokenService.getRefreshTokenByUserId(userId);
         return GetAuthDto.builder()
                 .accessToken(jwtToken)
                 .userId(userId)
-                .refreshToken(refreshToken.getToken())
+                .refreshToken(refreshToken)
                 .build();
     }
 

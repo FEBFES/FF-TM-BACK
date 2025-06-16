@@ -5,11 +5,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fftmback.authentication.domain.RefreshTokenEntity;
 import com.fftmback.authentication.domain.UserEntity;
+import com.fftmback.authentication.dto.RefreshTokenDto;
 import com.fftmback.authentication.repository.RefreshTokenRepository;
 import com.fftmback.authentication.service.RefreshTokenCacheService;
 import lombok.val;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ class RefreshTokenCacheServiceTest {
     @Autowired
     private CacheManager cacheManager;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String TEST_TOKEN = "test-token";
     private final Long TEST_USER_ID = 1L;
@@ -90,8 +91,12 @@ class RefreshTokenCacheServiceTest {
         refreshTokenRepository.save(entity);
     }
 
+    @AfterEach
+    void teardown() {
+        refreshTokenRepository.deleteAll();
+    }
+
     @Test
-//    @Disabled("To test when migrations will be in this service")
     void testGetByTokenStoresToCache() {
         assertNull(Objects.requireNonNull(cacheManager.getCache("refreshTokens")).get(TEST_TOKEN), "Cache should be empty before call");
 
@@ -99,12 +104,11 @@ class RefreshTokenCacheServiceTest {
 
         Cache.ValueWrapper cached = Objects.requireNonNull(cacheManager.getCache("refreshTokens")).get(TEST_TOKEN);
         assertNotNull(cached, "Cache should contain value after call");
-        val value = objectMapper.convertValue(cached.get(), RefreshTokenEntity.class);
-        assertInstanceOf(RefreshTokenEntity.class, value);
+        val value = objectMapper.convertValue(cached.get(), RefreshTokenDto.class);
+        assertInstanceOf(RefreshTokenDto.class, value);
     }
 
     @Test
-    @Disabled("To test when migrations will be in this service")
     void testGetByUserIdStoresToCache() {
         assertNull(Objects.requireNonNull(cacheManager.getCache("refreshTokensByUser")).get(TEST_USER_ID));
 
@@ -112,7 +116,8 @@ class RefreshTokenCacheServiceTest {
 
         Cache.ValueWrapper cached = Objects.requireNonNull(cacheManager.getCache("refreshTokensByUser")).get(TEST_USER_ID);
         assertNotNull(cached);
-        assertInstanceOf(RefreshTokenEntity.class, cached.get());
+        val value = objectMapper.convertValue(cached.get(), RefreshTokenDto.class);
+        assertInstanceOf(RefreshTokenDto.class, value);
     }
 }
 

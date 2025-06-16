@@ -40,20 +40,26 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+    public String generateToken(Long userId, String username) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", userId);
+        return generateToken(extraClaims, username);
+    }
+
     public String generateToken(UserEntity userDetails) {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("userId", userDetails.getId());
-        return generateToken(extraClaims, userDetails);
+        return generateToken(extraClaims, userDetails.getUsername());
     }
 
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
+            String username
     ) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationDateDuration.toMillis()))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)

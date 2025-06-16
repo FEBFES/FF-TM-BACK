@@ -7,11 +7,11 @@ import com.fftmback.authentication.dto.TokenDto;
 
 public interface RefreshTokenService {
 
-    RefreshTokenEntity updateRefreshToken(RefreshTokenDto refreshToken);
+    String updateRefreshToken(RefreshTokenDto refreshToken);
 
     RefreshTokenEntity createRefreshToken(Long userId);
 
     TokenDto refreshToken(String token);
 
-    RefreshTokenEntity getRefreshTokenByUserId(Long userId);
+    String getRefreshTokenByUserId(Long userId);
 }
