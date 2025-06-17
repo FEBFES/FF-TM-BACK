@@ -1,0 +1,74 @@
+version: '3.9'
+
+name: ff-tm-back
+services:
+  config-server:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-config-server
+    ports:
+      - "8888:8888"
+    env_file:
+      .env
+    depends_on:
+      - postgres
+
+  authentication:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-authentication
+    ports:
+      - "8092:8092"
+    env_file:
+      .env
+    restart: on-failure
+    depends_on:
+      - postgres
+      - config-server
+      - redis
+
+  gateway:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-gateway
+    ports:
+      - "8061:8061"
+    env_file:
+      .env
+    restart: on-failure
+    depends_on:
+      - postgres
+      - config-server
+
+  notification:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-notification
+    ports:
+      - "8091:8091"
+    env_file:
+      .env
+    restart: on-failure
+    depends_on:
+      - postgres
+      - config-server
+
+  ff-tm-back-monolith:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8090:8090"
+    env_file:
+      .env
+    restart: on-failure
+    volumes:
+      - febfes-files:/home/app/files
+      - febfes-userPics:/home/app/files/userPics
+    depends_on:
+      - postgres
+      - config-server
+
+volumes:
+  febfes-files:
+  febfes-userPics:
