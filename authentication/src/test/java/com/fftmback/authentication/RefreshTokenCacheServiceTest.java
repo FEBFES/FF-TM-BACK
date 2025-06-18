@@ -69,8 +69,8 @@ class RefreshTokenCacheServiceTest {
     @Autowired
     private ObjectMapper redisObjectMapper;
 
-    private final String TEST_TOKEN = "test-token";
-    private final Long TEST_USER_ID = 1L;
+    private static final String TEST_TOKEN = "test-token";
+    private static final Long TEST_USER_ID = 1L;
 
     @BeforeEach
     void setup() {
