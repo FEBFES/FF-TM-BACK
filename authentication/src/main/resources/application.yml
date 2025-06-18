@@ -17,6 +17,10 @@ spring:
     import: optional:configserver:${config.path}:8888
   cache:
     type: redis
+    redis:
+      time-to-live: 3600000 # TTL, ms (1h)
+      cache-null-values: false
+      key-prefix: true
   data:
     redis:
       host: ${redis.host:localhost}

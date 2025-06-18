@@ -1,8 +1,7 @@
 package com.fftmback.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fftmback.authentication.config.RedisConfig;
 import com.fftmback.authentication.domain.RefreshTokenEntity;
 import com.fftmback.authentication.domain.UserEntity;
 import com.fftmback.authentication.dto.RefreshTokenDto;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -66,22 +64,16 @@ class RefreshTokenCacheServiceTest {
     private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
     private CacheManager cacheManager;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper redisObjectMapper;
 
     private final String TEST_TOKEN = "test-token";
     private final Long TEST_USER_ID = 1L;
 
     @BeforeEach
     void setup() {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().flushAll();
-
         RefreshTokenEntity entity = RefreshTokenEntity.builder()
                 .token(TEST_TOKEN)
                 .userEntity(UserEntity.builder().id(TEST_USER_ID).build())
@@ -89,6 +81,9 @@ class RefreshTokenCacheServiceTest {
                 .build();
 
         refreshTokenRepository.save(entity);
+
+        Objects.requireNonNull(cacheManager.getCache(RedisConfig.REFRESH_TOKENS_CACHE_NAME)).clear();
+        Objects.requireNonNull(cacheManager.getCache(RedisConfig.REFRESH_TOKENS_BY_USER_CACHE_NAME)).clear();
     }
 
     @AfterEach
@@ -98,25 +93,30 @@ class RefreshTokenCacheServiceTest {
 
     @Test
     void testGetByTokenStoresToCache() {
-        assertNull(Objects.requireNonNull(cacheManager.getCache("refreshTokens")).get(TEST_TOKEN), "Cache should be empty before call");
+        assertNull(Objects.requireNonNull(cacheManager.getCache(RedisConfig.REFRESH_TOKENS_CACHE_NAME))
+                        .get(TEST_TOKEN),
+                "Cache should be empty before call");
 
         refreshTokenCacheService.getByToken(TEST_TOKEN);
 
-        Cache.ValueWrapper cached = Objects.requireNonNull(cacheManager.getCache("refreshTokens")).get(TEST_TOKEN);
+        Cache.ValueWrapper cached = Objects.requireNonNull(cacheManager.getCache(RedisConfig.REFRESH_TOKENS_CACHE_NAME))
+                .get(TEST_TOKEN);
         assertNotNull(cached, "Cache should contain value after call");
-        val value = objectMapper.convertValue(cached.get(), RefreshTokenDto.class);
+        val value = redisObjectMapper.convertValue(cached.get(), RefreshTokenDto.class);
         assertInstanceOf(RefreshTokenDto.class, value);
     }
 
     @Test
     void testGetByUserIdStoresToCache() {
-        assertNull(Objects.requireNonNull(cacheManager.getCache("refreshTokensByUser")).get(TEST_USER_ID));
+        assertNull(Objects.requireNonNull(cacheManager.getCache(RedisConfig.REFRESH_TOKENS_BY_USER_CACHE_NAME))
+                .get(TEST_USER_ID));
 
         refreshTokenCacheService.getByUserId(TEST_USER_ID);
 
-        Cache.ValueWrapper cached = Objects.requireNonNull(cacheManager.getCache("refreshTokensByUser")).get(TEST_USER_ID);
+        Cache.ValueWrapper cached = Objects.requireNonNull(cacheManager.getCache(RedisConfig.REFRESH_TOKENS_BY_USER_CACHE_NAME))
+                .get(TEST_USER_ID);
         assertNotNull(cached);
-        val value = objectMapper.convertValue(cached.get(), RefreshTokenDto.class);
+        val value = redisObjectMapper.convertValue(cached.get(), RefreshTokenDto.class);
         assertInstanceOf(RefreshTokenDto.class, value);
     }
 }
