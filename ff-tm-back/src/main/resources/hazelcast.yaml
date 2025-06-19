@@ -1,0 +1,8 @@
+hazelcast:
+  network:
+    join:
+      multicast:
+        enabled: false
+  serialization:
+    global-serializer:
+      class-name: com.febfes.fftmback.config.cache.KryoGlobalSerializer
