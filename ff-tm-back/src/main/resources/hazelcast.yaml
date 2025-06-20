@@ -6,3 +6,9 @@ hazelcast:
   serialization:
     global-serializer:
       class-name: com.febfes.fftmback.config.cache.KryoGlobalSerializer
+  management-center:
+    enabled: true
+    url: http://hazelcast-mc:8180/hazelcast-mancenter
+  metrics:
+    management-center:
+      enabled: true
