@@ -6,15 +6,19 @@ import com.esotericsoftware.kryo.io.Output;
 import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.RoleEntity;
+import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.dto.ProjectForUserDto;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.StreamSerializer;
 import lombok.NonNull;
+import org.springframework.cache.interceptor.SimpleKey;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class KryoGlobalSerializer implements StreamSerializer<Object> {
 
@@ -22,10 +26,17 @@ public class KryoGlobalSerializer implements StreamSerializer<Object> {
 
     public KryoGlobalSerializer() {
         kryo.setRegistrationRequired(true);
+        // common
+        kryo.register(List.class);
+        kryo.register(Object[].class);
+        kryo.register(SimpleKey.class);
+        kryo.register(LocalDateTime.class);
+
+        kryo.register(ProjectForUserDto.class);
+        kryo.register(ProjectDto.class);
         kryo.register(RoleEntity.class);
         kryo.register(ProjectEntity.class);
         kryo.register(RoleName.class);
-        kryo.register(LocalDateTime.class);
     }
 
     @Override

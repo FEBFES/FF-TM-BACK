@@ -55,7 +55,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     }
 
     @Override
-    @CacheEvict(value = "projects", key = "#id")
+    @CacheEvict(value = "projects", allEntries = true)
     public ProjectEntity editProject(Long id, ProjectEntity project) {
         ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow(Exceptions.projectNotFound(id));
         projectEntity.setName(project.getName());
@@ -66,20 +66,20 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     }
 
     @Override
-    @CacheEvict(value = "projects", key = "#id")
+    @CacheEvict(value = "projects", allEntries = true)
     public void editProjectPartially(Long id, Long ownerId, List<PatchDto> patchDtoList) {
         if (patchDtoList.isEmpty()) {
             return;
         }
         log.debug("Project with id={} partial update: {}", id, patchDtoList);
-        ProjectEntity projectEntity = getProject(id);
+        ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow(Exceptions.projectNotFound(id));
         patchDtoList.forEach(patchDto -> patchIsFavouriteProcessor.patchField(projectEntity, ownerId, patchDto));
         projectRepository.save(projectEntity); // добавить бы какую-то проверку на то, надо ли обновлять проект или нет
         log.info("Project updated partially: {}", projectEntity);
     }
 
     @Override
-    @CacheEvict(value = "projects", key = "#id")
+    @CacheEvict(value = "projects", allEntries = true)
     public void deleteProject(Long id) {
         if (projectRepository.existsById(id)) {
             projectRepository.deleteById(id);

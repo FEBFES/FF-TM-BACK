@@ -112,6 +112,7 @@ services:
       - "8888:8888"
     env_file:
       .env
+    restart: on-failure
     depends_on:
       - postgres
 
