@@ -1,5 +1,6 @@
 package com.fftmback.authentication.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -62,6 +63,7 @@ public class UserEntity implements UserDetails {
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
     @MapKeyColumn(name = "project_id")
     @Builder.Default
+    @JsonIgnore
     private Map<Long, RoleEntity> projectRoles = new HashMap<>();
 
     @Override

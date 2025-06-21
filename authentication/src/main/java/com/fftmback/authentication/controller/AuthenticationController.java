@@ -45,7 +45,7 @@ public class AuthenticationController {
     @Operation(summary = "Update refresh and access token. You need to send an existent Refresh Token")
     @PostMapping("refresh-token")
     @ApiResponse(responseCode = "404", description = "Token not found in db", content = @Content)
-    public TokenDto refreshToken(@RequestBody RefreshTokenDto tokenDto) {
+    public TokenDto refreshToken(@RequestBody RefreshOnlyTokenDto tokenDto) {
         String token = tokenDto.refreshToken();
         return refreshTokenService.refreshToken(token);
     }

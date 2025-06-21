@@ -1,6 +1,12 @@
 package com.fftmback.authentication.dto;
 
+import java.time.LocalDateTime;
+
 public record RefreshTokenDto(
-        String refreshToken
+        Long id,
+        String token,
+        LocalDateTime expiryDate,
+        Long userId,
+        String username
 ) {
 }

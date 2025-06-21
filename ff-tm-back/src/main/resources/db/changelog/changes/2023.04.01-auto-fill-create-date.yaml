@@ -8,9 +8,6 @@ databaseChangeLog:
             tableName: project
             columnName: create_date
         - dropNotNullConstraint:
-            tableName: refresh_token
-            columnName: create_date
-        - dropNotNullConstraint:
             tableName: task
             columnName: create_date
         - dropNotNullConstraint:
@@ -32,10 +29,6 @@ databaseChangeLog:
       changes:
         - addDefaultValue:
             tableName: project
-            columnName: create_date
-            defaultValueComputed: CURRENT_TIMESTAMP
-        - addDefaultValue:
-            tableName: refresh_token
             columnName: create_date
             defaultValueComputed: CURRENT_TIMESTAMP
         - addDefaultValue:
