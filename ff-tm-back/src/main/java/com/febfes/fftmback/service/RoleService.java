@@ -10,8 +10,6 @@ public interface RoleService {
 
     List<RoleEntity> getRoles();
 
-    RoleEntity getRoleByName(RoleName roleName);
-
     void changeUserRoleOnProject(Long projectId, Long userId, RoleName roleName);
 
     void changeUserRoleOnProject(Long projectId, UserEntity user, RoleName roleName);

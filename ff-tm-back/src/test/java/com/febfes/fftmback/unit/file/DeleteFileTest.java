@@ -6,12 +6,13 @@ import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.impl.FileServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,11 +41,14 @@ class DeleteFileTest {
         fileEntity.setEntityType(EntityType.USER_PIC);
         fileEntity.setFilePath("/path/to/file");
         when(fileRepository.findById(FIRST_ID)).thenReturn(Optional.of(fileEntity));
+        // Act & Assert
+        try (MockedStatic<Files> mockedFiles = Mockito.mockStatic(Files.class)) {
+            mockedFiles.when(() -> Files.deleteIfExists(any())).thenReturn(true);
 
-        // Act
-        fileService.deleteFileById(FIRST_ID);
+            fileService.deleteFileById(FIRST_ID);
 
-        // Assert
-        verify(fileRepository).deleteById(FIRST_ID);
+            verify(fileRepository).deleteById(FIRST_ID);
+            mockedFiles.verify(() -> Files.deleteIfExists(Path.of(fileEntity.getFilePath())));
+        }
     }
 }

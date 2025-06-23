@@ -11,7 +11,15 @@ public abstract class ProjectPatchFieldProcessor {
 
     protected ProjectPatchFieldProcessor nextProcessor;
 
-    public abstract void patchField(ProjectEntity project, Long ownerId, PatchDto patchDto);
+    /**
+     * Change Project field
+     *
+     * @param project Project entity to change
+     * @param ownerId Owner ID
+     * @param patchDto DTO with changes to make
+     * @return boolean that shows if field was changed or not
+     */
+    public abstract boolean patchField(ProjectEntity project, Long ownerId, PatchDto patchDto);
 
     public void callNextProcessor(ProjectEntity project, Long ownerId, PatchDto patchDto) {
         if (nonNull(nextProcessor)) {

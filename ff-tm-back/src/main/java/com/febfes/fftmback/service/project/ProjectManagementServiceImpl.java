@@ -73,9 +73,12 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
         }
         log.debug("Project with id={} partial update: {}", id, patchDtoList);
         ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow(Exceptions.projectNotFound(id));
-        patchDtoList.forEach(patchDto -> patchIsFavouriteProcessor.patchField(projectEntity, ownerId, patchDto));
-        projectRepository.save(projectEntity); // добавить бы какую-то проверку на то, надо ли обновлять проект или нет
-        log.info("Project updated partially: {}", projectEntity);
+        boolean isChanged = patchDtoList.stream()
+                .anyMatch(patchDto -> patchIsFavouriteProcessor.patchField(projectEntity, ownerId, patchDto));
+        if (isChanged) {
+            projectRepository.save(projectEntity);
+            log.info("Project updated partially: {}", projectEntity);
+        }
     }
 
     @Override

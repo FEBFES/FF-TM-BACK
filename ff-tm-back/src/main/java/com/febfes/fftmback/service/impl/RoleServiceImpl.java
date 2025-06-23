@@ -30,13 +30,6 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Cacheable(value = "roles", key = "#roleName")
-    public RoleEntity getRoleByName(RoleName roleName) {
-        return roleRepository.findByName(roleName)
-                .orElseThrow(Exceptions.roleNotFound(roleName));
-    }
-
-    @Override
     @CacheEvict(value = "roles", allEntries = true)
     public void changeUserRoleOnProject(Long projectId, Long userId, RoleName roleName) {
         UserEntity user = userRepository.findById(userId)
@@ -47,7 +40,8 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @CacheEvict(value = "roles", allEntries = true)
     public void changeUserRoleOnProject(Long projectId, UserEntity user, RoleName roleName) {
-        RoleEntity ownerRole = getRoleByName(roleName);
+        RoleEntity ownerRole = roleRepository.findByName(roleName)
+                .orElseThrow(Exceptions.roleNotFound(roleName));
         user.getProjectRoles().put(projectId, ownerRole);
         userRepository.save(user);
         log.info("The user's role on the project has been changed. User id: {}, Project id: {}, Role name: {}",

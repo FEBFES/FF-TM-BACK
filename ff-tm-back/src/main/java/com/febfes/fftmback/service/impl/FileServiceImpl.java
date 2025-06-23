@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -60,8 +61,16 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void deleteFileById(Long id) {
-        repository.deleteById(id);
-        log.info("Deleted file entity with id={}", id);
+        Optional<FileEntity> fileEntityOpt = repository.findById(id);
+        fileEntityOpt.ifPresent(fileEntity -> {
+            repository.deleteById(id);
+            log.info("Deleted file entity with id={}", id);
+            try {
+                Files.deleteIfExists(Path.of(fileEntity.getFilePath()));
+            } catch (IOException e) {
+                log.warn("Failed to delete file by path {}", fileEntity.getFilePath(), e);
+            }
+        });
     }
 
     private void fileProcess(

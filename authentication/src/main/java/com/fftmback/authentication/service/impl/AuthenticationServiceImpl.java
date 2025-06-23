@@ -51,6 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private static final String BEARER = "Bearer ";
     private static final String PROJECTS_REGEX = "/projects/(\\d+).*";
+    private static final Pattern PROJECTS_PATTERN = Pattern.compile(PROJECTS_REGEX);
 
     @Value("${custom-headers.init-uri}")
     private String initUriHeader;
@@ -139,8 +140,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return null;
         }
 
-        Pattern pattern = Pattern.compile(PROJECTS_REGEX);
-        Matcher matcher = pattern.matcher(initUri);
+        Matcher matcher = PROJECTS_PATTERN.matcher(initUri);
 
         if (matcher.find()) {
             String projectIdStr = matcher.group(1);

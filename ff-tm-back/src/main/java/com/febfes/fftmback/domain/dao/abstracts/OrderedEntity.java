@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 
@@ -14,6 +15,7 @@ import java.lang.reflect.Field;
 @Getter
 @Setter
 @ToString
+@Slf4j
 public abstract class OrderedEntity extends BaseEntity {
 
     @Column(name = "entity_order")
@@ -33,8 +35,8 @@ public abstract class OrderedEntity extends BaseEntity {
             field.setAccessible(true);
             return field.get(this);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
+            log.error("Can't get value for order column {}", getColumnToFindOrder(), e);
+            throw new RuntimeException(e);
         }
     }
 }
