@@ -3,6 +3,8 @@ package com.febfes.fftmback.domain.common;
 import com.febfes.fftmback.util.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Paths;
+
 public enum EntityType {
 
     TASK {
@@ -45,6 +47,7 @@ public enum EntityType {
     public abstract String getPathPropertyName();
 
     public String getFilePath(MultipartFile file, String folderPath, String idForPath) {
-        return "%s%s.%s".formatted(folderPath, idForPath, FileUtils.getExtension(file.getOriginalFilename()));
+        String sanitizedExt = FileUtils.getExtension(file.getOriginalFilename());
+        return Paths.get(folderPath, idForPath + '.' + sanitizedExt).toString();
     }
 }

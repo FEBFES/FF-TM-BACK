@@ -5,18 +5,18 @@ import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.impl.ColumnServiceImpl;
 import com.febfes.fftmback.service.order.OrderService;
-import org.junit.jupiter.api.BeforeEach;
+import com.febfes.fftmback.unit.BaseUnitTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
+import static com.febfes.fftmback.util.UnitTestBuilders.column;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-class DeleteColumnTest {
+class DeleteColumnTest extends BaseUnitTest {
 
     private static final Long FIRST_ID = 1L;
     private static final Long SECOND_ID = 2L;
@@ -31,18 +31,10 @@ class DeleteColumnTest {
     @InjectMocks
     private ColumnServiceImpl columnService;
 
-    @BeforeEach
-    public void init() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void testDeleteColumn() {
-        // Create a mock column entity
-        TaskColumnEntity columnEntity = new TaskColumnEntity();
-        columnEntity.setId(FIRST_ID);
-        columnEntity.setName(COLUMN_NAME);
-        columnEntity.setProjectId(SECOND_ID);
+        TaskColumnEntity columnEntity = column(FIRST_ID, SECOND_ID, COLUMN_NAME);
 
         when(columnRepository.findById(FIRST_ID)).thenReturn(Optional.of(columnEntity));
 

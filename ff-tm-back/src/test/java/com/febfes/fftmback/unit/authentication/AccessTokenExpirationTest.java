@@ -1,19 +1,15 @@
 package com.febfes.fftmback.unit.authentication;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.exception.TokenExpiredException;
 import com.febfes.fftmback.service.AuthenticationServiceImpl;
-import com.febfes.fftmback.service.JwtTestService;
+import com.febfes.fftmback.unit.BaseUnitTest;
 import com.febfes.fftmback.util.DateUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import javax.crypto.SecretKey;
 import java.time.Duration;
@@ -21,22 +17,23 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.Mockito.when;
 
-class AccessTokenExpirationTest {
-
-    @Mock
-    private JwtTestService jwtTestService;
+class AccessTokenExpirationTest extends BaseUnitTest {
 
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
 
-    @BeforeEach
-    public void init() {
-        MockitoAnnotations.openMocks(this);
+    private String mockToken(Duration offset) {
+        SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        return Jwts.builder()
+                .setClaims(new HashMap<>())
+                .setSubject("username")
+                .setIssuedAt(DateUtils.getCurrentDate())
+                .setExpiration(DateUtils.getCurrentDatePlusDuration(offset))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
     }
+
 
     @Test
     void testCheckAccessTokenExpirationWithInvalidToken() {
@@ -46,35 +43,13 @@ class AccessTokenExpirationTest {
 
     @Test
     void testCheckAccessTokenExpirationWithExpiredToken() {
-        SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        when(jwtTestService.generateToken(anyMap(), any(UserEntity.class))).thenReturn(
-                Jwts
-                        .builder()
-                        .setClaims(new HashMap<>())
-                        .setSubject("username")
-                        .setIssuedAt(DateUtils.getCurrentDate())
-                        .setExpiration(DateUtils.getCurrentDatePlusDuration(Duration.ofSeconds(-5)))
-                        .signWith(secretKey, SignatureAlgorithm.HS256)
-                        .compact()
-        );
-        String token = jwtTestService.generateToken(new HashMap<>(), new UserEntity());
+        String token = mockToken(Duration.ofSeconds(-5));
         assertThrows(TokenExpiredException.class, () -> authenticationService.checkAccessTokenExpiration(token));
     }
 
     @Test
     void testCheckAccessTokenExpirationWithValidToken() {
-        SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        when(jwtTestService.generateToken(anyMap(), any(UserEntity.class))).thenReturn(
-                Jwts
-                        .builder()
-                        .setClaims(new HashMap<>())
-                        .setSubject("username")
-                        .setIssuedAt(DateUtils.getCurrentDate())
-                        .setExpiration(DateUtils.getCurrentDatePlusDuration(Duration.ofSeconds(5)))
-                        .signWith(secretKey, SignatureAlgorithm.HS256)
-                        .compact()
-        );
-        String token = jwtTestService.generateToken(new HashMap<>(), new UserEntity());
+        String token = mockToken(Duration.ofSeconds(5));
         assertDoesNotThrow(() -> authenticationService.checkAccessTokenExpiration(token));
     }
 

@@ -7,24 +7,24 @@ import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.AuthenticationServiceImpl;
 import com.febfes.fftmback.service.JwtTestService;
 import com.febfes.fftmback.service.RefreshTokenService;
+import com.febfes.fftmback.unit.BaseUnitTest;
 import com.febfes.fftmback.util.DateUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import static com.febfes.fftmback.util.UnitTestBuilders.user;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class AuthenticateUserTest {
+class AuthenticateUserTest extends BaseUnitTest {
 
     private static final Long FIRST_ID = 1L;
     private static final String USERNAME = "test_user";
@@ -51,32 +51,23 @@ class AuthenticateUserTest {
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
 
-    @BeforeEach
-    public void init() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void testAuthenticateUser() {
-        // Create a mock UserEntity object
-        UserEntity user = new UserEntity();
-        user.setId(FIRST_ID);
-        user.setUsername(USERNAME);
-        user.setEncryptedPassword(USER_PASS);
-
-        // Create a mock RefreshTokenEntity object
-        RefreshTokenEntity refreshToken = new RefreshTokenEntity();
-        refreshToken.setId(FIRST_ID);
-        refreshToken.setToken(TOKEN);
-        refreshToken.setUserEntity(user);
-        refreshToken.setExpiryDate(DateUtils.getCurrentLocalDateTime());
+        UserEntity user = user(FIRST_ID, USERNAME, USER_PASS);
+        RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
+                .id(FIRST_ID)
+                .token(TOKEN)
+                .userEntity(user)
+                .expiryDate(DateUtils.getCurrentLocalDateTime())
+                .build();
 
         // Set up the mock objects to return the expected values
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(null);
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
-        when(passwordEncoder.encode(user.getPassword())).thenReturn(USER_ENCODED_PASS);
-        when(jwtTestService.generateToken(any(UserEntity.class))).thenReturn(JWT_TOKEN);
-        when(refreshTokenService.getRefreshTokenByUserId(anyLong())).thenReturn(refreshToken);
+        when(userRepository.findByUsername(USERNAME)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(USER_PASS)).thenReturn(USER_ENCODED_PASS);
+        when(jwtTestService.generateToken(user)).thenReturn(JWT_TOKEN);
+        when(refreshTokenService.getRefreshTokenByUserId(FIRST_ID)).thenReturn(refreshToken);
 
         // Call the registerUser method
         authenticationService.registerUser(user);
@@ -91,10 +82,10 @@ class AuthenticateUserTest {
 
         // Verify that the mock objects were called as expected
         verify(authenticationManager).authenticate(any(Authentication.class));
-        verify(userRepository).findByUsername(anyString());
-        verify(passwordEncoder).encode(anyString());
-        verify(jwtTestService).generateToken(any(UserEntity.class));
-        verify(refreshTokenService).getRefreshTokenByUserId(anyLong());
+        verify(userRepository).findByUsername(USERNAME);
+        verify(passwordEncoder).encode(USER_PASS);
+        verify(jwtTestService).generateToken(user);
+        verify(refreshTokenService).getRefreshTokenByUserId(FIRST_ID);
     }
 
 }

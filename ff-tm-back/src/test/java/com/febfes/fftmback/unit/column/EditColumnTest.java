@@ -5,21 +5,21 @@ import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.impl.ColumnServiceImpl;
 import com.febfes.fftmback.service.order.OrderService;
-import org.junit.jupiter.api.BeforeEach;
+import com.febfes.fftmback.unit.BaseUnitTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
+import static com.febfes.fftmback.util.UnitTestBuilders.column;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class EditColumnTest {
+class EditColumnTest extends BaseUnitTest {
 
     private static final Long FIRST_ID = 1L;
     private static final String COLUMN_NAME = "Test Column";
@@ -34,24 +34,14 @@ class EditColumnTest {
     @InjectMocks
     private ColumnServiceImpl columnService;
 
-    @BeforeEach
-    public void init() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void testEditColumn() {
-        // Create test column
-        TaskColumnEntity column = new TaskColumnEntity();
-        column.setId(FIRST_ID);
-        column.setName(COLUMN_NAME);
-        column.setProjectId(FIRST_ID);
+        TaskColumnEntity column = column(FIRST_ID, FIRST_ID, COLUMN_NAME);
 
         // Mock the column repository
         when(columnRepository.findById(column.getId())).thenReturn(Optional.of(column));
         when(columnRepository.save(column)).thenReturn(column);
-
-        when(orderService.getNewOrder(any())).thenReturn(FIRST_ID.intValue());
 
         // Call the editColumn method
         ColumnDto columnDto = new ColumnDto(column.getId(), COLUMN_NAME_2, column.getCreateDate(), FIRST_ID.intValue(), FIRST_ID);

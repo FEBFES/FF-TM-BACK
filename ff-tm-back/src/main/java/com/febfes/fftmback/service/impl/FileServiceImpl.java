@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -47,6 +48,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional
     public FileEntity saveFile(
             Long userId,
             Long entityId,
@@ -54,7 +56,12 @@ public class FileServiceImpl implements FileService {
             MultipartFile file
     ) throws IOException {
         FileEntity fileEntity = createFileEntity(userId, entityId, entityType, file);
-        fileProcess(fileEntity, file, entityId, entityType);
+        try {
+            fileProcess(fileEntity, file, entityId, entityType);
+        } catch (RuntimeException | IOException e) {
+            Files.deleteIfExists(new File(fileEntity.getFilePath()).toPath());
+            throw e;
+        }
         log.info("File entity with id={} saved by user with id={}", fileEntity.getId(), userId);
         return fileEntity;
     }
@@ -79,14 +86,12 @@ public class FileServiceImpl implements FileService {
             Long entityId,
             EntityType entityType
     ) throws IOException {
-        file.transferTo(new File(fileEntity.getFilePath()));
-        repository.findFirstByEntityIdAndEntityType(entityId, entityType)
-                .ifPresent(firstFile -> {
-                    if (EntityType.USER_PIC.equals(entityType)) {
-                        // We create only one FileEntity if entityType=USER_PIC
-                        fileEntity.setId(firstFile.getId());
-                    }
-                });
+        Path filePath = Path.of(fileEntity.getFilePath());
+        file.transferTo(filePath.toFile());
+        if (EntityType.USER_PIC.equals(entityType)) {
+            repository.findFirstByEntityIdAndEntityType(entityId, entityType)
+                    .ifPresent(firstFile -> fileEntity.setId(firstFile.getId()));
+        }
         repository.save(fileEntity);
     }
 
@@ -103,9 +108,14 @@ public class FileServiceImpl implements FileService {
     }
 
     private String getFilePath(EntityType entityType, MultipartFile file, String idForPath) {
-        return Optional.ofNullable(entityType)
-                .map(type -> type.getFilePath(file, env.getProperty(type.getPathPropertyName()), idForPath))
-                .orElseThrow(() -> new IllegalArgumentException("File path cannot be null or empty"));
+        if (entityType == null) {
+            throw new IllegalArgumentException("File path cannot be null or empty");
+        }
+        String folderPath = env.getProperty(entityType.getPathPropertyName());
+        if (folderPath == null) {
+            throw new IllegalArgumentException("Property %s is not set".formatted(entityType.getPathPropertyName()));
+        }
+        return entityType.getFilePath(file, folderPath, idForPath);
     }
 
     private FileEntity createFileEntity(

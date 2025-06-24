@@ -14,6 +14,8 @@ public class FileUtils {
         return Optional.ofNullable(filename)
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1))
+                .map(ext -> ext.replaceAll("[^a-zA-Z0-9]", ""))
+                .filter(ext -> !ext.isBlank())
                 .orElse("");
     }
 }

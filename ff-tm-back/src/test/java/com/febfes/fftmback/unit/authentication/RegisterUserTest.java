@@ -4,20 +4,20 @@ import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.exception.EntityAlreadyExistsException;
 import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.AuthenticationServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
+import com.febfes.fftmback.unit.BaseUnitTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static com.febfes.fftmback.util.UnitTestBuilders.user;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class RegisterUserTest {
+class RegisterUserTest extends BaseUnitTest {
 
     @Mock
     private UserRepository userRepository;
@@ -28,25 +28,18 @@ class RegisterUserTest {
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
 
-    @BeforeEach
-    public void init() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void testRegisterUser() {
-        // Create a new user
-        UserEntity user = new UserEntity();
+        UserEntity user = user(null, "testuser", "password");
         user.setEmail("test@example.com");
-        user.setUsername("testuser");
-        user.setEncryptedPassword("password");
 
         // Mock the userRepository to return false when checking for existing email or username
-        when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
-        when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
+        when(userRepository.existsByUsername("testuser")).thenReturn(false);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
 
         // Mock the passwordEncoder to return a hashed password
-        when(passwordEncoder.encode(user.getPassword())).thenReturn("hashedpassword");
+        when(passwordEncoder.encode("password")).thenReturn("hashedpassword");
 
         // Call the registerUser method
         authenticationService.registerUser(user);
@@ -57,14 +50,11 @@ class RegisterUserTest {
 
     @Test
     void testRegisterUserWithExistingEmailOrUsername() {
-        // Create a new user
-        UserEntity user = new UserEntity();
+        UserEntity user = user(null, "testuser", "password");
         user.setEmail("test@example.com");
-        user.setUsername("testuser");
-        user.setEncryptedPassword("password");
 
         // Mock the userRepository to return true when checking for existing email or username
-        when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
 
         assertThrows(EntityAlreadyExistsException.class, () -> authenticationService.registerUser(user));
     }
