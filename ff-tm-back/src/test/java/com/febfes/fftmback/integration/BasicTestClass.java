@@ -18,6 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,7 +37,8 @@ import static io.restassured.RestAssured.given;
 @Testcontainers
 @ActiveProfiles("test")
 @Slf4j
-public class BasicTestClass {
+@ImportAutoConfiguration(exclude = { KafkaAutoConfiguration.class })
+class BasicTestClass {
 
     @Autowired
     private DatabaseCleanup databaseCleanup;

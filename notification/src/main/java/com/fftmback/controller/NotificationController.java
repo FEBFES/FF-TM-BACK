@@ -1,9 +1,9 @@
 package com.fftmback.controller;
 
-import com.fftmback.annotation.ApiDelete;
-import com.fftmback.annotation.ApiGet;
-import com.fftmback.annotation.ApiPatch;
-import com.fftmback.annotation.ProtectedApi;
+import com.febfes.fftmback.annotation.ApiDelete;
+import com.febfes.fftmback.annotation.ApiGet;
+import com.febfes.fftmback.annotation.ApiPatch;
+import com.febfes.fftmback.annotation.ProtectedApi;
 import com.fftmback.domain.User;
 import com.fftmback.dto.NotificationDto;
 import com.fftmback.mapper.NotificationMapper;

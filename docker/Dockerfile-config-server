@@ -3,13 +3,18 @@ FROM amazoncorretto:17-alpine AS build
 WORKDIR /home/config-server
 
 COPY ./config-server/.mvn/ .mvn/
-COPY ./config-server/mvnw ./config-server/pom.xml ./
+COPY ./config-server/mvnw ./mvnw
+COPY ./config-server/pom.xml ./pom.xml
 COPY ./config-server/src ./src/
+
+# build commons module first
+COPY ./febfes-commons ./febfes-commons
 
 RUN apk add --no-cache curl
 RUN chmod +x mvnw
-# clean up the file
 RUN sed -i 's/\r$//' mvnw
+RUN ./mvnw -f febfes-commons/pom.xml clean install -DskipTests
+
 RUN ./mvnw clean install -Dmaven.test.skip
 
 ## Package stage
