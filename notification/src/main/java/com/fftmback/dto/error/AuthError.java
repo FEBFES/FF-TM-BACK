@@ -1,5 +1,6 @@
 package com.fftmback.dto.error;
 
+import com.febfes.fftmback.util.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
