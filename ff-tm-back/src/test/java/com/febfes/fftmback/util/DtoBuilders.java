@@ -78,14 +78,14 @@ public class DtoBuilders {
                 .create();
     }
 
-    private InstancioApi<UserEntity> commonUser() {
+    private static InstancioApi<UserEntity> commonUser() {
         return Instancio.of(UserEntity.class)
                 .generate(field(UserEntity::getEmail), gen -> gen.text().pattern(EMAIL_PATTERN))
                 .set(field(UserEntity::getProjectRoles), Collections.emptyMap())
                 .set(field(UserEntity::getEncryptedPassword), PASSWORD);
     }
 
-    private InstancioApi<TaskEntity> commonTask(Long projectId, Long columnId) {
+    private static InstancioApi<TaskEntity> commonTask(Long projectId, Long columnId) {
         return Instancio.of(TaskEntity.class)
                 .set(field(TaskEntity::getProjectId), projectId)
                 .set(field(TaskEntity::getColumnId), columnId)
@@ -94,7 +94,7 @@ public class DtoBuilders {
                 .set(field(TaskEntity::getTaskType), null);
     }
 
-    private InstancioApi<EditTaskDto> commonEditTask() {
+    private static InstancioApi<EditTaskDto> commonEditTask() {
         return Instancio.of(EditTaskDto.class)
                 .set(field(EditTaskDto::assigneeId), null);
     }

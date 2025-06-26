@@ -1,6 +1,6 @@
 package com.febfes.fftmback.repository;
 
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

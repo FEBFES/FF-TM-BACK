@@ -1,4 +1,4 @@
-package com.fftmback.authentication.domain;
+package com.febfes.fftmback.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,5 +11,5 @@ public enum RoleName {
     MEMBER_PLUS(1),
     OWNER(2);
 
-    private final int priority;
+    final int priority;
 }

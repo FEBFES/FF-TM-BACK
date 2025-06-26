@@ -34,7 +34,6 @@ class AccessTokenExpirationTest extends BaseUnitTest {
                 .compact();
     }
 
-
     @Test
     void testCheckAccessTokenExpirationWithInvalidToken() {
         String token = "invalid_token";

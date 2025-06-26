@@ -2,7 +2,7 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiGet;
 import com.febfes.fftmback.annotation.ProtectedApi;
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +33,7 @@ public class RoleController {
 
     @Operation(summary = "Change user role on a project")
     @PostMapping(path = "{roleName}/projects/{projectId}/users/{userId}/")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).OWNER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).OWNER.name())")
     public void changeUserRoleOnProject(
             @PathVariable RoleName roleName,
             @PathVariable Long projectId,

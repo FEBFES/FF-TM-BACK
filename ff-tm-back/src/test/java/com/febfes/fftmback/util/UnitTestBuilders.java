@@ -9,7 +9,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class UnitTestBuilders {
 
-    public UserEntity user(Long id, String username, String password) {
+    public static UserEntity user(Long id, String username, String password) {
         return UserEntity.builder()
                 .id(id)
                 .username(username)
@@ -17,7 +17,7 @@ public class UnitTestBuilders {
                 .build();
     }
 
-    public TaskColumnEntity column(Long id, Long projectId, String name) {
+    public static TaskColumnEntity column(Long id, Long projectId, String name) {
         return TaskColumnEntity.builder()
                 .id(id)
                 .projectId(projectId)
@@ -25,7 +25,7 @@ public class UnitTestBuilders {
                 .build();
     }
 
-    public FileEntity file(Long id, String fileUrn, EntityType type, String path) {
+    public static FileEntity file(Long id, String fileUrn, EntityType type, String path) {
         return FileEntity.builder()
                 .id(id)
                 .fileUrn(fileUrn)

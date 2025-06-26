@@ -1,6 +1,6 @@
 package com.febfes.fftmback.exception;
 
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.dto.error.ErrorType;
 import com.febfes.fftmback.dto.error.StatusError;
 

@@ -1,6 +1,6 @@
 package com.febfes.fftmback.service.project;
 
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.common.UserProjectId;
 import com.febfes.fftmback.domain.dao.UserProject;
 import com.febfes.fftmback.domain.projection.MemberProjection;

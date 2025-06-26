@@ -1,6 +1,6 @@
 package com.febfes.fftmback.domain.dao;
 
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

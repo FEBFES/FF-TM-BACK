@@ -1,7 +1,7 @@
 package com.febfes.fftmback.integration;
 
 
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;

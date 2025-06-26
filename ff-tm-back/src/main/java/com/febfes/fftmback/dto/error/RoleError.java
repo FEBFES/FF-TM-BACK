@@ -1,6 +1,6 @@
 package com.febfes.fftmback.dto.error;
 
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.util.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

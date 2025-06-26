@@ -2,7 +2,6 @@ package com.fftmback.authentication.dto.error;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fftmback.authentication.domain.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

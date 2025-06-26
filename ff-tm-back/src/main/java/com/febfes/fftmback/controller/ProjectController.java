@@ -74,7 +74,7 @@ public class ProjectController {
 
     @Operation(summary = "Edit project by its id")
     @ApiEdit(path = "{id}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER_PLUS.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER_PLUS.name())")
     public ProjectDto editProject(
             @PathVariable Long id,
             @RequestBody ProjectDto projectDto
@@ -86,7 +86,7 @@ public class ProjectController {
 
     @Operation(summary = "Delete project by its id")
     @ApiDelete(path = "{id}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).OWNER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).OWNER.name())")
     public void deleteProject(@PathVariable Long id) {
         projectManagementService.deleteProject(id);
     }

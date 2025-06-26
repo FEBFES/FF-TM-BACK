@@ -64,7 +64,7 @@ public class TaskController {
 
     @Operation(summary = "Create new task")
     @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER.name())")
     public TaskShortDto createTask(
             @AuthenticationPrincipal User user,
             @ParameterObject ColumnParameters pathVars,
@@ -79,7 +79,7 @@ public class TaskController {
 
     @Operation(summary = "Edit task by its id")
     @ApiEdit(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER.name())")
     public TaskShortDto updateTask(
             @AuthenticationPrincipal User user,
             @ParameterObject TaskParameters pathVars,
@@ -93,7 +93,7 @@ public class TaskController {
 
     @Operation(summary = "Delete task by its id")
     @ApiDelete(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER.name())")
     public void deleteTask(@ParameterObject TaskParameters pathVars) {
         taskService.deleteTask(pathVars.taskId());
     }
