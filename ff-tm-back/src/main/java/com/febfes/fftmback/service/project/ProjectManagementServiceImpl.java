@@ -10,6 +10,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,15 +31,13 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     @Qualifier("projectPatchCommonProcessor")
     private final ProjectPatchFieldProcessor patchCommonProcessor;
 
-//    @Value("${test.a}")
-//    private String testValue;
-
     @PostConstruct
     private void postConstruct() {
         patchIsFavouriteProcessor.setNextProcessor(patchCommonProcessor);
     }
 
     @Override
+    @CacheEvict(value = "projects", allEntries = true)
     public ProjectEntity createProject(ProjectEntity project, Long userId) {
         project.setOwnerId(userId);
         ProjectEntity projectEntity = projectRepository.save(project);
@@ -46,6 +46,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     }
 
     @Override
+    @Cacheable(value = "projects", key = "#id")
     public ProjectEntity getProject(Long id) {
         ProjectEntity projectEntity = projectRepository.findById(id)
                 .orElseThrow(Exceptions.projectNotFound(id));
@@ -54,6 +55,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     }
 
     @Override
+    @CacheEvict(value = "projects", allEntries = true)
     public ProjectEntity editProject(Long id, ProjectEntity project) {
         ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow(Exceptions.projectNotFound(id));
         projectEntity.setName(project.getName());
@@ -64,18 +66,20 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
     }
 
     @Override
+    @CacheEvict(value = "projects", allEntries = true)
     public void editProjectPartially(Long id, Long ownerId, List<PatchDto> patchDtoList) {
         if (patchDtoList.isEmpty()) {
             return;
         }
         log.debug("Project with id={} partial update: {}", id, patchDtoList);
-        ProjectEntity projectEntity = getProject(id);
+        ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow(Exceptions.projectNotFound(id));
         patchDtoList.forEach(patchDto -> patchIsFavouriteProcessor.patchField(projectEntity, ownerId, patchDto));
         projectRepository.save(projectEntity); // добавить бы какую-то проверку на то, надо ли обновлять проект или нет
         log.info("Project updated partially: {}", projectEntity);
     }
 
     @Override
+    @CacheEvict(value = "projects", allEntries = true)
     public void deleteProject(Long id) {
         if (projectRepository.existsById(id)) {
             projectRepository.deleteById(id);

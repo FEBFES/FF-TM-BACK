@@ -11,5 +11,5 @@ public enum RoleName {
     MEMBER_PLUS(1),
     OWNER(2);
 
-    final int priority;
+    private final int priority;
 }
