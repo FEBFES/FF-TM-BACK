@@ -43,7 +43,7 @@ public class TaskDeadlineJob implements Job {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         Long userId = jobDataMap.getLong(USER_ID);
         Long taskId = jobDataMap.getLong(TASK_ID);
-        log.info("USER ID: " + userId);
+        log.info("Executing TaskDeadlineJob: USER_ID: {}", userId);
         try {
             TaskView taskView = taskService.getTaskById(taskId);
             ProjectEntity project = projectManagementService.getProject(taskView.getProjectId());
