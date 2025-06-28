@@ -1,12 +1,12 @@
-package com.febfes.fftmback.service.impl;
+package com.fftmback.authentication.service.impl;
 
 import com.febfes.fftmback.domain.RoleName;
-import com.febfes.fftmback.domain.dao.RoleEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.exception.Exceptions;
-import com.febfes.fftmback.repository.RoleRepository;
-import com.febfes.fftmback.repository.UserRepository;
-import com.febfes.fftmback.service.RoleService;
+import com.fftmback.authentication.domain.RoleEntity;
+import com.fftmback.authentication.domain.UserEntity;
+import com.fftmback.authentication.exception.Exceptions;
+import com.fftmback.authentication.repository.RoleRepository;
+import com.fftmback.authentication.repository.UserRepository;
+import com.fftmback.authentication.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;

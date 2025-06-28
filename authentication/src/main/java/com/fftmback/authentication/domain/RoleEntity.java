@@ -1,11 +1,10 @@
 package com.fftmback.authentication.domain;
 
+import com.febfes.fftmback.domain.RoleName;
+import com.febfes.fftmback.domain.abstracts.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "role")
@@ -16,17 +15,9 @@ import java.time.LocalDateTime;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class RoleEntity {
+public class RoleEntity extends BaseEntity {
 
     public static final String ENTITY_NAME = "Role";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "create_date", updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createDate;
 
     @Column(name = "name")
     @Enumerated(EnumType.STRING)

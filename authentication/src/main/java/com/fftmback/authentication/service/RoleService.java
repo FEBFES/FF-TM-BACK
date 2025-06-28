@@ -1,8 +1,8 @@
-package com.febfes.fftmback.service;
+package com.fftmback.authentication.service;
 
 import com.febfes.fftmback.domain.RoleName;
-import com.febfes.fftmback.domain.dao.RoleEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
+import com.fftmback.authentication.domain.RoleEntity;
+import com.fftmback.authentication.domain.UserEntity;
 
 import java.util.List;
 

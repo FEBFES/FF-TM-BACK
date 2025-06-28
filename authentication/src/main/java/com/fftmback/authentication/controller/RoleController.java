@@ -1,10 +1,10 @@
-package com.febfes.fftmback.controller;
+package com.fftmback.authentication.controller;
 
 import com.febfes.fftmback.annotation.ApiGet;
 import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.domain.RoleName;
-import com.febfes.fftmback.domain.dao.RoleEntity;
-import com.febfes.fftmback.service.RoleService;
+import com.fftmback.authentication.domain.RoleEntity;
+import com.fftmback.authentication.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
