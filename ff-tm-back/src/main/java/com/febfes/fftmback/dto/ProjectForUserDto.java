@@ -2,12 +2,14 @@ package com.febfes.fftmback.dto;
 
 import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 public class ProjectForUserDto implements Serializable {
 
     private Long id;
