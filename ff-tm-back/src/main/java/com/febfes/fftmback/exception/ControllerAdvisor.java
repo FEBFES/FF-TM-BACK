@@ -1,9 +1,8 @@
 package com.febfes.fftmback.exception;
 
-import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.dto.error.ErrorDto;
-import com.febfes.fftmback.dto.error.ErrorType;
-import com.febfes.fftmback.dto.error.StatusError;
+import com.febfes.fftmback.dto.ErrorDto;
+import com.febfes.fftmback.dto.ErrorType;
+import com.febfes.fftmback.dto.StatusError;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.febfes.fftmback.dto.error.AuthError.createBaseError;
+import static com.febfes.fftmback.dto.AuthError.createBaseError;
 import static com.febfes.fftmback.util.DateUtils.getCurrentLocalDateTime;
 import static java.util.Objects.isNull;
 
@@ -29,26 +28,6 @@ import static java.util.Objects.isNull;
 public class ControllerAdvisor {
 
     private static final String LOG_MSG = "Handled %s.";
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @Hidden
-    public ErrorDto handleEntityNotFoundException(
-            EntityNotFoundException ex
-    ) {
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
-        return createExceptionResponseBody(HttpStatus.NOT_FOUND, ex);
-    }
-
-    @ExceptionHandler(EntityAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @Hidden
-    public ErrorDto handleEntityAlreadyExistsException(
-            EntityAlreadyExistsException ex
-    ) {
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
-        return createExceptionResponseBody(HttpStatus.CONFLICT, ex);
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -96,7 +75,7 @@ public class ControllerAdvisor {
         log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
         return new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), StatusError.BAD_CREDENTIALS,
                 errorType, getCurrentLocalDateTime(), ex.getMessage(),
-                createBaseError(UserEntity.ENTITY_NAME, "password", null, errorType));
+                createBaseError("User", "password", null, errorType));
     }
 
     @ExceptionHandler(ProjectColumnException.class)
@@ -117,20 +96,6 @@ public class ControllerAdvisor {
     ) {
         log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
         return createExceptionResponseBody(HttpStatus.INTERNAL_SERVER_ERROR, ex);
-    }
-
-    private ErrorDto createExceptionResponseBody(
-            HttpStatus status,
-            CustomException ex
-    ) {
-        return new ErrorDto(
-                status.value(),
-                ex.getStatusError(),
-                ex.getErrorType(),
-                getCurrentLocalDateTime(),
-                ex.getMessage(),
-                ex.getBaseError()
-        );
     }
 
     private ErrorDto createExceptionResponseBody(

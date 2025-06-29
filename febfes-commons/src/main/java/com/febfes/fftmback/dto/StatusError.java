@@ -1,4 +1,4 @@
-package com.fftmback.authentication.dto.error;
+package com.febfes.fftmback.dto;
 
 public enum StatusError {
 

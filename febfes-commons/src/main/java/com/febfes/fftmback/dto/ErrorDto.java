@@ -1,4 +1,4 @@
-package com.fftmback.authentication.dto.error;
+package com.febfes.fftmback.dto;
 
 import java.time.LocalDateTime;
 import java.util.Map;

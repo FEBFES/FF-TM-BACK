@@ -1,7 +1,10 @@
 package com.febfes.fftmback.exception;
 
-import com.febfes.fftmback.domain.dao.*;
-import com.febfes.fftmback.dto.error.ErrorType;
+import com.febfes.fftmback.domain.dao.FileEntity;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.TaskColumnEntity;
+import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.dto.ErrorType;
 import lombok.experimental.UtilityClass;
 
 import java.util.function.Supplier;

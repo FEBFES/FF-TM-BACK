@@ -1,7 +1,7 @@
-package com.fftmback.authentication.exception;
+package com.febfes.fftmback.exception;
 
-import com.fftmback.authentication.dto.error.ErrorType;
-import com.fftmback.authentication.dto.error.StatusError;
+import com.febfes.fftmback.dto.ErrorType;
+import com.febfes.fftmback.dto.StatusError;
 import lombok.Getter;
 import lombok.Setter;
 

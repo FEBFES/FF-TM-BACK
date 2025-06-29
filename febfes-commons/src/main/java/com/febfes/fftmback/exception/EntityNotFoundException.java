@@ -1,12 +1,12 @@
 package com.febfes.fftmback.exception;
 
-import com.febfes.fftmback.dto.error.ErrorType;
-import com.febfes.fftmback.dto.error.StatusError;
+import com.febfes.fftmback.dto.ErrorType;
+import com.febfes.fftmback.dto.StatusError;
 import lombok.Getter;
 
 import java.io.Serial;
 
-import static com.febfes.fftmback.dto.error.AuthError.createBaseError;
+import static com.febfes.fftmback.dto.AuthError.createBaseError;
 
 @Getter
 public class EntityNotFoundException extends CustomException {

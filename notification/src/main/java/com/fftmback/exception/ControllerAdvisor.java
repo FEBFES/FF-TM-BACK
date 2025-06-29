@@ -1,8 +1,8 @@
 package com.fftmback.exception;
 
-import com.fftmback.dto.error.ErrorDto;
-import com.fftmback.dto.error.ErrorType;
-import com.fftmback.dto.error.StatusError;
+import com.febfes.fftmback.dto.ErrorDto;
+import com.febfes.fftmback.dto.ErrorType;
+import com.febfes.fftmback.dto.StatusError;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +20,6 @@ public class ControllerAdvisor {
 
     private static final String LOG_MSG = "Handled %s.";
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @Hidden
-    public ErrorDto handleEntityNotFoundException(
-            EntityNotFoundException ex
-    ) {
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
-        return createExceptionResponseBody(HttpStatus.NOT_FOUND, ex);
-    }
-
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @Hidden
@@ -38,20 +28,6 @@ public class ControllerAdvisor {
     ) {
         log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
         return createExceptionResponseBody(HttpStatus.INTERNAL_SERVER_ERROR, ex);
-    }
-
-    private ErrorDto createExceptionResponseBody(
-            HttpStatus status,
-            CustomException ex
-    ) {
-        return new ErrorDto(
-                status.value(),
-                ex.getStatusError(),
-                ex.getErrorType(),
-                LocalDateTime.now(),
-                ex.getMessage(),
-                ex.getBaseError()
-        );
     }
 
     private ErrorDto createExceptionResponseBody(

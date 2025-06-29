@@ -1,7 +1,8 @@
 package com.fftmback.authentication.exception;
 
 import com.febfes.fftmback.domain.RoleName;
-import com.febfes.fftmback.dto.error.ErrorType;
+import com.febfes.fftmback.dto.ErrorType;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.fftmback.authentication.domain.RefreshTokenEntity;
 import com.fftmback.authentication.domain.RoleEntity;
 import com.fftmback.authentication.domain.UserEntity;

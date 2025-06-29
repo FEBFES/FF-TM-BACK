@@ -1,4 +1,4 @@
-package com.febfes.fftmback.dto.error;
+package com.febfes.fftmback.dto;
 
 import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.util.JsonUtils;
