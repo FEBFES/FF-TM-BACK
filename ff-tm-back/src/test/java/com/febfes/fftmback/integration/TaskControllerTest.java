@@ -2,12 +2,11 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.TaskPriority;
-import com.febfes.fftmback.domain.dao.*;
-import com.febfes.fftmback.dto.EditTaskDto;
-import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.dto.TaskFileDto;
-import com.febfes.fftmback.dto.TaskShortDto;
-import com.febfes.fftmback.dto.error.ErrorDto;
+import com.febfes.fftmback.domain.dao.FileEntity;
+import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.TaskTypeEntity;
+import com.febfes.fftmback.domain.dao.TaskView;
+import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DtoBuilders;

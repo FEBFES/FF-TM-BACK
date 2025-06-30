@@ -1,4 +1,4 @@
-package com.febfes.fftmback.domain.dao.abstracts;
+package com.febfes.fftmback.domain.abstracts;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,14 +14,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public abstract class BaseView {
+public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "\"id\"")
     private Long id;
 
-    @Column(name = "\"createDate\"", updatable = false)
+    @Column(name = "create_date", updatable = false)
     @CreationTimestamp
     private LocalDateTime createDate;
 }

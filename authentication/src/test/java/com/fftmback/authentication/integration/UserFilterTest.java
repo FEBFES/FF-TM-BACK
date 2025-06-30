@@ -1,4 +1,4 @@
-package com.febfes.fftmback.integration;
+package com.fftmback.authentication.integration;
 
 import com.febfes.fftmback.domain.common.specification.UserSpec;
 import com.febfes.fftmback.repository.UserViewRepository;

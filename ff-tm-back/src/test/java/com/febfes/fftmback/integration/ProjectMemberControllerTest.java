@@ -2,7 +2,6 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.mapper.UserMapper;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -20,7 +19,7 @@ import java.util.Optional;
 
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
 
-class MemberControllerTest extends BasicTestClass {
+class ProjectMemberControllerTest extends BasicTestClass {
 
     @Autowired
     private TransactionTemplate txTemplate;

@@ -3,9 +3,10 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
-import com.febfes.fftmback.service.*;
+import com.febfes.fftmback.service.ColumnService;
+import com.febfes.fftmback.service.TaskService;
+import com.febfes.fftmback.service.TaskTypeService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.febfes.fftmback.util.DatabaseCleanup;

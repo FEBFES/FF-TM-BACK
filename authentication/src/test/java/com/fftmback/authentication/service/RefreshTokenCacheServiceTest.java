@@ -1,4 +1,4 @@
-package com.fftmback.authentication;
+package com.fftmback.authentication.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fftmback.authentication.config.RedisConfig;
@@ -6,7 +6,6 @@ import com.fftmback.authentication.domain.RefreshTokenEntity;
 import com.fftmback.authentication.domain.UserEntity;
 import com.fftmback.authentication.dto.RefreshTokenDto;
 import com.fftmback.authentication.repository.RefreshTokenRepository;
-import com.fftmback.authentication.service.RefreshTokenCacheService;
 import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

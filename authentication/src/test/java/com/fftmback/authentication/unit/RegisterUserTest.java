@@ -1,17 +1,15 @@
-package com.febfes.fftmback.unit.authentication;
+package com.fftmback.authentication.unit;
 
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.exception.EntityAlreadyExistsException;
-import com.febfes.fftmback.repository.UserRepository;
-import com.febfes.fftmback.service.AuthenticationServiceImpl;
-import com.febfes.fftmback.unit.BaseUnitTest;
+import com.fftmback.authentication.domain.UserEntity;
+import com.fftmback.authentication.repository.UserRepository;
+import com.fftmback.authentication.service.impl.AuthenticationServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static com.febfes.fftmback.util.UnitTestBuilders.user;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;

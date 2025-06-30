@@ -1,12 +1,5 @@
-package com.febfes.fftmback.integration;
+package com.fftmback.authentication.integration;
 
-import com.febfes.fftmback.domain.common.EntityType;
-import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.dto.EditUserDto;
-import com.febfes.fftmback.dto.UserDto;
-import com.febfes.fftmback.dto.UserPicDto;
-import com.febfes.fftmback.exception.EntityNotFoundException;
-import com.febfes.fftmback.service.FileService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -29,7 +22,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
 import static java.util.Objects.nonNull;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -140,7 +132,7 @@ class UserControllerTest extends BasicTestClass {
                 .response()
                 .as(UserDto.class);
         Assertions.assertNotNull(userDto.userPic());
-        Assertions.assertEquals(String.format(USER_PIC_URN, createdUserId), userDto.userPic());
+        Assertions.assertEquals(String.format(FileUtils.USER_PIC_URN, createdUserId), userDto.userPic());
     }
 
     @Test
@@ -151,7 +143,7 @@ class UserControllerTest extends BasicTestClass {
                 .delete("/api/v1/files/user-pic/{userId}", createdUserId)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
-        String userPicUrn = String.format(USER_PIC_URN, createdUserId);
+        String userPicUrn = String.format(FileUtils.USER_PIC_URN, createdUserId);
         Assertions.assertThrows(
                 EntityNotFoundException.class,
                 () -> fileService.getFile(userPicUrn)

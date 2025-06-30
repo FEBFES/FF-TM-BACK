@@ -3,7 +3,6 @@ package com.febfes.fftmback.util;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

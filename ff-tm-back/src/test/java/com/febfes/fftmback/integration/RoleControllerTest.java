@@ -1,8 +1,6 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.RoleName;
-import com.febfes.fftmback.domain.dao.RoleEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.service.AuthenticationService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;

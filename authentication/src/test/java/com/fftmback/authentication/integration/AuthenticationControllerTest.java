@@ -1,31 +1,79 @@
-package com.febfes.fftmback.integration;
+package com.fftmback.authentication.integration;
 
-import com.febfes.fftmback.domain.dao.RefreshTokenEntity;
-import com.febfes.fftmback.dto.auth.AccessTokenDto;
-import com.febfes.fftmback.dto.auth.GetAuthDto;
-import com.febfes.fftmback.dto.auth.RefreshTokenDto;
-import com.febfes.fftmback.dto.auth.UserDetailsDto;
-import com.febfes.fftmback.service.RefreshTokenService;
+import com.fftmback.authentication.dto.*;
+import com.fftmback.authentication.service.RefreshTokenCacheService;
+import com.fftmback.authentication.util.DatabaseCleanup;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static io.restassured.RestAssured.given;
 import static org.instancio.Select.field;
 
-@Disabled("Should be moved to authentication service")
-public class AuthenticationControllerTest extends BasicTestClass {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Testcontainers
+@ActiveProfiles("test")
+public class AuthenticationControllerTest {
 
-    public static final String PATH_TO_AUTH_API = "/api/v1/auth";
+    @Container
+    static GenericContainer<?> redisContainer = new GenericContainer<>("redis:7.2.5")
+            .withExposedPorts(6379)
+            .waitingFor(Wait.forListeningPort());
+
+    @Container
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14-alpine");
+
+    static {
+        redisContainer.start();
+    }
+
+    @DynamicPropertySource
+    static void addProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.redis.host", redisContainer::getHost);
+        registry.add("spring.data.redis.port", () -> redisContainer.getFirstMappedPort());
+        registry.add("spring.cache.type", () -> "redis");
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
+    @LocalServerPort
+    private Integer port;
+
+    @BeforeEach
+    void setupBaseUri() {
+        RestAssured.baseURI = "http://localhost:" + port;
+    }
+
+    @AfterEach
+    void cleanup() {
+        databaseCleanup.execute();
+    }
+
+    public static final String PATH_TO_AUTH_API = "/v1/auth";
     public static final String EMAIL_PATTERN = "#a#a#a#a#a#a@example.com";
 
     @Autowired
-    RefreshTokenService refreshTokenService;
+    RefreshTokenCacheService refreshTokenCacheService;
 
     @Test
     void successfulRegisterTest() {
@@ -92,14 +140,14 @@ public class AuthenticationControllerTest extends BasicTestClass {
                 .response()
                 .as(GetAuthDto.class);
 
-        RefreshTokenEntity refreshToken = refreshTokenService.getByToken(authDto.refreshToken());
+        RefreshTokenDto refreshToken = refreshTokenCacheService.getByToken(authDto.refreshToken());
         Assertions.assertNotNull(refreshToken);
     }
 
     @Test
     void successfulRefreshTokenTest() {
         GetAuthDto authDto = getRefreshTokenDto();
-        RefreshTokenDto tokenDto = new RefreshTokenDto(authDto.refreshToken());
+        RefreshOnlyTokenDto tokenDto = new RefreshOnlyTokenDto(authDto.refreshToken());
         given()
                 .contentType(ContentType.JSON)
                 .body(tokenDto)
