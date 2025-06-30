@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ColumnMapper {
 
+    @Mapping(target = "order", ignore = true)
     ColumnDto columnToColumnDto(TaskColumnEntity columnEntity);
 
     @Mapping(target = "projectId", source = "projectId")

@@ -4,7 +4,6 @@ import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.dto.ErrorType;
 import lombok.experimental.UtilityClass;
 
 import java.util.function.Supplier;
@@ -12,12 +11,8 @@ import java.util.function.Supplier;
 @UtilityClass
 public class Exceptions {
 
-    public Supplier<EntityNotFoundException> userNotFound(String username) {
-        return () -> new EntityNotFoundException(UserEntity.ENTITY_NAME, "username", username, ErrorType.AUTH);
-    }
-
     public Supplier<EntityNotFoundException> userNotFoundById(Long id) {
-        return () -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id);
+        return () -> new EntityNotFoundException("User", id);
     }
 
     public Supplier<EntityNotFoundException> columnNotFound(Long id) {

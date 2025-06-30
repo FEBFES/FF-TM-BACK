@@ -1,4 +1,4 @@
-package com.febfes.fftmback.dto;
+package com.fftmback.authentication.dto;
 
 public record EditUserDto(
         String firstName,

@@ -1,4 +1,4 @@
-package com.febfes.fftmback.domain.dao.abstracts;
+package com.febfes.fftmback.domain.abstracts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;

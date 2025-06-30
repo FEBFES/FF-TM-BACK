@@ -1,5 +1,6 @@
 package com.febfes.fftmback.service;
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
@@ -19,12 +20,12 @@ public interface TaskService {
      * Creates task with parameters from task.
      *
      * @param task task to create
-     * @param userId user id that creates task
+     * @param user user that creates task
      * @return created task id
      */
-    Long createTask(TaskEntity task, Long userId);
+    Long createTask(TaskEntity task, User user);
 
-    void updateTask(TaskEntity editTask, Long userId);
+    void updateTask(TaskEntity editTask, User user);
 
     void deleteTask(Long id);
 }

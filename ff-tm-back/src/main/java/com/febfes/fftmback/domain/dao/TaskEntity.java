@@ -1,8 +1,8 @@
 package com.febfes.fftmback.domain.dao;
 
 
+import com.febfes.fftmback.domain.abstracts.OrderedEntity;
 import com.febfes.fftmback.domain.common.TaskPriority;
-import com.febfes.fftmback.domain.dao.abstracts.OrderedEntity;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.*;

@@ -5,10 +5,10 @@ spring:
   application:
     name: authentication
   jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
-      hibernate:
-        naming:
-          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         jdbc:
           lob:
             non_contextual_creation: true

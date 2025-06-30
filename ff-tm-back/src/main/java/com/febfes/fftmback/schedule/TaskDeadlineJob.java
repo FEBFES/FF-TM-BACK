@@ -6,7 +6,6 @@ import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.SendNotificationDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.service.TaskService;
-import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +18,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.febfes.fftmback.service.TaskServiceDeadlineAspect.TASK_ID;
-import static com.febfes.fftmback.service.TaskServiceDeadlineAspect.USER_ID;
+import static com.febfes.fftmback.service.TaskServiceDeadlineAspect.*;
 
 @Slf4j
 @Component
@@ -29,7 +27,6 @@ import static com.febfes.fftmback.service.TaskServiceDeadlineAspect.USER_ID;
 @DisallowConcurrentExecution
 public class TaskDeadlineJob implements Job {
 
-    private final UserService userService;
     private final SseNotificationController sseNotificationController;
 
     @Qualifier("projectManagementServiceDecorator")
@@ -42,6 +39,7 @@ public class TaskDeadlineJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         Long userId = jobDataMap.getLong(USER_ID);
+        String username = jobDataMap.getString(USERNAME);
         Long taskId = jobDataMap.getLong(TASK_ID);
         log.info("Executing TaskDeadlineJob: USER_ID: {}", userId);
         try {
@@ -49,7 +47,6 @@ public class TaskDeadlineJob implements Job {
             ProjectEntity project = projectManagementService.getProject(taskView.getProjectId());
             String message = createDeadlineNotificationMessage(taskId, project.getName());
             kafkaTemplate.send("notification-topic", new SendNotificationDto(message, userId));
-            String username = userService.getUserById(userId).getUsername();
             sseNotificationController.sendMessageToUser(message, username);
         } catch (EntityNotFoundException ex) {
             log.warn("Can't find task with id = {}, so notification about deadline date won't be send", taskId);
@@ -57,6 +54,7 @@ public class TaskDeadlineJob implements Job {
     }
 
     private String createDeadlineNotificationMessage(Long taskId, String projectName) {
+        // TODO: locale (EN, RU)?
         return String.format("Наступил дедлайн для задачи %s на проекте \"%s\"",
                 taskId, projectName);
     }

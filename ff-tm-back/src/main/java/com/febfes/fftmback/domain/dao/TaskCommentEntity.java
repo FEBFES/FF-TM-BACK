@@ -1,8 +1,10 @@
 package com.febfes.fftmback.domain.dao;
 
 
-import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
-import jakarta.persistence.*;
+import com.febfes.fftmback.domain.abstracts.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +20,8 @@ import lombok.experimental.SuperBuilder;
 @Setter
 public class TaskCommentEntity extends BaseEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "creator_id", referencedColumnName = "id")
-    private UserEntity creator;
+    @Column(name = "creator_id")
+    private Long creatorId;
 
     @Column(name = "task_id")
     private Long taskId;

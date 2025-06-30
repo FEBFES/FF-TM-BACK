@@ -1,7 +1,7 @@
 package com.febfes.fftmback.service.order;
 
-import com.febfes.fftmback.domain.dao.abstracts.OrderedEntity;
 
+import com.febfes.fftmback.domain.abstracts.OrderedEntity;
 
 public interface OrderService<T extends OrderedEntity> {
 

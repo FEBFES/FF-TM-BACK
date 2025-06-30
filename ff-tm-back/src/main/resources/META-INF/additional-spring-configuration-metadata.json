@@ -7,12 +7,12 @@
     },
     {
       "name": "jwt.expirationDateDuration",
-      "type": "java.lang.Integer",
+      "type": "java.time.Duration",
       "description": "JWT expiration date duration."
     },
     {
       "name": "jwt.refreshExpirationDateDuration",
-      "type": "java.lang.Integer",
+      "type": "java.time.Duration",
       "description": "Refresh JWT expiration date duration."
     }
   ]

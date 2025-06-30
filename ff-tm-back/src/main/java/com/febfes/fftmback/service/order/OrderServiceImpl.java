@@ -1,6 +1,6 @@
 package com.febfes.fftmback.service.order;
 
-import com.febfes.fftmback.domain.dao.abstracts.OrderedEntity;
+import com.febfes.fftmback.domain.abstracts.OrderedEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;

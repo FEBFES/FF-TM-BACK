@@ -1,6 +1,6 @@
 package com.febfes.fftmback.domain.dao;
 
-import com.febfes.fftmback.domain.dao.abstracts.OrderedEntity;
+import com.febfes.fftmback.domain.abstracts.OrderedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
