@@ -2,7 +2,6 @@ package com.febfes.fftmback.service.project;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.PatchDto;
-import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.service.project.patch.ProjectPatchFieldProcessor;
@@ -88,7 +87,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
             projectRepository.deleteById(id);
             log.info("Project with id={} was deleted", id);
         } else {
-            throw new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id);
+            Exceptions.projectNotFound(id);
         }
     }
 }

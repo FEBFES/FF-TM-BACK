@@ -11,15 +11,13 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class})
+@Mapper(componentModel = "spring")
 public interface ProjectMapper {
 
     @Mapping(target = "isFavourite", ignore = true)
     ProjectDto projectToProjectDto(ProjectEntity project);
 
     ProjectEntity projectDtoToProject(ProjectDto projectDto);
-
-    ProjectDto projectProjectionToProjectDto(ProjectForUserDto projectForUserDto);
 
     List<ProjectDto> projectProjectionToProjectDto(List<ProjectProjection> projectForUserDto);
 

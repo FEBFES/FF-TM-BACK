@@ -1,14 +1,14 @@
-package com.febfes.fftmback.controller;
+package com.fftmback.authentication.controller;
 
 import com.febfes.fftmback.annotation.ApiEdit;
 import com.febfes.fftmback.annotation.ApiGet;
 import com.febfes.fftmback.annotation.ApiGetOne;
 import com.febfes.fftmback.annotation.ProtectedApi;
-import com.febfes.fftmback.domain.common.specification.UserSpec;
-import com.febfes.fftmback.dto.EditUserDto;
-import com.febfes.fftmback.dto.UserDto;
-import com.febfes.fftmback.mapper.UserMapper;
-import com.febfes.fftmback.service.UserService;
+import com.fftmback.authentication.domain.spec.UserSpec;
+import com.fftmback.authentication.dto.EditUserDto;
+import com.fftmback.authentication.dto.UserDto;
+import com.fftmback.authentication.mapper.UserMapper;
+import com.fftmback.authentication.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

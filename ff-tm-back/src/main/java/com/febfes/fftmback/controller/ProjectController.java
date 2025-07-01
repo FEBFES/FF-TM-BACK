@@ -11,7 +11,6 @@ import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.ProjectForUserDto;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.TaskTypeService;
-import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +38,6 @@ public class ProjectController {
     private final ProjectMemberService projectMemberService;
     private final TaskTypeService taskTypeService;
     private final ProjectMapper projectMapper;
-    private final UserService userService;
 
 
     @Operation(summary = "Get all projects for authenticated user")
@@ -68,7 +66,7 @@ public class ProjectController {
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public OneProjectDto getProject(@AuthenticationPrincipal User user, @PathVariable Long id) {
         ProjectForUserDto project = projectMemberService.getProjectForUser(id, user.id());
-        List<MemberProjection> members = userService.getProjectMembersWithRole(id);
+        List<MemberProjection> members = projectMemberService.getProjectMembersWithRole(id);
         return projectMapper.projectWithMembersToOneProjectDto(project, members);
     }
 

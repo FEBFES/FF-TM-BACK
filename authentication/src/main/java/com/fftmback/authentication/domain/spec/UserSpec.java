@@ -1,6 +1,6 @@
-package com.febfes.fftmback.domain.common.specification;
+package com.fftmback.authentication.domain.spec;
 
-import com.febfes.fftmback.domain.dao.UserView;
+import com.fftmback.authentication.domain.UserView;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;

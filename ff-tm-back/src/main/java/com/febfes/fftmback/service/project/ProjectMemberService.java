@@ -7,6 +7,7 @@ import com.febfes.fftmback.dto.ProjectForUserDto;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ProjectMemberService {
 
@@ -19,4 +20,10 @@ public interface ProjectMemberService {
     MemberProjection removeMember(Long projectId, Long memberId);
 
     void addUserToProjectAndChangeRole(Long projectId, Long memberId, RoleName roleName);
+
+    List<MemberProjection> getProjectMembersWithRole(Long projectId);
+
+    MemberProjection getProjectMemberWithRole(Long projectId, Long memberId);
+
+    List<MemberProjection> getProjectMembersWithRole(Long projectId, Set<Long> membersIds);
 }

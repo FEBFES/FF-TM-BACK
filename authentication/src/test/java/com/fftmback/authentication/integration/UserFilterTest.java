@@ -1,9 +1,9 @@
 package com.fftmback.authentication.integration;
 
-import com.febfes.fftmback.domain.common.specification.UserSpec;
-import com.febfes.fftmback.repository.UserViewRepository;
-import com.febfes.fftmback.service.AuthenticationService;
-import com.febfes.fftmback.util.DtoBuilders;
+import com.fftmback.authentication.domain.spec.UserSpec;
+import com.fftmback.authentication.repository.UserViewRepository;
+import com.fftmback.authentication.service.AuthenticationService;
+import com.fftmback.authentication.util.DtoBuilders;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
