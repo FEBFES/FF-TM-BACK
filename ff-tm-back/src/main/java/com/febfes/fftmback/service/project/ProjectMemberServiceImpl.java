@@ -9,11 +9,11 @@ import com.febfes.fftmback.domain.projection.ProjectProjection;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.ProjectForUserDto;
 import com.febfes.fftmback.exception.Exceptions;
+import com.febfes.fftmback.feign.RoleClient;
 import com.febfes.fftmback.mapper.ProjectMapper;
+import com.febfes.fftmback.repository.ProjectMemberRepository;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.UserProjectRepository;
-import com.febfes.fftmback.service.RoleService;
-import com.febfes.fftmback.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,20 +23,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.febfes.fftmback.util.CaseUtils.camelToSnake;
 
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
-    private final UserService userService;
-    private final RoleService roleService;
+    private final ProjectMemberRepository projectMemberRepository;
     private final ProjectMapper projectMapper;
+    private final RoleClient roleClient;
 
     @Override
     @Cacheable(value = "projects", key = "'projectsForUser:' + #userId + ':' + #sort.hashCode()")
@@ -61,6 +61,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     @CacheEvict(value = "projects", allEntries = true)
     public void addNewMembers(Long projectId, List<Long> memberIds) {
+        // TODO: @Transactional self-invocation
         memberIds.forEach(memberId -> addUserToProjectAndChangeRole(projectId, memberId, RoleName.MEMBER));
         log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
     }
@@ -68,23 +69,46 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     @CacheEvict(value = "projects", allEntries = true)
     public MemberProjection removeMember(Long projectId, Long memberId) {
-        MemberProjection memberToDelete = userService.getProjectMemberWithRole(projectId, memberId);
         userProjectRepository.deleteByIdProjectIdAndIdUserId(projectId, memberId);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
-        return memberToDelete;
+        return getProjectMemberWithRole(projectId, memberId);
     }
 
     @Override
+    @Transactional
     @CacheEvict(value = "projects", allEntries = true)
     public void addUserToProjectAndChangeRole(Long projectId, Long memberId, RoleName roleName) {
-        UserProject userProject = UserProject.builder()
-                .id(UserProjectId.builder()
-                        .userId(memberId)
-                        .projectId(projectId)
-                        .build()
-                )
-                .build();
-        userProjectRepository.save(userProject);
-        roleService.changeUserRoleOnProject(projectId, memberId, roleName);
+        try {
+            UserProject userProject = UserProject.builder()
+                    .id(UserProjectId.builder()
+                            .userId(memberId)
+                            .projectId(projectId)
+                            .build()
+                    )
+                    .build();
+
+            userProjectRepository.save(userProject);
+
+            roleClient.changeUserRoleOnProject(projectId, memberId, roleName);
+        } catch (Exception e) {
+            log.error("Failed to call authentication service", e);
+            throw new RuntimeException("Failed to assign role", e);
+        }
+    }
+
+    @Override
+    public List<MemberProjection> getProjectMembersWithRole(Long projectId) {
+        return projectMemberRepository.getProjectMembersWithRole(projectId);
+    }
+
+    @Override
+    public MemberProjection getProjectMemberWithRole(Long projectId, Long memberId) {
+        return projectMemberRepository.getProjectMemberWithRole(projectId, memberId)
+                .orElseThrow(Exceptions.userNotFoundById(memberId));
+    }
+
+    @Override
+    public List<MemberProjection> getProjectMembersWithRole(Long projectId, Set<Long> membersIds) {
+        return projectMemberRepository.getProjectMembersWithRole(projectId, membersIds);
     }
 }

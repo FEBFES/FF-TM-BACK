@@ -5,9 +5,9 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.ProjectForUserDto;
+import com.febfes.fftmback.dto.UserDto;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.StreamSerializer;
@@ -34,9 +34,9 @@ public class KryoGlobalSerializer implements StreamSerializer<Object> {
 
         kryo.register(ProjectForUserDto.class);
         kryo.register(ProjectDto.class);
-        kryo.register(RoleEntity.class);
         kryo.register(ProjectEntity.class);
         kryo.register(RoleName.class);
+        kryo.register(UserDto.class);
     }
 
     @Override

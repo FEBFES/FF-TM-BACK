@@ -19,10 +19,19 @@ spring:
             - Path=/api/v1/notifications/**
           filters:
             - TokenValidationFilter
+#TODO: объединить в один id?
         - id: authentication
           uri: ${config.path}:8092
           predicates:
             - Path=/api/v1/auth/**
+
+        - id: users
+          uri: ${config.path}:8092
+          predicates:
+            - Path=/api/v1/users/**
+          filters:
+            - TokenValidationFilter
+
         - id: monolith
           uri: ${config.path}:8090
           predicates:

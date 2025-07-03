@@ -1,5 +1,6 @@
 package com.febfes.fftmback.service.impl;
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
@@ -76,11 +77,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Long createTask(
-            TaskEntity task,
-            Long userId
-    ) {
-        task.setOwnerId(userId);
+    public Long createTask(TaskEntity task, User user) {
+        task.setOwnerId(user.id());
         Long projectId = task.getProjectId();
         Long columnId = task.getColumnId();
         if (nonNull(task.getTaskType())) {
@@ -96,7 +94,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void updateTask(TaskEntity editTask, Long userId) {
+    public void updateTask(TaskEntity editTask, User user) {
         Long id = editTask.getId();
         TaskEntity task = taskRepository.findById(id).orElseThrow(Exceptions.taskNotFound(id));
         task.setName(editTask.getName());

@@ -1,12 +1,11 @@
 package com.febfes.fftmback.service.impl;
 
-import com.febfes.fftmback.domain.dao.TaskCommentEntity;
+import com.febfes.fftmback.dto.TaskCommentDto;
+import com.febfes.fftmback.mapper.TaskCommentMapper;
 import com.febfes.fftmback.repository.TaskCommentRepository;
 import com.febfes.fftmback.service.TaskCommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,17 +16,21 @@ import java.util.List;
 public class TaskCommentServiceImpl implements TaskCommentService {
 
     private final TaskCommentRepository taskCommentRepository;
+    private final TaskCommentMapper taskCommentMapper;
 
     @Override
-    public TaskCommentEntity saveTaskComment(TaskCommentEntity taskComment) {
-        return taskCommentRepository.save(taskComment);
+    public TaskCommentDto saveTaskComment(TaskCommentDto taskComment) {
+        taskCommentRepository.save(taskCommentMapper.taskCommentToTaskCommentEntity(taskComment));
+        log.info("Saved task comment: {}", taskComment);
+        return taskCommentMapper.projectionToDto(
+                taskCommentRepository.findOneWithCreatorNameById(taskComment.id())
+        );
     }
 
     @Override
-    public List<TaskCommentEntity> getCommentsByTaskId(Long taskId) {
-        return taskCommentRepository.findAll(
-                Example.of(TaskCommentEntity.builder().taskId(taskId).build()),
-                Sort.by(Sort.Direction.ASC, "createDate")
+    public List<TaskCommentDto> getCommentsByTaskId(Long taskId) {
+        return taskCommentMapper.projectionListToDtoList(
+                taskCommentRepository.findCommentsWithCreatorNameByTaskId(taskId)
         );
     }
 }

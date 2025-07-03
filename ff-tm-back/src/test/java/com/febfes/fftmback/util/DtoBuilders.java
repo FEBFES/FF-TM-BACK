@@ -12,7 +12,6 @@ import org.instancio.InstancioApi;
 import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 
 import static org.instancio.Select.field;
 
@@ -21,23 +20,12 @@ import static org.instancio.Select.field;
 public class DtoBuilders {
 
     public static final String PASSWORD = "password";
-    public static final String EMAIL_PATTERN = "#a#a#a#a#a#a@example.com";
 
     public ColumnDto createColumnDto(String name, Integer order) {
         return ColumnDto.builder()
                 .name(name)
                 .order(order)
                 .build();
-    }
-
-    public static UserEntity createUser() {
-        return commonUser().create();
-    }
-
-    public static UserEntity createUser(String displayName) {
-        return commonUser()
-                .set(field(UserEntity::getDisplayName), displayName)
-                .create();
     }
 
     public static TaskColumnEntity createColumn(Long projectId) {
@@ -79,13 +67,6 @@ public class DtoBuilders {
                 .set(field(EditTaskDto::order), order)
                 .set(field(EditTaskDto::deadlineDate), LocalDateTime.now().plusDays(1L))
                 .create();
-    }
-
-    private static InstancioApi<UserEntity> commonUser() {
-        return Instancio.of(UserEntity.class)
-                .generate(field(UserEntity::getEmail), gen -> gen.text().pattern(EMAIL_PATTERN))
-                .set(field(UserEntity::getProjectRoles), Collections.emptyMap())
-                .set(field(UserEntity::getEncryptedPassword), PASSWORD);
     }
 
     private static InstancioApi<TaskEntity> commonTask(Long projectId, Long columnId) {

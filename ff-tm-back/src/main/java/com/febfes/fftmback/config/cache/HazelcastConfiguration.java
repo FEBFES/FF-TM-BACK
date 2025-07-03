@@ -16,6 +16,12 @@ public class HazelcastConfiguration {
         Config config = new Config();
         config.setClusterName("dev");
 
+        // === TTL config for "users" cache ===
+        MapConfig usersCacheConfig = new MapConfig("users");
+        // TODO: create property for 600 seconds?
+        usersCacheConfig.setTimeToLiveSeconds(600); // 600 sec = 10 min
+        config.addMapConfig(usersCacheConfig);
+
         // === network.join.multicast.enabled = false ===
         NetworkConfig networkConfig = config.getNetworkConfig();
         JoinConfig joinConfig = networkConfig.getJoin();

@@ -4,7 +4,6 @@ import com.febfes.fftmback.annotation.ApiCreate;
 import com.febfes.fftmback.annotation.ApiGet;
 import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.dto.TaskCommentDto;
-import com.febfes.fftmback.mapper.TaskCommentMapper;
 import com.febfes.fftmback.service.TaskCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,16 +23,13 @@ import java.util.List;
 public class TaskCommentController {
 
     private final TaskCommentService taskCommentService;
-    private final TaskCommentMapper taskCommentMapper;
 
     @Operation(summary = "Create new task comment")
     @ApiCreate(path = "comment")
     public TaskCommentDto createTask(
             @RequestBody TaskCommentDto taskCommentDto
     ) {
-        return taskCommentMapper.taskCommentEntityToTaskCommentDto(
-                taskCommentService.saveTaskComment(taskCommentMapper.taskCommentToTaskCommentEntity(taskCommentDto))
-        );
+        return taskCommentService.saveTaskComment(taskCommentDto);
     }
 
     @Operation(summary = "Get task comments")
@@ -41,6 +37,6 @@ public class TaskCommentController {
     public List<TaskCommentDto> getTaskComments(
             @PathVariable Long taskId
     ) {
-        return taskCommentMapper.taskCommentEntityToTaskCommentDto(taskCommentService.getCommentsByTaskId(taskId));
+        return taskCommentService.getCommentsByTaskId(taskId);
     }
 }

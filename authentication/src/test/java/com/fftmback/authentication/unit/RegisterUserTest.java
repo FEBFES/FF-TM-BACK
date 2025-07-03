@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static com.fftmback.authentication.util.UnitTestBuilders.user;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
@@ -25,7 +26,6 @@ class RegisterUserTest extends BaseUnitTest {
 
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
-
 
     @Test
     void testRegisterUser() {
@@ -62,9 +62,9 @@ class RegisterUserTest extends BaseUnitTest {
         @Override
         public boolean matches(UserEntity actualUser) {
             return expectedUser.getEmail().equals(actualUser.getEmail())
-                    && expectedUser.getUsername().equals(actualUser.getUsername())
-                    && expectedUser.getPassword().equals(actualUser.getPassword())
-                    && actualUser.getDisplayName() != null;
+                   && expectedUser.getUsername().equals(actualUser.getUsername())
+                   && expectedUser.getPassword().equals(actualUser.getPassword())
+                   && actualUser.getDisplayName() != null;
         }
     }
 }

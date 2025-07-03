@@ -1,9 +1,9 @@
 package com.fftmback.authentication.service.impl;
 
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.fftmback.authentication.config.RedisConfig;
 import com.fftmback.authentication.domain.RefreshTokenEntity;
 import com.fftmback.authentication.dto.RefreshTokenDto;
-import com.fftmback.authentication.exception.EntityNotFoundException;
 import com.fftmback.authentication.mapper.RefreshTokenMapper;
 import com.fftmback.authentication.repository.RefreshTokenRepository;
 import com.fftmback.authentication.service.RefreshTokenCacheService;

@@ -5,6 +5,7 @@ import com.fftmback.authentication.config.RedisConfig;
 import com.fftmback.authentication.domain.RefreshTokenEntity;
 import com.fftmback.authentication.domain.UserEntity;
 import com.fftmback.authentication.dto.RefreshTokenDto;
+import com.fftmback.authentication.integration.BasicTestClass;
 import com.fftmback.authentication.repository.RefreshTokenRepository;
 import lombok.val;
 import org.junit.jupiter.api.AfterEach;
@@ -12,36 +13,32 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@Testcontainers
+//@SpringBootTest
+//@Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ActiveProfiles("test")
-class RefreshTokenCacheServiceTest {
+//@ActiveProfiles("test")
+class RefreshTokenCacheServiceTest extends BasicTestClass {
 
     @Container
     static GenericContainer<?> redisContainer = new GenericContainer<>("redis:7.2.5")
             .withExposedPorts(6379)
             .waitingFor(Wait.forListeningPort());
 
-    @Container
-    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14-alpine");
+//    @Container
+//    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14-alpine");
 
     static {
         redisContainer.start();
@@ -52,8 +49,8 @@ class RefreshTokenCacheServiceTest {
         registry.add("spring.data.redis.host", redisContainer::getHost);
         registry.add("spring.data.redis.port", () -> redisContainer.getFirstMappedPort());
         registry.add("spring.cache.type", () -> "redis");
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+//        registry.add("spring.datasource.username", postgres::getUsername);
+//        registry.add("spring.datasource.password", postgres::getPassword);
     }
 
     @Autowired
