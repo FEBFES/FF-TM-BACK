@@ -46,7 +46,7 @@ class TaskCommentControllerTest extends BasicTestClass {
 
         TaskCommentEntity comment = taskCommentService.saveTaskComment(
                 TaskCommentEntity.builder()
-                    .creator(UserEntity.builder().id(userId).build())
+                    .creatorId(userId)
                     .taskId(taskId)
                     .text("Some comment text")
                     .build()
@@ -69,7 +69,7 @@ class TaskCommentControllerTest extends BasicTestClass {
         receivedCommentOpt.ifPresent(receivedComment -> {
             assertThat(receivedComment.id()).isEqualTo(comment.getTaskId());
             assertThat(receivedComment.taskId()).isEqualTo(comment.getTaskId());
-            assertThat(receivedComment.creatorId()).isEqualTo(comment.getCreator().getId());
+            assertThat(receivedComment.creatorId()).isEqualTo(comment.getCreatorId());
             assertThat(receivedComment.text()).isEqualTo(comment.getText());
         });
     }

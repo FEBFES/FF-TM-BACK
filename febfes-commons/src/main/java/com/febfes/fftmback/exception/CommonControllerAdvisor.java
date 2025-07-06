@@ -1,6 +1,8 @@
 package com.febfes.fftmback.exception;
 
 import com.febfes.fftmback.dto.ErrorDto;
+import com.febfes.fftmback.dto.ErrorType;
+import com.febfes.fftmback.dto.StatusError;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,14 @@ public class CommonControllerAdvisor {
         return createExceptionResponseBody(HttpStatus.CONFLICT, ex);
     }
 
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @Hidden
+    public ErrorDto handleGlobalException(Exception ex) {
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        return createGlobalExceptionResponseBody(ex);
+    }
+
     private ErrorDto createExceptionResponseBody(HttpStatus status, CustomException ex) {
         return new ErrorDto(
                 status.value(),
@@ -42,6 +52,17 @@ public class CommonControllerAdvisor {
                 LocalDateTime.now(),
                 ex.getMessage(),
                 ex.getBaseError()
+        );
+    }
+
+    private ErrorDto createGlobalExceptionResponseBody(Exception ex) {
+        return new ErrorDto(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                StatusError.UNDEFINED,
+                ErrorType.UNDEFINED,
+                LocalDateTime.now(),
+                ex.getMessage(),
+                null
         );
     }
 }

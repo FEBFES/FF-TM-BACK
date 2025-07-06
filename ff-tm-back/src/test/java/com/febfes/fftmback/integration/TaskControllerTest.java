@@ -1,5 +1,6 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.dao.FileEntity;
@@ -10,6 +11,7 @@ import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DtoBuilders;
+import com.fftmback.authentication.domain.UserEntity;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -297,14 +299,14 @@ class TaskControllerTest extends BasicTestClass {
     }
 
     private TaskView createNewTask() {
-        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), createdUserId);
+        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), new User(createdUserId, null, null));
         return taskService.getTaskById(taskId);
     }
 
     private void createNewTask(String name, String description) {
         TaskEntity task = DtoBuilders.createTask(createdProjectId, createdColumnId, name);
         task.setDescription(description);
-        taskService.createTask(task, createdUserId);
+        taskService.createTask(task, new User(createdUserId, null, null));
     }
 
     private void saveTaskFile(Long taskId) {

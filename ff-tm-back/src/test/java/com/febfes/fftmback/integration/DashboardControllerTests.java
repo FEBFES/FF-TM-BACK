@@ -1,6 +1,7 @@
 package com.febfes.fftmback.integration;
 
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
@@ -33,7 +34,7 @@ class DashboardControllerTests extends BasicTestClass {
         Long projectId = createNewProject();
         TaskColumnEntity columnEntity = columnService.createColumn(DtoBuilders.createColumn(projectId));
         TaskEntity task = DtoBuilders.createTask(projectId, columnEntity.getId());
-        taskService.createTask(task, createdUserId);
+        taskService.createTask(task, new User(createdUserId, null, null));
 
         DashboardDto dashboardDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)

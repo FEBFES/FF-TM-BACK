@@ -1,17 +1,20 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.repository.TaskViewRepository;
-import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.util.DtoBuilders;
+import com.fftmback.authentication.domain.UserEntity;
+import com.fftmback.authentication.service.AuthenticationService;
+import com.fftmback.authentication.service.UserService;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
@@ -24,6 +27,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 import java.util.stream.Stream;
+
+import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 
 class TaskFilterTest extends BasicStaticDataTestClass {
 
@@ -43,11 +48,15 @@ class TaskFilterTest extends BasicStaticDataTestClass {
     ) {
         UserEntity user = DtoBuilders.createUser();
         authenticationService.registerUser(user);
-        Long createdUserId = userService.getUserIdByUsername(user.getUsername());
+        Long createdUserId = authenticationService.authenticateUser(
+                UserEntity.builder().username(user.getUsername()).encryptedPassword(PASSWORD).build()
+        ).userId();
 
         UserEntity user2 = DtoBuilders.createUser();
         authenticationService.registerUser(user2);
-        Long createdUserId2 = userService.getUserIdByUsername(user2.getUsername());
+        Long createdUserId2 = authenticationService.authenticateUser(
+                UserEntity.builder().username(user2.getUsername()).encryptedPassword(PASSWORD).build()
+        ).userId();
 
         Long createdProjectId = createProject(projectManagementService, columnService, createdUserId);
         Long createdProjectId2 = createProject(projectManagementService, columnService, createdUserId2);
@@ -67,7 +76,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .description("123")
                         .priority(TaskPriority.LOW)
                         .build(),
-                createdUserId
+                new User(createdUserId, null, null)
         );
 
         taskService.createTask(
@@ -78,7 +87,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME + "2")
                         .description("12345")
                         .build(),
-                createdUserId
+                new User(createdUserId, null, null)
         );
 
         taskService.createTask(
@@ -89,7 +98,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME)
                         .description("12345")
                         .build(),
-                createdUserId
+                new User(createdUserId, null, null)
         );
 
         taskService.createTask(
@@ -100,7 +109,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
-                createdUserId2
+                new User(createdUserId2, null, null)
         );
 
         taskService.createTask(
@@ -111,7 +120,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
-                createdUserId2
+                new User(createdUserId2, null, null)
         );
 
         /*

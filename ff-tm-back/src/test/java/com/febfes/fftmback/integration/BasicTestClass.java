@@ -1,9 +1,10 @@
 package com.febfes.fftmback.integration;
 
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.RoleName;
+import com.febfes.fftmback.domain.abstracts.BaseEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
@@ -11,6 +12,9 @@ import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.febfes.fftmback.util.DatabaseCleanup;
 import com.febfes.fftmback.util.DtoBuilders;
+import com.fftmback.authentication.domain.UserEntity;
+import com.fftmback.authentication.service.AuthenticationService;
+import com.fftmback.authentication.service.UserService;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
@@ -90,10 +94,11 @@ class BasicTestClass {
 
         UserEntity user = DtoBuilders.createUser();
         authenticationService.registerUser(user);
-        createdUserId = userService.getUserIdByUsername(user.getUsername());
-        token = authenticationService.authenticateUser(
+        var authDto = authenticationService.authenticateUser(
                 UserEntity.builder().username(user.getUsername()).encryptedPassword(PASSWORD).build()
-        ).accessToken();
+        );
+        createdUserId = authDto.userId();
+        token = authDto.accessToken();
     }
 
     @AfterEach
@@ -109,7 +114,9 @@ class BasicTestClass {
     protected Long createNewUser() {
         UserEntity user = DtoBuilders.createUser();
         authenticationService.registerUser(user);
-        return userService.getUserIdByUsername(user.getUsername());
+        return authenticationService.authenticateUser(
+                UserEntity.builder().username(user.getUsername()).encryptedPassword(PASSWORD).build()
+        ).userId();
     }
 
     protected Long createNewProject() {
@@ -129,7 +136,7 @@ class BasicTestClass {
                 .orElseThrow(() -> new IllegalArgumentException("Project with id=%d doesn't have task columns"));
         return taskService.createTask(
                 TaskEntity.builder().projectId(projectId).columnId(columnId).name("SomeTask").build(),
-                userId
+                new User(userId, null, null)
         );
     }
 }

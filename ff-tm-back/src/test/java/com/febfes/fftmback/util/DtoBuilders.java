@@ -82,4 +82,8 @@ public class DtoBuilders {
         return Instancio.of(EditTaskDto.class)
                 .set(field(EditTaskDto::assigneeId), null);
     }
+
+    public static com.fftmback.authentication.domain.UserEntity createUser() {
+        return com.fftmback.authentication.util.DtoBuilders.createUser();
+    }
 }

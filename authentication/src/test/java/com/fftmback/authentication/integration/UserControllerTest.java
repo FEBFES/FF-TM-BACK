@@ -9,16 +9,12 @@ import io.restassured.http.ContentType;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 
-import java.io.File;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -29,18 +25,18 @@ class UserControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_USERS_API = "/api/v1/users";
 
-    @TempDir
-    static File tempDir;
+//    @TempDir
+//    static File tempDir;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @DynamicPropertySource
-    static void registerPgProperties(DynamicPropertyRegistry registry) {
-        registry.add("user-pic.folder",
-                () -> String.format("%s\\", tempDir.getPath())
-        );
-    }
+//    @DynamicPropertySource
+//    static void registerPgProperties(DynamicPropertyRegistry registry) {
+//        registry.add("user-pic.folder",
+//                () -> String.format("%s\\", tempDir.getPath())
+//        );
+//    }
 
     @Test
     void successfulGetUserTest() {

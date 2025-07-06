@@ -3,6 +3,7 @@ package com.fftmback.authentication.integration;
 import com.fftmback.authentication.domain.spec.UserSpec;
 import com.fftmback.authentication.repository.UserViewRepository;
 import com.fftmback.authentication.service.AuthenticationService;
+import com.fftmback.authentication.util.DatabaseCleanup;
 import com.fftmback.authentication.util.DtoBuilders;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.junit.jupiter.api.Assertions;
@@ -23,8 +24,10 @@ public class UserFilterTest extends BasicStaticDataTestClass {
 
     @BeforeAll
     static void beforeAll(
-            @Autowired AuthenticationService authenticationService
+            @Autowired AuthenticationService authenticationService,
+            @Autowired DatabaseCleanup databaseCleanup
     ) {
+        databaseCleanup.execute();
         authenticationService.registerUser(DtoBuilders.createUser(USER_DISPLAY_NAME));
         authenticationService.registerUser(DtoBuilders.createUser("123" + USER_DISPLAY_NAME));
         authenticationService.registerUser(DtoBuilders.createUser(USER_DISPLAY_NAME + "456"));

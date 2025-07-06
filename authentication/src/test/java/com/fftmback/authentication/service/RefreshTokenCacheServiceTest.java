@@ -70,6 +70,7 @@ class RefreshTokenCacheServiceTest extends BasicTestClass {
 
     @BeforeEach
     void setup() {
+        refreshTokenRepository.deleteAll();
         RefreshTokenEntity entity = RefreshTokenEntity.builder()
                 .token(TEST_TOKEN)
                 .userEntity(UserEntity.builder().id(TEST_USER_ID).build())
