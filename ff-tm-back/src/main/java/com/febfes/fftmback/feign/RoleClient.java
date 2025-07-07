@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "role-client",
-        // TODO: const value??
-        url = "http://localhost:8092/api",
+        url = "${authentication.url}",
         configuration = FeignConfig.class,
         path = "/v1/roles")
 public interface RoleClient {

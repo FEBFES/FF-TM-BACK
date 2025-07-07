@@ -1,4 +1,4 @@
-package com.febfes.fftmback.integration;
+package com.febfes.fftmback.integration.basic;
 
 import com.febfes.fftmback.util.DatabaseCleanup;
 import org.junit.jupiter.api.AfterAll;

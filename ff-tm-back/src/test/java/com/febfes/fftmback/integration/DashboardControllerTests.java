@@ -7,6 +7,7 @@ import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.util.DtoBuilders;

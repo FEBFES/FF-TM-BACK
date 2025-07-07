@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "user-client",
-        // TODO: const value??
-        url = "http://localhost:8092/api",
+        url = "${authentication.url}",
         configuration = FeignConfig.class,
         path = "/v1/users")
 public interface UserClient {

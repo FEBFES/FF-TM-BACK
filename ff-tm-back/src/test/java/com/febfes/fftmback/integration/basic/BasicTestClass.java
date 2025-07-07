@@ -1,4 +1,4 @@
-package com.febfes.fftmback.integration;
+package com.febfes.fftmback.integration.basic;
 
 
 import com.febfes.fftmback.config.jwt.User;
@@ -12,9 +12,6 @@ import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.febfes.fftmback.util.DatabaseCleanup;
 import com.febfes.fftmback.util.DtoBuilders;
-import com.fftmback.authentication.domain.UserEntity;
-import com.fftmback.authentication.service.AuthenticationService;
-import com.fftmback.authentication.service.UserService;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +31,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 
 
@@ -42,17 +38,14 @@ import static io.restassured.RestAssured.given;
 @Testcontainers
 @ActiveProfiles("test")
 @Slf4j
-@ImportAutoConfiguration(exclude = { KafkaAutoConfiguration.class })
-class BasicTestClass {
+@ImportAutoConfiguration(exclude = {KafkaAutoConfiguration.class})
+public class BasicTestClass {
 
     @Autowired
     private DatabaseCleanup databaseCleanup;
 
     @Autowired
-    protected AuthenticationService authenticationService;
-
-    @Autowired
-    protected UserService userService;
+    private JwtTestUtil jwtTestUtil;
 
     @Autowired
     protected ColumnService columnService;
@@ -80,7 +73,8 @@ class BasicTestClass {
     private String userRoleHeader;
 
     protected String token;
-    protected Long createdUserId;
+    protected String username = "username";
+    protected Long createdUserId = 0L;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -92,13 +86,8 @@ class BasicTestClass {
     void setUp() {
         RestAssured.baseURI = "http://localhost:" + port;
 
-        UserEntity user = DtoBuilders.createUser();
-        authenticationService.registerUser(user);
-        var authDto = authenticationService.authenticateUser(
-                UserEntity.builder().username(user.getUsername()).encryptedPassword(PASSWORD).build()
-        );
-        createdUserId = authDto.userId();
-        token = authDto.accessToken();
+        createdUserId = 1L;
+        token = jwtTestUtil.generateToken(createdUserId, username);
     }
 
     @AfterEach
@@ -112,11 +101,7 @@ class BasicTestClass {
     }
 
     protected Long createNewUser() {
-        UserEntity user = DtoBuilders.createUser();
-        authenticationService.registerUser(user);
-        return authenticationService.authenticateUser(
-                UserEntity.builder().username(user.getUsername()).encryptedPassword(PASSWORD).build()
-        ).userId();
+        return ++createdUserId;
     }
 
     protected Long createNewProject() {
