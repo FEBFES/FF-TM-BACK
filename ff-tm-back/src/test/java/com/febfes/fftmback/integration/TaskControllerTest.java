@@ -8,6 +8,7 @@ import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.*;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DtoBuilders;

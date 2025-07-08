@@ -6,6 +6,7 @@ import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
+import com.febfes.fftmback.integration.basic.BasicStaticDataTestClass;
 import com.febfes.fftmback.repository.TaskViewRepository;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;

@@ -1,8 +1,10 @@
-package com.febfes.fftmback.integration;
+package com.fftmback.authentication.integration;
 
 import com.febfes.fftmback.domain.RoleName;
+import com.fftmback.authentication.domain.RoleEntity;
 import com.fftmback.authentication.domain.UserEntity;
 import com.fftmback.authentication.service.AuthenticationService;
+import com.fftmback.authentication.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -17,7 +19,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
-import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 
 public class RoleControllerTest extends BasicTestClass {
@@ -74,7 +75,7 @@ public class RoleControllerTest extends BasicTestClass {
         Long newUserId = createNewUser();
         UserEntity newUser = userService.getUserById(newUserId);
         String newToken = authenticationService.authenticateUser(
-                UserEntity.builder().username(newUser.getUsername()).encryptedPassword(PASSWORD).build()
+                UserEntity.builder().username(newUser.getUsername()).encryptedPassword(DtoBuilders.PASSWORD).build()
         ).accessToken();
         projectMemberService.addNewMembers(createdProjectId, List.of(newUserId));
 

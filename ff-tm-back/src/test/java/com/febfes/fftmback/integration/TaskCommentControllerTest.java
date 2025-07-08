@@ -1,6 +1,7 @@
 package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.dao.TaskCommentEntity;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.TaskCommentService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;

@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.*;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.impl.DefaultColumns;
 import com.febfes.fftmback.service.project.DashboardService;

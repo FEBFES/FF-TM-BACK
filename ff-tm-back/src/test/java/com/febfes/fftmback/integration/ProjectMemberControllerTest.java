@@ -2,7 +2,7 @@ package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.ProjectDto;
-import com.fftmback.authentication.mapper.UserMapper;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -24,6 +24,7 @@ class ProjectMemberControllerTest extends BasicTestClass {
 
     @Autowired
     private TransactionTemplate txTemplate;
+
     @Autowired
     private UserMapper userMapper;
 
