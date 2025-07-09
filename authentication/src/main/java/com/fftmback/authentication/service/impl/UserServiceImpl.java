@@ -3,11 +3,11 @@ package com.fftmback.authentication.service.impl;
 import com.febfes.fftmback.dto.ErrorType;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.fftmback.authentication.domain.UserEntity;
-import com.fftmback.authentication.domain.UserView;
 import com.fftmback.authentication.domain.spec.UserSpec;
+import com.fftmback.authentication.dto.UserDto;
 import com.fftmback.authentication.exception.Exceptions;
+import com.fftmback.authentication.mapper.UserMapper;
 import com.fftmback.authentication.repository.UserRepository;
-import com.fftmback.authentication.repository.UserViewRepository;
 import com.fftmback.authentication.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +26,8 @@ import static java.util.Objects.nonNull;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserViewRepository userViewRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -37,17 +37,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity getUserById(Long id) {
-        UserEntity userEntity = userRepository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(UserEntity.ENTITY_NAME, id));
-        log.info("Received user by id={}", id);
-        return userEntity;
     }
 
     @Override
-    public UserView getUserViewById(Long id) {
-        UserView user = userViewRepository.findById(id).orElseThrow(Exceptions.userNotFoundById(id));
-        log.info("Received user by id={}", id);
-        return user;
+    public UserDto getUserDtoById(Long id) {
+        UserEntity user = userRepository.findById(id).orElseThrow(Exceptions.userNotFoundById(id));
+        log.info("Received user dto by id={}", id);
+        return userMapper.mapToUserDto(user);
     }
 
     @Override
@@ -65,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserView> getUsersByFilter(UserSpec userSpec) {
-        return userViewRepository.findAll(userSpec);
+    public List<UserDto> getUsersByFilter(UserSpec userSpec) {
+        return userMapper.mapToUserDto(userRepository.findAll(userSpec));
     }
 }

@@ -1,5 +1,6 @@
 package com.febfes.fftmback.domain.common;
 
+import com.febfes.fftmback.util.FileUrnUtils;
 import com.febfes.fftmback.util.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +32,7 @@ public enum EntityType {
 
         @Override
         public String getFileUrn(String idForUrn) {
-            return String.format(FileUtils.USER_PIC_URN, Long.parseLong(idForUrn));
+            return FileUrnUtils.getUserPicUrn(Long.parseLong(idForUrn));
         }
 
         @Override

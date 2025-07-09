@@ -33,7 +33,7 @@ public class UserController {
     @ApiGetOne(path = "{id}")
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public UserDto getUser(@PathVariable Long id) {
-        return userMapper.userViewToUserDto(userService.getUserViewById(id));
+        return userService.getUserDtoById(id);
     }
 
     @Operation(summary = "Edit user by its id")
@@ -48,8 +48,6 @@ public class UserController {
     @Operation(summary = "Get users with filter")
     @ApiGet()
     public List<UserDto> getUsersWithFilter(UserSpec userSpec) {
-        return userService.getUsersByFilter(userSpec).stream()
-                .map(userMapper::userViewToUserDto)
-                .toList();
+        return userService.getUsersByFilter(userSpec);
     }
 }

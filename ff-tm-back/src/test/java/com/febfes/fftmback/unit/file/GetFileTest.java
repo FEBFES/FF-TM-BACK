@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.impl.FileServiceImpl;
 import com.febfes.fftmback.unit.BaseUnitTest;
+import com.febfes.fftmback.util.FileUrnUtils;
 import com.febfes.fftmback.util.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -29,7 +30,7 @@ class GetFileTest extends BaseUnitTest {
     private static final String FILE_URN = "test-file-urn";
     private static final String ID_FOR_URN = "123";
     private static final String FILE_PATH = "test-file-path";
-    private static final String USER_FILE_URN = String.format(FileUtils.USER_PIC_URN, Long.parseLong(ID_FOR_URN));
+    private static final String USER_FILE_URN = FileUrnUtils.getUserPicUrn(Long.parseLong(ID_FOR_URN));
     private static final String TASK_FILE_URN = String.format(FileUtils.TASK_FILE_URN, Long.parseLong(ID_FOR_URN));
     private static final byte[] EXPECTED_BYTES = "test content".getBytes();
 

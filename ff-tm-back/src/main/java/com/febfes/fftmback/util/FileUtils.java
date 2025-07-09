@@ -8,7 +8,6 @@ import java.util.Optional;
 public class FileUtils {
 
     public static final String TASK_FILE_URN = "/files/task/%s";
-    public static final String USER_PIC_URN = "/files/user-pic/%d";
 
     public static String getExtension(String filename) {
         return Optional.ofNullable(filename)

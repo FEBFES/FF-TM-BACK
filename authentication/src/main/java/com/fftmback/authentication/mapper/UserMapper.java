@@ -1,7 +1,6 @@
 package com.fftmback.authentication.mapper;
 
 import com.fftmback.authentication.domain.UserEntity;
-import com.fftmback.authentication.domain.UserView;
 import com.fftmback.authentication.dto.AuthenticationDto;
 import com.fftmback.authentication.dto.EditUserDto;
 import com.fftmback.authentication.dto.UserDetailsDto;
@@ -9,7 +8,9 @@ import com.fftmback.authentication.dto.UserDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+import java.util.List;
+
+@Mapper(componentModel = "spring", imports = com.febfes.fftmback.util.FileUrnUtils.class)
 public interface UserMapper {
 
     @Mapping(target = "projectRoles", ignore = true)
@@ -33,6 +34,8 @@ public interface UserMapper {
     @Mapping(target = "encryptedPassword", source = "password")
     UserEntity editUserDtoToUser(EditUserDto editUserDto);
 
-    @Mapping(target = "userPic", source = "userPicUrn")
-    UserDto userViewToUserDto(UserView userView);
+    @Mapping(target = "userPic", expression = "java(com.febfes.fftmback.util.FileUrnUtils.getUserPicUrn(user.getId()))")
+    UserDto mapToUserDto(UserEntity user);
+
+    List<UserDto> mapToUserDto(List<UserEntity> user);
 }
