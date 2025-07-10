@@ -3,7 +3,6 @@ package com.febfes.fftmback.controller;
 import com.febfes.fftmback.annotation.ApiGet;
 import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.dto.MemberDto;
-import com.febfes.fftmback.mapper.ProjectMemberMapper;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,14 +23,11 @@ import java.util.Set;
 public class ProjectMemberController {
 
     private final ProjectMemberService projectMemberService;
-    private final ProjectMemberMapper projectMemberMapper;
 
     @Operation(summary = "Get project members")
     @ApiGet(path = "{id}/members")
     public List<MemberDto> getProjectMembers(@PathVariable Long id) {
-        return projectMemberMapper.memberProjectionToMemberDto(
-                projectMemberService.getProjectMembersWithRole(id)
-        );
+        return projectMemberService.getProjectMembersWithRole(id);
     }
 
     @Operation(summary = "Add new members to the project")
@@ -41,9 +37,7 @@ public class ProjectMemberController {
     @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER_PLUS.name())")
     public List<MemberDto> addNewMembers(@PathVariable Long id, @RequestBody List<Long> memberIds) {
         projectMemberService.addNewMembers(id, memberIds);
-        return projectMemberMapper.memberProjectionToMemberDto(
-                projectMemberService.getProjectMembersWithRole(id, Set.copyOf(memberIds))
-        );
+        return projectMemberService.getProjectMembersWithRole(id, Set.copyOf(memberIds));
     }
 
     @Operation(summary = "Delete member from project")
@@ -52,8 +46,6 @@ public class ProjectMemberController {
     @ApiResponse(responseCode = "409", description = "Only owner can remove a member", content = @Content)
     @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).OWNER.name())")
     public MemberDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
-        return projectMemberMapper.memberProjectionToMemberDto(
-                projectMemberService.removeMember(id, memberId)
-        );
+        return projectMemberService.removeMember(id, memberId);
     }
 }

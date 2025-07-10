@@ -1,8 +1,8 @@
 package com.febfes.fftmback.mapper;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.projection.MemberProjection;
 import com.febfes.fftmback.domain.projection.ProjectProjection;
+import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.ProjectForUserDto;
@@ -26,6 +26,6 @@ public interface ProjectMapper {
     @Mapping(target = "userRoleOnProject.description", source = "projectForUserDto.roleDescription")
     OneProjectDto projectWithMembersToOneProjectDto(
             ProjectForUserDto projectForUserDto,
-            List<MemberProjection> members
+            List<MemberDto> members
     );
 }

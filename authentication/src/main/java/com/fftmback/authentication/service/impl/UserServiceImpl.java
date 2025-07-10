@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.nonNull;
 
@@ -65,5 +66,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getUsersByFilter(UserSpec userSpec) {
         return userMapper.mapToUserDto(userRepository.findAll(userSpec));
+    }
+
+    @Override
+    public List<UserDto> getUsersByIds(Set<Long> ids) {
+        return userMapper.mapToUserDto(userRepository.findAllById(ids));
     }
 }

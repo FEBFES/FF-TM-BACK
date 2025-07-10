@@ -12,12 +12,10 @@ import com.fftmback.authentication.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("v1/users")
@@ -49,5 +47,11 @@ public class UserController {
     @ApiGet()
     public List<UserDto> getUsersWithFilter(UserSpec userSpec) {
         return userService.getUsersByFilter(userSpec);
+    }
+
+    @Operation(summary = "Get users by ids")
+    @ApiGet(path = "list")
+    public List<UserDto> getUsersByIds(@RequestParam Set<Long> ids) {
+        return userService.getUsersByIds(ids);
     }
 }

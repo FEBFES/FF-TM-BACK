@@ -2,6 +2,7 @@ package com.febfes.fftmback.unit.file;
 
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.impl.FileServiceImpl;
 import com.febfes.fftmback.unit.BaseUnitTest;

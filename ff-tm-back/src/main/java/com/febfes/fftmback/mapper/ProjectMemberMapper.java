@@ -1,15 +1,24 @@
 package com.febfes.fftmback.mapper;
 
-import com.febfes.fftmback.domain.projection.MemberProjection;
+import com.febfes.fftmback.domain.projection.MemberIdRoleProjection;
 import com.febfes.fftmback.dto.MemberDto;
+import com.febfes.fftmback.dto.UserDto;
 import org.mapstruct.Mapper;
-
-import java.util.List;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
 public interface ProjectMemberMapper {
 
-    MemberDto memberProjectionToMemberDto(MemberProjection memberProjection);
-
-    List<MemberDto> memberProjectionToMemberDto(List<MemberProjection> memberProjections);
+    @Mappings({
+            @Mapping(source = "user.id", target = "id"),
+            @Mapping(source = "user.email", target = "email"),
+            @Mapping(source = "user.username", target = "username"),
+            @Mapping(source = "user.firstName", target = "firstName"),
+            @Mapping(source = "user.lastName", target = "lastName"),
+            @Mapping(source = "user.displayName", target = "displayName"),
+            @Mapping(source = "user.userPic", target = "userPic"),
+            @Mapping(source = "projection.roleOnProject", target = "roleOnProject")
+    })
+    MemberDto mapToMemberDto(MemberIdRoleProjection projection, UserDto user);
 }

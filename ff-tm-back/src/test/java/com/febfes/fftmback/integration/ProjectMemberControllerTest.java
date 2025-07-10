@@ -40,9 +40,7 @@ class ProjectMemberControllerTest extends BasicTestClass {
 
             @Override
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
-                List<MemberDto> members = userMapper.memberProjectionToMemberDto(
-                        projectMemberService.getProjectMembersWithRole(createdProjectId)
-                );
+                List<MemberDto> members = projectMemberService.getProjectMembersWithRole(createdProjectId);
                 // as owner is also a member
                 Assertions.assertThat(members).hasSize(3);
                 List<ProjectDto> secondUserProjects =
@@ -67,9 +65,7 @@ class ProjectMemberControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        List<MemberDto> members = userMapper.memberProjectionToMemberDto(
-                projectMemberService.getProjectMembersWithRole(createdProjectId)
-        );
+        List<MemberDto> members = projectMemberService.getProjectMembersWithRole(createdProjectId);
         Assertions.assertThat(members).hasSize(1);
         List<ProjectDto> secondMemberProjects = projectMemberService.getProjectsForUser(secondCreatedUserId, Lists.newArrayList());
         Assertions.assertThat(secondMemberProjects).isEmpty();

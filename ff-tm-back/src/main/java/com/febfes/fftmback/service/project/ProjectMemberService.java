@@ -1,7 +1,7 @@
 package com.febfes.fftmback.service.project;
 
 import com.febfes.fftmback.domain.RoleName;
-import com.febfes.fftmback.domain.projection.MemberProjection;
+import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.ProjectForUserDto;
 import org.springframework.data.domain.Sort;
@@ -17,13 +17,13 @@ public interface ProjectMemberService {
 
     void addNewMembers(Long projectId, List<Long> memberIds);
 
-    MemberProjection removeMember(Long projectId, Long memberId);
+    MemberDto removeMember(Long projectId, Long memberId);
 
     void addUserToProjectAndChangeRole(Long projectId, Long memberId, RoleName roleName);
 
-    List<MemberProjection> getProjectMembersWithRole(Long projectId);
+    List<MemberDto> getProjectMembersWithRole(Long projectId);
 
-    MemberProjection getProjectMemberWithRole(Long projectId, Long memberId);
+    MemberDto getProjectMemberWithRole(Long projectId, Long memberId);
 
-    List<MemberProjection> getProjectMembersWithRole(Long projectId, Set<Long> membersIds);
+    List<MemberDto> getProjectMembersWithRole(Long projectId, Set<Long> membersIds);
 }

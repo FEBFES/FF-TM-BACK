@@ -6,6 +6,7 @@ import com.fftmback.authentication.dto.UserDto;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
+import java.util.Set;
 
 public interface UserService extends UserDetailsService {
 
@@ -16,4 +17,6 @@ public interface UserService extends UserDetailsService {
     void updateUser(UserEntity user, Long id);
 
     List<UserDto> getUsersByFilter(UserSpec userSpec);
+
+    List<UserDto> getUsersByIds(Set<Long> ids);
 }

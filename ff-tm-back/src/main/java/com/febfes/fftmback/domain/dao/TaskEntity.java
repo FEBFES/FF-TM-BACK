@@ -9,8 +9,10 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 @Entity
@@ -20,7 +22,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class TaskEntity extends OrderedEntity {
 
@@ -51,6 +52,7 @@ public class TaskEntity extends OrderedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_type_id", referencedColumnName = "id")
+    @ToString.Exclude
     private TaskTypeEntity taskType;
 
     @Column(name = "update_date")
@@ -63,5 +65,21 @@ public class TaskEntity extends OrderedEntity {
     @Override
     public String getColumnToFindOrder() {
         return "columnId";
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        TaskEntity that = (TaskEntity) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

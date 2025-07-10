@@ -1,7 +1,7 @@
 package com.fftmback.authentication.integration;
 
 import com.fftmback.authentication.domain.spec.UserSpec;
-import com.fftmback.authentication.repository.UserViewRepository;
+import com.fftmback.authentication.repository.UserRepository;
 import com.fftmback.authentication.service.AuthenticationService;
 import com.fftmback.authentication.util.DatabaseCleanup;
 import com.fftmback.authentication.util.DtoBuilders;
@@ -20,7 +20,7 @@ public class UserFilterTest extends BasicStaticDataTestClass {
     public static final String USER_DISPLAY_NAME = "test_display_name";
 
     @Autowired
-    UserViewRepository userViewRepository;
+    UserRepository userRepository;
 
     @BeforeAll
     static void beforeAll(
@@ -38,7 +38,7 @@ public class UserFilterTest extends BasicStaticDataTestClass {
     @ParameterizedTest
     @MethodSource("displayNameLikeFilterData")
     void displayNameLikeFilterTest(UserSpec userSpec, int expected) {
-        Assertions.assertEquals(expected, userViewRepository.findAll(userSpec).size());
+        Assertions.assertEquals(expected, userRepository.findAll(userSpec).size());
     }
 
     static Stream<Arguments> displayNameLikeFilterData() {

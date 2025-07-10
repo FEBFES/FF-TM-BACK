@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -20,5 +23,13 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return userClient.getUser(id);
+    }
+
+    @Override
+    public List<UserDto> getUsers(Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return userClient.getUsers(ids);
     }
 }

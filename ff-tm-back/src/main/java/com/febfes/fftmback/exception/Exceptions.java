@@ -1,9 +1,6 @@
 package com.febfes.fftmback.exception;
 
-import com.febfes.fftmback.domain.dao.FileEntity;
-import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.TaskColumnEntity;
-import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.*;
 import lombok.experimental.UtilityClass;
 
 import java.util.function.Supplier;
@@ -29,6 +26,10 @@ public class Exceptions {
 
     public Supplier<EntityNotFoundException> taskNotFound(Long id) {
         return () -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id);
+    }
+
+    public Supplier<EntityNotFoundException> taskCommentNotFound(Long id) {
+        return () -> new EntityNotFoundException(TaskCommentEntity.ENTITY_NAME, id);
     }
 
 }
