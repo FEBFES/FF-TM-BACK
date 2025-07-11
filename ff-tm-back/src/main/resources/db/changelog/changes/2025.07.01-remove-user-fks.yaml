@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: IvanShish
+      comment: "Remove foreign keys to user_entity"
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: task
+            constraintName: fk_task_user
+        - dropForeignKeyConstraint:
+            baseTableName: project
+            constraintName: fk_project_user
+        - dropForeignKeyConstraint:
+            baseTableName: favourite_project
+            constraintName: fk_user_id
+        - dropForeignKeyConstraint:
+            baseTableName: file_entity
+            constraintName: fk_user_id
+        - dropForeignKeyConstraint:
+            baseTableName: user_project
+            constraintName: fk_user_id
+        - dropForeignKeyConstraint:
+            baseTableName: task
+            constraintName: fk_task_assignee_user
+        - dropForeignKeyConstraint:
+            baseTableName: project_user_role
+            constraintName: fk_user_id
+        - dropForeignKeyConstraint:
+            baseTableName: task_comment
+            constraintName: fk_creator_id
+

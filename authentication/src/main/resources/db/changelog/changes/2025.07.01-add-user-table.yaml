@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: IvanShish
+      comment: "Create user table"
+      preConditions:
+        - not:
+            tableExists:
+              tableName: user_entity
+      changes:
+        - createTable:
+            tableName: user_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: username
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: encrypted_password
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(50)
+              - column:
+                  name: last_name
+                  type: varchar(50)
+              - column:
+                  name: display_name
+                  type: varchar(50)
+                  defaultValue: "defaultDisplayName"
+                  constraints:
+                    nullable: false
+        - addDefaultValue:
+            tableName: user_entity
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP
