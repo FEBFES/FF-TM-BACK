@@ -102,8 +102,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
             roleClient.changeUserRoleOnProject(projectId, memberId, roleName);
         } catch (Exception e) {
-            log.error("Failed to call authentication service", e);
-            throw new RuntimeException("Failed to assign role", e);
+            log.error("Failed to call authentication service: {}", e.getMessage());
+            throw new RuntimeException("Failed to assign role");
         }
     }
 

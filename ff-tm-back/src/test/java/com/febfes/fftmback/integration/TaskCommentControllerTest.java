@@ -1,6 +1,6 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.dao.TaskCommentEntity;
+import com.febfes.fftmback.dto.TaskCommentDto;
 import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.TaskCommentService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -45,12 +45,12 @@ class TaskCommentControllerTest extends BasicTestClass {
         Long projectId = createNewProject();
         Long taskId = createNewTask(projectId, userId);
 
-        TaskCommentEntity comment = taskCommentService.saveTaskComment(
-                TaskCommentEntity.builder()
-                    .creatorId(userId)
-                    .taskId(taskId)
-                    .text("Some comment text")
-                    .build()
+        var comment = taskCommentService.saveTaskComment(
+                TaskCommentDto.builder()
+                        .creatorId(userId)
+                        .taskId(taskId)
+                        .text("Some comment text")
+                        .build()
         );
 
         Optional<com.febfes.fftmback.dto.TaskCommentDto> receivedCommentOpt = requestWithBearerToken()
@@ -68,10 +68,10 @@ class TaskCommentControllerTest extends BasicTestClass {
 
         assertThat(receivedCommentOpt).isPresent();
         receivedCommentOpt.ifPresent(receivedComment -> {
-            assertThat(receivedComment.id()).isEqualTo(comment.getTaskId());
-            assertThat(receivedComment.taskId()).isEqualTo(comment.getTaskId());
-            assertThat(receivedComment.creatorId()).isEqualTo(comment.getCreatorId());
-            assertThat(receivedComment.text()).isEqualTo(comment.getText());
+            assertThat(receivedComment.id()).isEqualTo(comment.taskId());
+            assertThat(receivedComment.taskId()).isEqualTo(comment.taskId());
+            assertThat(receivedComment.creatorId()).isEqualTo(comment.creatorId());
+            assertThat(receivedComment.text()).isEqualTo(comment.text());
         });
     }
 }

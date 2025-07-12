@@ -36,7 +36,7 @@ public class ProjectPatchCommonProcessor extends ProjectPatchFieldProcessor {
             ReflectionUtils.setField(field, projectEntity, patchDto.value());
             log.info("Project field \"{}\" updated. New value: {}", patchDto.key(), patchDto.value());
         } catch (NoSuchFieldException e) {
-            log.warn("Can't find field \"{}\" in Project entity", patchDto.key(), e);
+            log.warn("Can't find field \"{}\" in Project entity: {}", patchDto.key(), e.getMessage());
         }
     }
 }

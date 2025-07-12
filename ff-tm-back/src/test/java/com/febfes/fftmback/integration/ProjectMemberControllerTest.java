@@ -25,9 +25,6 @@ class ProjectMemberControllerTest extends BasicTestClass {
     @Autowired
     private TransactionTemplate txTemplate;
 
-    @Autowired
-    private UserMapper userMapper;
-
     @Test
     void successfulAddNewMembersTest() {
         Long secondCreatedUserId = createNewUser();

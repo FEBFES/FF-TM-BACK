@@ -1,5 +1,6 @@
 package com.febfes.fftmback.util;
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
@@ -23,5 +24,9 @@ public class UnitTestBuilders {
                 .entityType(type)
                 .filePath(path)
                 .build();
+    }
+
+    public static User user(Long id) {
+        return new User(id, null, null);
     }
 }

@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.*;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.impl.DefaultColumns;
@@ -30,7 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
-import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
+import static com.febfes.fftmback.util.UnitTestBuilders.user;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
@@ -131,7 +132,7 @@ class ProjectControllerTest extends BasicTestClass {
         Long createdProjectId = createNewProject();
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         Long columnId = dashboardService.getDashboard(createdProjectId, emptyTaskSpec).columns().get(0).id();
-        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, columnId), createdUserId);
+        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, columnId), user(createdUserId));
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
@@ -223,14 +224,15 @@ class ProjectControllerTest extends BasicTestClass {
 
     @Test
     void successfulGetUserProjectsTest() {
+        String token = generateToken();
         Long secondCreatedUserId = createNewUser();
-        UserEntity secondUser = userService.getUserById(secondCreatedUserId);
+//        UserEntity secondUser = userService.getUserById(secondCreatedUserId);
         projectManagementServiceDecorator.createProject(Instancio.create(ProjectEntity.class), secondCreatedUserId);
 
-        String tokenForSecondUser = authenticationService.authenticateUser(
-                UserEntity.builder().username(secondUser.getUsername()).encryptedPassword(PASSWORD).build()
-        ).accessToken();
-        Response response = given().header("Authorization", "Bearer " + tokenForSecondUser)
+//        String tokenForSecondUser = authenticationService.authenticateUser(
+//                UserEntity.builder().username(secondUser.getUsername()).encryptedPassword(PASSWORD).build()
+//        ).accessToken();
+        Response response = given().header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .when()
                 .get(PATH_TO_PROJECTS_API);

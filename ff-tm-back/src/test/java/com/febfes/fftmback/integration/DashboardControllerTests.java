@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static com.febfes.fftmback.util.UnitTestBuilders.user;
+
 
 class DashboardControllerTests extends BasicTestClass {
 
@@ -88,7 +90,7 @@ class DashboardControllerTests extends BasicTestClass {
     private void createTask(Long projectId, Long columnId, String taskName) {
         taskService.createTask(
                 DtoBuilders.createTask(projectId, columnId, taskName),
-                createdUserId
+                user(createdUserId)
         );
     }
 }

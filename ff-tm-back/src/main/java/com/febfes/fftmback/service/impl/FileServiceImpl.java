@@ -75,7 +75,7 @@ public class FileServiceImpl implements FileService {
             try {
                 Files.deleteIfExists(Path.of(fileEntity.getFilePath()));
             } catch (IOException e) {
-                log.warn("Failed to delete file by path {}", fileEntity.getFilePath(), e);
+                log.warn("Failed to delete file by path {}: {}", fileEntity.getFilePath(), e.getMessage());
             }
         });
     }

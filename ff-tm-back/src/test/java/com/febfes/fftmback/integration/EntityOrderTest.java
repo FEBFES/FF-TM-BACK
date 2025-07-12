@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
+import static com.febfes.fftmback.util.UnitTestBuilders.user;
 
 class EntityOrderTest extends BasicTestClass {
 
@@ -38,7 +39,7 @@ class EntityOrderTest extends BasicTestClass {
         createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
 
         for (int i = 0; i < 4; i++) {
-            taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), createdUserId);
+            taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), user(createdUserId));
         }
     }
 

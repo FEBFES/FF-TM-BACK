@@ -117,7 +117,7 @@ class ColumnControllerTest extends BasicTestClass {
         List<ColumnWithTasksDto> columnsAfterDelete = getDashboard().columns();
         Assertions.assertThat(columnsBeforeDelete.size() - 1)
                 .isEqualTo(columnsAfterDelete.size());
-        if (columnsAfterDelete.size() > 0) {
+        if (!columnsAfterDelete.isEmpty()) {
             ColumnWithTasksDto firstColumn = columnsAfterDelete.get(0);
             deleteFoo.accept(firstColumn.id());
             List<ColumnWithTasksDto> columnsAfterSecondDelete = getDashboard().columns();

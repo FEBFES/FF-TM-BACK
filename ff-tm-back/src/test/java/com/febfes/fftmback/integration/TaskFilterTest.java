@@ -12,7 +12,6 @@ import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
-import com.febfes.fftmback.util.DtoBuilders;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
@@ -26,8 +25,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
-
 class TaskFilterTest extends BasicStaticDataTestClass {
 
     private static final String TASK_NAME = "task name";
@@ -37,24 +34,13 @@ class TaskFilterTest extends BasicStaticDataTestClass {
 
     @BeforeAll
     static void beforeAll(
-            @Autowired AuthenticationService authenticationService,
-            @Autowired UserService userService,
             @Autowired @Qualifier("projectManagementService") ProjectManagementService projectManagementService,
             @Autowired TaskService taskService,
             @Autowired ColumnService columnService,
             @Autowired DashboardService dashboardService
     ) {
-        UserEntity user = DtoBuilders.createUser();
-        authenticationService.registerUser(user);
-        Long createdUserId = authenticationService.authenticateUser(
-                UserEntity.builder().username(user.getUsername()).encryptedPassword(PASSWORD).build()
-        ).userId();
-
-        UserEntity user2 = DtoBuilders.createUser();
-        authenticationService.registerUser(user2);
-        Long createdUserId2 = authenticationService.authenticateUser(
-                UserEntity.builder().username(user2.getUsername()).encryptedPassword(PASSWORD).build()
-        ).userId();
+        Long createdUserId = 1L;
+        Long createdUserId2 = 2L;
 
         Long createdProjectId = createProject(projectManagementService, columnService, createdUserId);
         Long createdProjectId2 = createProject(projectManagementService, columnService, createdUserId2);

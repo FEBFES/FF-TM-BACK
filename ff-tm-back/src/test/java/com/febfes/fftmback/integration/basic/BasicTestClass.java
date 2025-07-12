@@ -5,6 +5,8 @@ import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.abstracts.BaseEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.feign.RoleClient;
+import com.febfes.fftmback.feign.UserClient;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
@@ -23,7 +25,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -72,6 +76,15 @@ public class BasicTestClass {
     @Value("${custom-headers.user-role}")
     private String userRoleHeader;
 
+    @MockBean
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    @MockBean
+    private UserClient userClient;
+
+    @MockBean
+    private RoleClient roleClient;
+
     protected String token;
     protected String username = "username";
     protected Long createdUserId = 0L;
@@ -87,7 +100,7 @@ public class BasicTestClass {
         RestAssured.baseURI = "http://localhost:" + port;
 
         createdUserId = 1L;
-        token = jwtTestUtil.generateToken(createdUserId, username);
+        token = generateToken();
     }
 
     @AfterEach
@@ -123,6 +136,10 @@ public class BasicTestClass {
                 TaskEntity.builder().projectId(projectId).columnId(columnId).name("SomeTask").build(),
                 new User(userId, null, null)
         );
+    }
+
+    protected String generateToken() {
+        return jwtTestUtil.generateToken(createdUserId, username);
     }
 }
 
