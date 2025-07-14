@@ -22,10 +22,6 @@ databaseChangeLog:
               - column:
                   name: user_id_to
                   type: bigint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_notification_user
-                    references: user_entity(id)
               - column:
                   name: message
                   type: text

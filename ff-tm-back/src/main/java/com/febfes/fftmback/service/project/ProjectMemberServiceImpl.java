@@ -89,22 +89,17 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Transactional
     @CacheEvict(value = "projects", allEntries = true)
     public void addUserToProjectAndChangeRole(Long projectId, Long memberId, RoleName roleName) {
-        try {
-            UserProject userProject = UserProject.builder()
-                    .id(UserProjectId.builder()
-                            .userId(memberId)
-                            .projectId(projectId)
-                            .build()
-                    )
-                    .build();
+        UserProject userProject = UserProject.builder()
+                .id(UserProjectId.builder()
+                        .userId(memberId)
+                        .projectId(projectId)
+                        .build()
+                )
+                .build();
 
-            userProjectRepository.save(userProject);
+        userProjectRepository.save(userProject);
 
-            roleClient.changeUserRoleOnProject(projectId, memberId, roleName);
-        } catch (Exception e) {
-            log.error("Failed to call authentication service: {}", e.getMessage());
-            throw new RuntimeException("Failed to assign role");
-        }
+        roleClient.changeUserRoleOnProject(projectId, memberId, roleName);
     }
 
     @Override
