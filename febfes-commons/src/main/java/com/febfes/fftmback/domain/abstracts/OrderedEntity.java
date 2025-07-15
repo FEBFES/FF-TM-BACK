@@ -35,8 +35,8 @@ public abstract class OrderedEntity extends BaseEntity {
             field.setAccessible(true);
             return field.get(this);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            log.error("Can't get value for order column {}", getColumnToFindOrder(), e);
-            throw new RuntimeException(e);
+            log.error("Can't get value for order column {}: {}", getColumnToFindOrder(), e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

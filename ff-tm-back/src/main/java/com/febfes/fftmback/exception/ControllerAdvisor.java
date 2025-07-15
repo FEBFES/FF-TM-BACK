@@ -40,7 +40,7 @@ public class ControllerAdvisor {
                 .map(err -> createBaseError(err.getObjectName(), err.getField(),
                         isNull(err.getRejectedValue()) ? null : err.getRejectedValue().toString(), errorType))
                 .orElse(Collections.emptyMap());
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()));
         return new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), StatusError.ARGUMENT_NOT_VALID,
                 errorType, getCurrentLocalDateTime(), ex.getMessage(), errorMap);
     }
@@ -51,7 +51,7 @@ public class ControllerAdvisor {
     public ErrorDto handleExpiredJwtException(
             RuntimeException ex
     ) {
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()));
         return createExceptionResponseBody(HttpStatus.UNAUTHORIZED, ex);
     }
 
@@ -61,7 +61,7 @@ public class ControllerAdvisor {
     public ErrorDto handleRoleCheckException(
             RuntimeException ex
     ) {
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()));
         return createExceptionResponseBody(HttpStatus.FORBIDDEN, ex);
     }
 
@@ -72,7 +72,7 @@ public class ControllerAdvisor {
             BadCredentialsException ex
     ) {
         ErrorType errorType = ErrorType.AUTH;
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()));
         return new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), StatusError.BAD_CREDENTIALS,
                 errorType, getCurrentLocalDateTime(), ex.getMessage(),
                 createBaseError("User", "password", null, errorType));
@@ -84,7 +84,7 @@ public class ControllerAdvisor {
     public ErrorDto handleProjectColumnException(
             ProjectColumnException ex
     ) {
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()));
         return createExceptionResponseBody(HttpStatus.CONFLICT, ex);
     }
 
@@ -94,7 +94,7 @@ public class ControllerAdvisor {
     public ErrorDto handleGlobalException(
             Exception ex
     ) {
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()), ex);
+        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()));
         return createExceptionResponseBody(HttpStatus.INTERNAL_SERVER_ERROR, ex);
     }
 

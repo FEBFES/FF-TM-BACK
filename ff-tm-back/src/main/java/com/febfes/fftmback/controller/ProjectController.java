@@ -35,7 +35,6 @@ public class ProjectController {
     private final TaskTypeService taskTypeService;
     private final ProjectMapper projectMapper;
 
-
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
     public List<ProjectDto> getProjectsForUser(
