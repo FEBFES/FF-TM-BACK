@@ -19,7 +19,6 @@ class NotificationControllerTest extends BasicTestClass {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    // TODO: fix tests
     @Test
     void getNotificationsForUser() {
         NotificationEntity first = NotificationEntity.builder()

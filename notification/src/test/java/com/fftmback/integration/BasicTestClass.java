@@ -1,6 +1,8 @@
 package com.fftmback.integration;
 
 import com.febfes.fftmback.domain.RoleName;
+import com.fftmback.config.KafkaTestMockConfig;
+import com.fftmback.config.WebSecurityTestConfig;
 import com.fftmback.util.DatabaseCleanup;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,6 +18,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.kafka.annotation.KafkaBootstrapConfiguration;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +39,7 @@ import static io.restassured.RestAssured.given;
 @Testcontainers
 @ActiveProfiles("test")
 @ImportAutoConfiguration(exclude = {KafkaAutoConfiguration.class, KafkaBootstrapConfiguration.class})
+@Import({WebSecurityTestConfig.class, KafkaTestMockConfig.class})
 public abstract class BasicTestClass {
 
     @Container

@@ -24,7 +24,7 @@ public class DatabaseCleanup implements InitializingBean {
         entityManager.flush();
 
         for (final String tableName : tableNames) {
-            entityManager.createNativeQuery("TRUNCATE TABLE " + tableName + " RESTART IDENTITY CASCADE")
+            entityManager.createNativeQuery("TRUNCATE TABLE notify." + tableName + " RESTART IDENTITY CASCADE")
                     .executeUpdate();
         }
     }
