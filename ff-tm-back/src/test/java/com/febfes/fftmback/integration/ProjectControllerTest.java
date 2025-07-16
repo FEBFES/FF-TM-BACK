@@ -1,5 +1,6 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.config.WebSecurityTestConfig;
 import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.common.PatchOperation;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
@@ -24,6 +25,7 @@ import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Import;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @Slf4j
+@Import(WebSecurityTestConfig.class)
 class ProjectControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_PROJECTS_API = "/api/v1/projects";
@@ -92,6 +95,7 @@ class ProjectControllerTest extends BasicTestClass {
     }
 
     @Test
+//    @WithMockUser(authorities = {"MEMBER_PLUS"})
     void successfulEditOfProjectTest() {
         Long createdProjectId = createNewProject();
         ProjectDto editProjectDto = Instancio.create(ProjectDto.class);

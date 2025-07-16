@@ -24,6 +24,10 @@ public class Exceptions {
         return () -> new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id);
     }
 
+    public EntityNotFoundException exceptionProjectNotFound(Long id) {
+        return new EntityNotFoundException(ProjectEntity.ENTITY_NAME, id);
+    }
+
     public Supplier<EntityNotFoundException> taskNotFound(Long id) {
         return () -> new EntityNotFoundException(TaskEntity.ENTITY_NAME, id);
     }

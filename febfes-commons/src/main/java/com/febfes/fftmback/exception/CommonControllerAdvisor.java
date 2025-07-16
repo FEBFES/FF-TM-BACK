@@ -6,6 +6,7 @@ import com.febfes.fftmback.dto.StatusError;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 @RequiredArgsConstructor
 @Slf4j
+@Order(2)
 public class CommonControllerAdvisor {
 
     private static final String LOG_MSG = "Handled %s.";

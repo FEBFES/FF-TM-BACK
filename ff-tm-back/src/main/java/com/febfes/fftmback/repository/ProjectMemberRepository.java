@@ -10,8 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ProjectMemberRepository extends JpaRepository<ProjectEntity, Long> {
-
-    // TODO: create migration and drop v_user in there
     @Query(value = """
             select up.user_id as id,
                    r.name      as "roleOnProject"

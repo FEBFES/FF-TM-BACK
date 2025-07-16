@@ -7,6 +7,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +26,7 @@ import static java.util.Objects.isNull;
 @RestControllerAdvice
 @RequiredArgsConstructor
 @Slf4j
+@Order(1) // order 2 in febfes-commons
 public class ControllerAdvisor {
 
     private static final String LOG_MSG = "Handled %s.";
@@ -86,16 +88,6 @@ public class ControllerAdvisor {
     ) {
         log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()));
         return createExceptionResponseBody(HttpStatus.CONFLICT, ex);
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @Hidden
-    public ErrorDto handleGlobalException(
-            Exception ex
-    ) {
-        log.error(LOG_MSG.formatted(ex.getClass().getSimpleName()));
-        return createExceptionResponseBody(HttpStatus.INTERNAL_SERVER_ERROR, ex);
     }
 
     private ErrorDto createExceptionResponseBody(
