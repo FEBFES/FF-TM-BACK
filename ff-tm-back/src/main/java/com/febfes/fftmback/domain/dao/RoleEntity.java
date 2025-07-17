@@ -1,4 +1,4 @@
-package com.fftmback.authentication.domain;
+package com.febfes.fftmback.domain.dao;
 
 import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.abstracts.BaseEntity;
