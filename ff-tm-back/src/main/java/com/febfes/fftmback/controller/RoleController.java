@@ -1,10 +1,11 @@
-package com.fftmback.authentication.controller;
+package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiGet;
+import com.febfes.fftmback.annotation.ApiGetOne;
 import com.febfes.fftmback.annotation.ProtectedApi;
 import com.febfes.fftmback.domain.RoleName;
-import com.fftmback.authentication.domain.RoleEntity;
-import com.fftmback.authentication.service.RoleService;
+import com.febfes.fftmback.domain.dao.RoleEntity;
+import com.febfes.fftmback.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,12 @@ public class RoleController {
     @ApiGet
     public List<RoleEntity> getRoles() {
         return roleService.getRoles();
+    }
+
+    @Operation(summary = "Get user role name on project")
+    @ApiGetOne(path = "/projects/{projectId}/users/{userId}/")
+    public RoleName getUserRoleNameOnProject(@PathVariable Long projectId, @PathVariable Long userId) {
+        return roleService.getUserRoleOnProject(projectId, userId).getName();
     }
 
     @Operation(summary = "Change user role on a project")

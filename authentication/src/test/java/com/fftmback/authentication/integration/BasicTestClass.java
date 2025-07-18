@@ -3,6 +3,7 @@ package com.fftmback.authentication.integration;
 
 import com.febfes.fftmback.domain.RoleName;
 import com.fftmback.authentication.domain.UserEntity;
+import com.fftmback.authentication.feign.RoleClient;
 import com.fftmback.authentication.service.AuthenticationService;
 import com.fftmback.authentication.service.UserService;
 import com.fftmback.authentication.util.DatabaseCleanup;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -47,6 +49,9 @@ public class BasicTestClass {
 
     @Container
     static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14-alpine");
+
+    @MockBean
+    private RoleClient roleClient;
 
     @Value("${custom-headers.user-role}")
     private String userRoleHeader;

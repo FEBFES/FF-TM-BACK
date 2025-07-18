@@ -11,6 +11,7 @@ import com.fftmback.authentication.domain.UserEntity;
 import com.fftmback.authentication.dto.ConnValidationResponse;
 import com.fftmback.authentication.dto.GetAuthDto;
 import com.fftmback.authentication.exception.TokenExpiredException;
+import com.fftmback.authentication.feign.RoleClient;
 import com.fftmback.authentication.repository.UserRepository;
 import com.fftmback.authentication.service.AuthenticationService;
 import com.fftmback.authentication.service.RefreshTokenService;
@@ -42,6 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
+    private final RoleClient roleClient;
 
     private final RandomStringGenerator generator = new RandomStringGenerator.Builder()
             .selectFrom('0', '9')
@@ -146,7 +148,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             String projectIdStr = matcher.group(1);
             try {
                 Long projectId = Long.parseLong(projectIdStr);
-                return userDetails.getProjectRoles().get(projectId).getName().name();
+                return roleClient.getUserRoleNameOnProject(projectId, userDetails.getId()).name();
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Invalid project ID format in init URI", e);
             }

@@ -13,14 +13,12 @@ import java.util.List;
 @Mapper(componentModel = "spring", imports = com.febfes.fftmback.util.FileUrnUtils.class)
 public interface UserMapper {
 
-    @Mapping(target = "projectRoles", ignore = true)
     @Mapping(target = "lastName", ignore = true)
     @Mapping(target = "firstName", ignore = true)
     @Mapping(target = "displayName", ignore = true)
     @Mapping(target = "encryptedPassword", source = "password")
     UserEntity userDetailsDtoToUser(UserDetailsDto userDetailsDto);
 
-    @Mapping(target = "projectRoles", ignore = true)
     @Mapping(target = "lastName", ignore = true)
     @Mapping(target = "firstName", ignore = true)
     @Mapping(target = "email", ignore = true)
@@ -29,7 +27,6 @@ public interface UserMapper {
     UserEntity authenticationDtoToUser(AuthenticationDto authenticationDto);
 
     @Mapping(target = "username", ignore = true)
-    @Mapping(target = "projectRoles", ignore = true)
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "encryptedPassword", source = "password")
     UserEntity editUserDtoToUser(EditUserDto editUserDto);

@@ -5,7 +5,6 @@ import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.abstracts.BaseEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.feign.RoleClient;
 import com.febfes.fftmback.feign.UserClient;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
@@ -81,9 +80,6 @@ public class BasicTestClass {
 
     @MockBean
     private UserClient userClient;
-
-    @MockBean
-    private RoleClient roleClient;
 
     protected String token;
     protected String username = "username";

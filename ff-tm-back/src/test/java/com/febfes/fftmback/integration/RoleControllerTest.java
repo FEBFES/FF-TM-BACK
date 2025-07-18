@@ -1,4 +1,4 @@
-package com.fftmback.authentication.integration;
+package com.febfes.fftmback.integration;
 
 import com.febfes.fftmback.domain.RoleName;
 import com.fftmback.authentication.domain.RoleEntity;

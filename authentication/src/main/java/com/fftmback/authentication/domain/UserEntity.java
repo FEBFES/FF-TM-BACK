@@ -1,8 +1,9 @@
 package com.fftmback.authentication.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.febfes.fftmback.domain.abstracts.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.proxy.HibernateProxy;
@@ -10,7 +11,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_entity")
@@ -44,15 +47,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
 
     @Column(name = "display_name")
     private String displayName;
-
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "project_user_role",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    @MapKeyColumn(name = "project_id")
-    @Builder.Default
-    @JsonIgnore
-    private Map<Long, RoleEntity> projectRoles = new HashMap<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

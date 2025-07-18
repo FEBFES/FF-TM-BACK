@@ -6,8 +6,6 @@ import org.instancio.Instancio;
 import org.instancio.InstancioApi;
 import org.springframework.context.annotation.Profile;
 
-import java.util.Collections;
-
 import static org.instancio.Select.field;
 
 @UtilityClass
@@ -30,7 +28,6 @@ public class DtoBuilders {
     private static InstancioApi<UserEntity> commonUser() {
         return Instancio.of(UserEntity.class)
                 .generate(field(UserEntity::getEmail), gen -> gen.text().pattern(EMAIL_PATTERN))
-                .set(field(UserEntity::getProjectRoles), Collections.emptyMap())
                 .set(field(UserEntity::getEncryptedPassword), PASSWORD);
     }
 }

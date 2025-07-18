@@ -1,10 +1,8 @@
 package com.fftmback.authentication.exception;
 
-import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.dto.ErrorType;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.fftmback.authentication.domain.RefreshTokenEntity;
-import com.fftmback.authentication.domain.RoleEntity;
 import com.fftmback.authentication.domain.UserEntity;
 import lombok.experimental.UtilityClass;
 
@@ -27,14 +25,6 @@ public class Exceptions {
 
     public Supplier<EntityNotFoundException> refreshTokenNotFoundByUserId(Long userId) {
         return () -> new EntityNotFoundException(RefreshTokenEntity.ENTITY_NAME, "userId", userId.toString());
-    }
-
-    public Supplier<EntityNotFoundException> roleNotFound(RoleName roleName) {
-        return () -> new EntityNotFoundException(RoleEntity.ENTITY_NAME, "name", roleName.name());
-    }
-
-    public Supplier<EntityNotFoundException> roleNotFoundByProjectId(Long projectId) {
-        return () -> new EntityNotFoundException(RoleEntity.ENTITY_NAME, "projectId", projectId.toString());
     }
 
 }
