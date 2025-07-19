@@ -28,11 +28,12 @@ public class TaskCommentServiceImpl implements TaskCommentService {
     private final UserService userService;
 
     @Override
-    public TaskCommentDto saveTaskComment(TaskCommentDto taskComment) {
-        taskCommentRepository.save(taskCommentMapper.taskCommentToTaskCommentEntity(taskComment));
+    public TaskCommentDto saveTaskComment(TaskCommentDto taskCommentDto) {
+        var taskComment = taskCommentMapper.taskCommentToTaskCommentEntity(taskCommentDto);
+        taskCommentRepository.save(taskComment);
         log.info("Saved task comment: {}", taskComment);
-        var taskCommentEntity = taskCommentRepository.findById(taskComment.id())
-                .orElseThrow(Exceptions.taskCommentNotFound(taskComment.id()));
+        var taskCommentEntity = taskCommentRepository.findById(taskComment.getId())
+                .orElseThrow(Exceptions.taskCommentNotFound(taskComment.getId()));
         var user = userService.getUser(taskCommentEntity.getCreatorId());
         return taskCommentMapper.mapToDto(taskCommentEntity, user);
     }

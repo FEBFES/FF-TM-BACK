@@ -45,7 +45,7 @@ public class ProjectMemberController {
     @ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
     @ApiResponse(responseCode = "409", description = "Only owner can remove a member", content = @Content)
     @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).OWNER.name())")
-    public MemberDto removeMember(@PathVariable Long id, @PathVariable Long memberId) {
-        return projectMemberService.removeMember(id, memberId);
+    public void removeMember(@PathVariable Long id, @PathVariable Long memberId) {
+        projectMemberService.removeMember(id, memberId);
     }
 }

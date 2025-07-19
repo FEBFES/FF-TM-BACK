@@ -17,7 +17,7 @@ public interface ProjectMemberService {
 
     void addNewMembers(Long projectId, List<Long> memberIds);
 
-    MemberDto removeMember(Long projectId, Long memberId);
+    void removeMember(Long projectId, Long memberId);
 
     void addUserToProjectAndChangeRole(Long projectId, Long memberId, RoleName roleName);
 

@@ -1,5 +1,6 @@
 package com.febfes.fftmback.exception;
 
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.*;
 import lombok.experimental.UtilityClass;
 
@@ -34,6 +35,14 @@ public class Exceptions {
 
     public Supplier<EntityNotFoundException> taskCommentNotFound(Long id) {
         return () -> new EntityNotFoundException(TaskCommentEntity.ENTITY_NAME, id);
+    }
+
+    public Supplier<EntityNotFoundException> roleNotFound(RoleName roleName) {
+        return () -> new EntityNotFoundException(RoleEntity.ENTITY_NAME, "name", roleName.name());
+    }
+
+    public Supplier<EntityNotFoundException> roleNotFoundByProjectId(Long projectId) {
+        return () -> new EntityNotFoundException(RoleEntity.ENTITY_NAME, "projectId", projectId.toString());
     }
 
 }

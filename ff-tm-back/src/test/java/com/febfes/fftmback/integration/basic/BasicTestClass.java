@@ -1,14 +1,16 @@
 package com.febfes.fftmback.integration.basic;
 
 
+import com.febfes.fftmback.config.WebSecurityTestConfig;
 import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.abstracts.BaseEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.feign.UserClient;
+import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import com.febfes.fftmback.util.DatabaseCleanup;
@@ -26,6 +28,7 @@ import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -35,6 +38,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static io.restassured.RestAssured.given;
+import static org.mockito.Mockito.when;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,6 +46,7 @@ import static io.restassured.RestAssured.given;
 @ActiveProfiles("test")
 @Slf4j
 @ImportAutoConfiguration(exclude = {KafkaAutoConfiguration.class})
+@Import(WebSecurityTestConfig.class)
 public class BasicTestClass {
 
     @Autowired
@@ -79,11 +84,12 @@ public class BasicTestClass {
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     @MockBean
-    private UserClient userClient;
+    protected UserService userService;
 
     protected String token;
     protected String username = "username";
-    protected Long createdUserId = 0L;
+    protected Long createdUserId = 1L;
+    private Long userIdCounter = 1L;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -96,7 +102,9 @@ public class BasicTestClass {
         RestAssured.baseURI = "http://localhost:" + port;
 
         createdUserId = 1L;
-        token = generateToken();
+        UserDto newUser = new UserDto(createdUserId, "new@test.com", "new-user", null, null, null, null);
+        when(userService.getUser(createdUserId)).thenReturn(newUser);
+        token = generateToken(createdUserId, username);
     }
 
     @AfterEach
@@ -110,7 +118,7 @@ public class BasicTestClass {
     }
 
     protected Long createNewUser() {
-        return ++createdUserId;
+        return ++userIdCounter;
     }
 
     protected Long createNewProject() {
@@ -134,8 +142,8 @@ public class BasicTestClass {
         );
     }
 
-    protected String generateToken() {
-        return jwtTestUtil.generateToken(createdUserId, username);
+    protected String generateToken(Long userId, String username) {
+        return jwtTestUtil.generateToken(userId, username);
     }
 }
 

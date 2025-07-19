@@ -9,7 +9,7 @@ public interface RoleService {
 
     List<RoleEntity> getRoles();
 
-    void changeUserRoleOnProject(Long projectId, Long userId, RoleName roleName);
+    RoleEntity getUserRoleOnProject(Long projectId, Long userId);
 
-    void changeUserRoleOnProject(Long projectId, UserEntity user, RoleName roleName);
+    void changeUserRoleOnProject(Long projectId, Long userId, RoleName roleName);
 }

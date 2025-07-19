@@ -34,6 +34,7 @@ import java.util.Map;
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
+import static org.mockito.Mockito.when;
 
 class TaskControllerTest extends BasicTestClass {
 
@@ -130,11 +131,13 @@ class TaskControllerTest extends BasicTestClass {
     void successfulEditTaskTest() {
         TaskView task = createNewTask();
         Long newUserId = createNewUser();
-//        UserEntity newUser = userService.getUserById(newUserId);
         EditTaskDto editTaskDto = Instancio.of(EditTaskDto.class)
                 .set(field(EditTaskDto::assigneeId), newUserId)
                 .set(field(EditTaskDto::deadlineDate), LocalDateTime.now().plusDays(1L))
                 .create();
+
+        UserDto newUser = new UserDto(newUserId, "new@test.com", "new-user", null, null, null, null);
+        when(userService.getUser(newUserId)).thenReturn(newUser);
 
         TaskShortDto taskShortDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -150,8 +153,8 @@ class TaskControllerTest extends BasicTestClass {
         Assertions.assertEquals(editTaskDto.name(), taskShortDto.name());
         Assertions.assertEquals(editTaskDto.description(), taskShortDto.description());
         Assertions.assertEquals(editTaskDto.assigneeId(), taskShortDto.assignee().id());
-//        Assertions.assertEquals(newUser.getEmail(), taskShortDto.assignee().email());
-//        Assertions.assertEquals(newUser.getUsername(), taskShortDto.assignee().username());
+        Assertions.assertEquals(newUser.email(), taskShortDto.assignee().email());
+        Assertions.assertEquals(newUser.username(), taskShortDto.assignee().username());
         Assertions.assertEquals(editTaskDto.priority(), taskShortDto.priority());
         Assertions.assertEquals(editTaskDto.type(), taskShortDto.type());
         Assertions.assertNotNull(taskShortDto.createDate());

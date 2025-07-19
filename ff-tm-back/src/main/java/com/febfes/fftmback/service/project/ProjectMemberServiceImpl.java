@@ -11,12 +11,12 @@ import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.ProjectForUserDto;
 import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.exception.Exceptions;
-import com.febfes.fftmback.feign.RoleClient;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.mapper.ProjectMemberMapper;
 import com.febfes.fftmback.repository.ProjectMemberRepository;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.UserProjectRepository;
+import com.febfes.fftmback.service.RoleService;
 import com.febfes.fftmback.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private final ProjectMapper projectMapper;
     private final ProjectMemberMapper projectMemberMapper;
 
-    private final RoleClient roleClient;
+    private final RoleService roleService;
     private final UserService userService;
 
     @Override
@@ -79,10 +79,10 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     @Override
     @CacheEvict(value = "projects", allEntries = true)
-    public MemberDto removeMember(Long projectId, Long memberId) {
+    @Transactional
+    public void removeMember(Long projectId, Long memberId) {
         userProjectRepository.deleteByIdProjectIdAndIdUserId(projectId, memberId);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
-        return getProjectMemberWithRole(projectId, memberId);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
         userProjectRepository.save(userProject);
 
-        roleClient.changeUserRoleOnProject(projectId, memberId, roleName);
+        roleService.changeUserRoleOnProject(projectId, memberId, roleName);
     }
 
     @Override

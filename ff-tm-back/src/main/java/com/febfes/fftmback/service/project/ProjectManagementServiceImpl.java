@@ -87,7 +87,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
             projectRepository.deleteById(id);
             log.info("Project with id={} was deleted", id);
         } else {
-            Exceptions.projectNotFound(id);
+            throw Exceptions.exceptionProjectNotFound(id);
         }
     }
 }
