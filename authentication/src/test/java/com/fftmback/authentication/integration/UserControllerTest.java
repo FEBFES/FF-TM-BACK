@@ -25,18 +25,8 @@ class UserControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_USERS_API = "/api/v1/users";
 
-//    @TempDir
-//    static File tempDir;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-//    @DynamicPropertySource
-//    static void registerPgProperties(DynamicPropertyRegistry registry) {
-//        registry.add("user-pic.folder",
-//                () -> String.format("%s\\", tempDir.getPath())
-//        );
-//    }
 
     @Test
     void successfulGetUserTest() {
@@ -78,26 +68,6 @@ class UserControllerTest extends BasicTestClass {
         );
     }
 
-//    @Test
-//    // TODO: do something with this class
-//    void successfulLoadUserPicTest() {
-//        UserPicDto userPicDto = loadUserPic();
-//        Assertions.assertEquals("/files/user-pic/%d".formatted(createdUserId), userPicDto.fileUrn());
-//        Assertions.assertEquals(createdUserId, userPicDto.userId());
-//    }
-
-//    @Test
-//        // TODO: do something with this class
-//    void successfulGetUserPicTest() throws IOException {
-//        MultipartFile file = new MockMultipartFile("image.jpg", "image", "jpg", new byte[]{1});
-//        fileService.saveFile(createdUserId, createdUserId, EntityType.USER_PIC, file);
-//        requestWithBearerToken()
-//                .when()
-//                .get("/api/v1/files/user-pic/{userId}", createdUserId)
-//                .then()
-//                .statusCode(HttpStatus.SC_OK);
-//    }
-
     @Test
     void successfulGetUsersWithFilterTest() {
         UserEntity user = userService.getUserById(createdUserId);
@@ -114,50 +84,5 @@ class UserControllerTest extends BasicTestClass {
                 });
         Assertions.assertEquals(1, users.size());
     }
-
-//    @Test
-//        // TODO: do something with this class
-//    void successfulGetUserPicFromUserInfoTest() {
-//        loadUserPic();
-//        UserDto userDto = requestWithBearerToken()
-//                .when()
-//                .get("%s/{id}".formatted(PATH_TO_USERS_API), createdUserId)
-//                .then()
-//                .statusCode(HttpStatus.SC_OK)
-//                .extract()
-//                .response()
-//                .as(UserDto.class);
-//        Assertions.assertNotNull(userDto.userPic());
-//        Assertions.assertEquals(String.format(FileUtils.USER_PIC_URN, createdUserId), userDto.userPic());
-//    }
-
-//    @Test
-//        // TODO: do something with this class
-//    void successfulDeleteUserPicTest() {
-//        loadUserPic();
-//        requestWithBearerToken()
-//                .when()
-//                .delete("/api/v1/files/user-pic/{userId}", createdUserId)
-//                .then()
-//                .statusCode(HttpStatus.SC_OK);
-//        String userPicUrn = String.format(FileUtils.USER_PIC_URN, createdUserId);
-//        Assertions.assertThrows(
-//                EntityNotFoundException.class,
-//                () -> fileService.getFile(userPicUrn)
-//        );
-//    }
-
-//    private UserPicDto loadUserPic() {
-//        File imageFile = new File("src/test/resources/image.jpg");
-//        return requestWithBearerToken()
-//                .multiPart("image", imageFile, "multipart/form-data")
-//                .when()
-//                .post("/api/v1/files/user-pic/{userId}", createdUserId)
-//                .then()
-//                .statusCode(HttpStatus.SC_OK)
-//                .extract()
-//                .response()
-//                .as(UserPicDto.class);
-//    }
 
 }

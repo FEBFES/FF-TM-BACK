@@ -1,8 +1,6 @@
 package com.febfes.fftmback.service.project;
 
 import com.febfes.fftmback.domain.RoleName;
-import com.febfes.fftmback.domain.common.UserProjectId;
-import com.febfes.fftmback.domain.dao.UserProject;
 import com.febfes.fftmback.domain.projection.MemberIdRoleProjection;
 import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
 import com.febfes.fftmback.domain.projection.ProjectProjection;
@@ -16,15 +14,14 @@ import com.febfes.fftmback.mapper.ProjectMemberMapper;
 import com.febfes.fftmback.repository.ProjectMemberRepository;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.UserProjectRepository;
-import com.febfes.fftmback.service.RoleService;
 import com.febfes.fftmback.service.UserService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -46,8 +43,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private final ProjectMapper projectMapper;
     private final ProjectMemberMapper projectMemberMapper;
 
-    private final RoleService roleService;
     private final UserService userService;
+    private final ProjectMemberTransactionalService projectMemberTransactionalService;
 
     @Override
     @Cacheable(value = "projects", key = "'projectsForUser:' + #userId + ':' + #sort.hashCode()")
@@ -72,8 +69,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     @CacheEvict(value = "projects", allEntries = true)
     public void addNewMembers(Long projectId, List<Long> memberIds) {
-        // TODO: @Transactional self-invocation
-        memberIds.forEach(memberId -> addUserToProjectAndChangeRole(projectId, memberId, RoleName.MEMBER));
+        memberIds.forEach(memberId ->
+                projectMemberTransactionalService.addUserToProjectAndChangeRole(projectId, memberId, RoleName.MEMBER)
+        );
         log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
     }
 
@@ -86,20 +84,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    @Transactional
     @CacheEvict(value = "projects", allEntries = true)
     public void addUserToProjectAndChangeRole(Long projectId, Long memberId, RoleName roleName) {
-        UserProject userProject = UserProject.builder()
-                .id(UserProjectId.builder()
-                        .userId(memberId)
-                        .projectId(projectId)
-                        .build()
-                )
-                .build();
-
-        userProjectRepository.save(userProject);
-
-        roleService.changeUserRoleOnProject(projectId, memberId, roleName);
+        projectMemberTransactionalService.addUserToProjectAndChangeRole(projectId, memberId, roleName);
     }
 
     @Override

@@ -25,9 +25,6 @@ class AuthenticationControllerTest extends BasicTestClass {
             .withExposedPorts(6379)
             .waitingFor(Wait.forListeningPort());
 
-//    @Container
-//    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14-alpine");
-
     static {
         redisContainer.start();
     }
@@ -37,25 +34,7 @@ class AuthenticationControllerTest extends BasicTestClass {
         registry.add("spring.data.redis.host", redisContainer::getHost);
         registry.add("spring.data.redis.port", () -> redisContainer.getFirstMappedPort());
         registry.add("spring.cache.type", () -> "redis");
-//        registry.add("spring.datasource.username", postgres::getUsername);
-//        registry.add("spring.datasource.password", postgres::getPassword);
     }
-
-//    @Autowired
-//    private DatabaseCleanup databaseCleanup;
-//
-//    @LocalServerPort
-//    private Integer port;
-//
-//    @BeforeEach
-//    void setupBaseUri() {
-//        RestAssured.baseURI = "http://localhost:" + port;
-//    }
-//
-//    @AfterEach
-//    void cleanup() {
-//        databaseCleanup.execute();
-//    }
 
     public static final String PATH_TO_AUTH_API = "/api/v1/auth";
     public static final String EMAIL_PATTERN = "#a#a#a#a#a#a@example.com";

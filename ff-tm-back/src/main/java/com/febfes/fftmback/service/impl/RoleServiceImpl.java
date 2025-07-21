@@ -3,6 +3,7 @@ package com.febfes.fftmback.service.impl;
 import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.exception.Exceptions;
+import com.febfes.fftmback.exception.UserRoleChangeException;
 import com.febfes.fftmback.repository.RoleRepository;
 import com.febfes.fftmback.service.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +40,7 @@ public class RoleServiceImpl implements RoleService {
                 .orElseThrow(Exceptions.roleNotFound(roleName));
         int res = roleRepository.changeUserRoleOnProject(projectId, userId, ownerRole.getName().name());
         if (res == 0) {
-            // TODO: custom exception???
-            throw new RuntimeException("Role change failed");
+            throw new UserRoleChangeException(projectId, userId, roleName);
         }
         log.info("The user's role on the project has been changed. User id: {}, Project id: {}, Role name: {}",
                 userId, projectId, roleName.name());

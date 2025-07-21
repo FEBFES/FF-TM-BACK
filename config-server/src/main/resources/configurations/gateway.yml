@@ -19,7 +19,7 @@ spring:
             - Path=/api/v1/notifications/**
           filters:
             - TokenValidationFilter
-#TODO: объединить в один id?
+
         - id: authentication
           uri: ${config.path}:8092
           predicates:

@@ -1,21 +1,30 @@
 package com.febfes.fftmback.service.impl;
 
 import com.febfes.fftmback.config.jwt.User;
+import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
+import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.domain.dao.TaskView;
+import com.febfes.fftmback.dto.TaskDto;
+import com.febfes.fftmback.dto.TaskShortDto;
+import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.exception.ProjectColumnException;
+import com.febfes.fftmback.mapper.TaskMapper;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.TaskRepository;
 import com.febfes.fftmback.repository.TaskViewRepository;
+import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.TaskTypeService;
+import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.order.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,6 +32,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.febfes.fftmback.domain.common.specification.TaskSpec.byColumnId;
 import static com.febfes.fftmback.domain.common.specification.TaskSpec.columnIdIn;
@@ -38,42 +50,61 @@ public class TaskServiceImpl implements TaskService {
 
     private static final String RECEIVED_TASKS_SIZE_LOG = "Received {} tasks";
 
+    private final TaskMapper taskMapper;
+
     private final TaskRepository taskRepository;
     private final TaskViewRepository taskViewRepository;
-    private final TaskTypeService taskTypeService;
     private final ProjectRepository projectRepository;
+
+    private final TaskTypeService taskTypeService;
     private final OrderService<TaskEntity> orderService;
+    private final UserService userService;
+    private final FileService fileService;
 
     @Override
-    public List<TaskView> getTasks(
-            int page,
-            int limit,
-            Long columnId,
-            TaskSpec taskSpec
-    ) {
+    public List<TaskShortDto> getTasks(int page, int limit, Long columnId, TaskSpec taskSpec) {
         Pageable pageableRequest = PageRequest.of(page, limit, Sort.by(ORDER_FIELD_NAME));
         List<TaskView> tasks = taskViewRepository.findAll(taskSpec.and(byColumnId(columnId)), pageableRequest)
                 .getContent();
-        log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
-        return tasks;
+        var userIds = tasks.stream()
+                .flatMap(t -> Stream.of(t.getOwnerId(), t.getAssigneeId()))
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toSet());
+        var users = userService.getUsers(userIds).stream()
+                .collect(Collectors.toMap(UserDto::id, Function.identity()));
+        log.debug(RECEIVED_TASKS_SIZE_LOG, tasks.size());
+        return tasks.stream()
+                .map(t -> taskMapper.taskViewToTaskShortDto(
+                        t,
+                        users.get(t.getOwnerId()),
+                        users.get(t.getAssigneeId())
+                ))
+                .toList();
     }
 
     @Override
-    public List<TaskView> getTasks(
-            Set<Long> columnIds,
-            TaskSpec taskSpec
-    ) {
+    public List<TaskView> getTasks(Set<Long> columnIds, TaskSpec taskSpec) {
         List<TaskView> tasks = taskViewRepository.findAll(
                 taskSpec.and(columnIdIn(columnIds)),
                 Sort.by(ORDER_FIELD_NAME)
         );
-        log.info(RECEIVED_TASKS_SIZE_LOG, tasks.size());
+        log.debug(RECEIVED_TASKS_SIZE_LOG, tasks.size());
         return tasks;
     }
 
     @Override
-    public TaskView getTaskById(Long id) {
-        return taskViewRepository.findById(id).orElseThrow(Exceptions.taskNotFound(id));
+    public TaskDto getTaskById(Long id) {
+        var task = taskViewRepository.findById(id).orElseThrow(Exceptions.taskNotFound(id));
+        List<FileEntity> files = fileService.getFilesByEntityId(id, EntityType.TASK);
+        var ownerAssignee = getOwnerAndAssignee(task);
+        return taskMapper.taskViewToTaskDto(task, files, ownerAssignee.getLeft(), ownerAssignee.getRight());
+    }
+
+    @Override
+    public TaskShortDto getTaskShortById(Long id) {
+        var task = taskViewRepository.findById(id).orElseThrow(Exceptions.taskNotFound(id));
+        var ownerAssignee = getOwnerAndAssignee(task);
+        return taskMapper.taskViewToTaskShortDto(task, ownerAssignee.getLeft(), ownerAssignee.getRight());
     }
 
     @Override
@@ -131,5 +162,12 @@ public class TaskServiceImpl implements TaskService {
                                 .projectId(projectId)
                                 .build()
                 )));
+    }
+
+    // owner = left, assignee = right
+    private Pair<UserDto, UserDto> getOwnerAndAssignee(TaskView task) {
+        UserDto owner = userService.getUser(task.getOwnerId());
+        UserDto assignee = userService.getUser(task.getAssigneeId());
+        return Pair.of(owner, assignee);
     }
 }

@@ -6,7 +6,6 @@ import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
-import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.FileService;
@@ -129,7 +128,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditTaskTest() {
-        TaskView task = createNewTask();
+        var task = createNewTask();
         Long newUserId = createNewUser();
         EditTaskDto editTaskDto = Instancio.of(EditTaskDto.class)
                 .set(field(EditTaskDto::assigneeId), newUserId)
@@ -144,7 +143,7 @@ class TaskControllerTest extends BasicTestClass {
                 .body(editTaskDto)
                 .when()
                 .put("%s/{projectId}/columns/{columnId}/tasks/{taskId}".formatted(PATH_TO_PROJECTS_API),
-                        createdProjectId, createdColumnId, task.getId())
+                        createdProjectId, createdColumnId, task.id())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
@@ -182,7 +181,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfTaskTest() {
-        long createdTaskId = createNewTask().getId();
+        long createdTaskId = createNewTask().id();
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -257,28 +256,28 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void saveTaskFileTest() {
-        TaskView task = createNewTask();
-        saveTaskFile(task.getId());
+        var task = createNewTask();
+        saveTaskFile(task.id());
     }
 
     @Test
     void getTaskFilesTest() {
-        TaskView task = createNewTask();
-        saveTaskFile(task.getId());
+        var task = createNewTask();
+        saveTaskFile(task.id());
 
-        TaskView updatedTask = taskService.getTaskById(task.getId());
-        Assertions.assertEquals(1, updatedTask.getFilesCounter());
+        var updatedTask = taskService.getTaskById(task.id());
+        Assertions.assertEquals(1, updatedTask.filesCounter());
 
-        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
+        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.id(), EntityType.TASK);
         Assertions.assertEquals(1, taskFiles.size());
     }
 
     @Test
     void deleteTaskFileTest() {
-        TaskView task = createNewTask();
+        var task = createNewTask();
 
-        saveTaskFile(task.getId());
-        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
+        saveTaskFile(task.id());
+        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.id(), EntityType.TASK);
         Assertions.assertEquals(1, taskFiles.size());
 
         requestWithBearerToken()
@@ -288,7 +287,7 @@ class TaskControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        List<FileEntity> newTaskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
+        List<FileEntity> newTaskFiles = fileService.getFilesByEntityId(task.id(), EntityType.TASK);
         Assertions.assertEquals(0, newTaskFiles.size());
     }
 
@@ -301,7 +300,7 @@ class TaskControllerTest extends BasicTestClass {
                         createdProjectId, createdColumnId);
     }
 
-    private TaskView createNewTask() {
+    private TaskDto createNewTask() {
         Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), new User(createdUserId, null, null));
         return taskService.getTaskById(taskId);
     }

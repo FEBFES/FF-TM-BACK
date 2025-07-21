@@ -2,21 +2,15 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.config.jwt.User;
-import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
-import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.TaskShortDto;
-import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
 import com.febfes.fftmback.dto.parameter.TaskParameters;
 import com.febfes.fftmback.mapper.TaskMapper;
-import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.TaskService;
-import com.febfes.fftmback.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -39,9 +33,7 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
-    private final FileService fileService;
     private final TaskMapper taskMapper;
-    private final UserService userService;
 
     @Operation(summary = "Get tasks with pagination")
     @ApiGet(path = "{projectId}/columns/{columnId}/tasks")
@@ -51,26 +43,13 @@ public class TaskController {
             TaskSpec taskSpec,
             @ParameterObject ColumnParameters pathVars
     ) {
-        // TODO: Перенести все вызовы в сервис
-        List<TaskView> tasks = taskService.getTasks(page, limit, pathVars.columnId(), taskSpec);
-        return tasks.stream()
-                .map(task -> {
-                    UserDto owner = userService.getUser(task.getOwnerId());
-                    UserDto assignee = userService.getUser(task.getAssigneeId());
-                    return taskMapper.taskViewToTaskShortDto(task, owner, assignee);
-                })
-                .toList();
+        return taskService.getTasks(page, limit, pathVars.columnId(), taskSpec);
     }
 
     @Operation(summary = "Get task by its id")
     @ApiGetOne(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
     public TaskDto getTaskById(@ParameterObject TaskParameters pathVars) {
-        // TODO: Перенести все вызовы в сервис
-        TaskView task = taskService.getTaskById(pathVars.taskId());
-        List<FileEntity> files = fileService.getFilesByEntityId(pathVars.taskId(), EntityType.TASK);
-        UserDto owner = userService.getUser(task.getOwnerId());
-        UserDto assignee = userService.getUser(task.getAssigneeId());
-        return taskMapper.taskViewToTaskDto(task, files, owner, assignee);
+        return taskService.getTaskById(pathVars.taskId());
     }
 
     @Operation(summary = "Create new task")
@@ -81,15 +60,11 @@ public class TaskController {
             @ParameterObject ColumnParameters pathVars,
             @RequestBody @Valid EditTaskDto editTaskDto
     ) {
-        // TODO: Перенести все вызовы в сервис
         Long createdTaskId = taskService.createTask(
                 taskMapper.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto),
                 user
         );
-        TaskView task = taskService.getTaskById(createdTaskId);
-        UserDto owner = userService.getUser(task.getOwnerId());
-        UserDto assignee = userService.getUser(task.getAssigneeId());
-        return taskMapper.taskViewToTaskShortDto(task, owner, assignee);
+        return taskService.getTaskShortById(createdTaskId);
     }
 
     @Operation(summary = "Edit task by its id")
@@ -100,14 +75,10 @@ public class TaskController {
             @ParameterObject TaskParameters pathVars,
             @RequestBody @Valid EditTaskDto editTaskDto
     ) {
-        // TODO: Перенести все вызовы в сервис
         TaskEntity editTask = taskMapper.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto);
         editTask.setId(pathVars.taskId());
         taskService.updateTask(editTask, user);
-        TaskView task = taskService.getTaskById(editTask.getId());
-        UserDto owner = userService.getUser(task.getOwnerId());
-        UserDto assignee = userService.getUser(task.getAssigneeId());
-        return taskMapper.taskViewToTaskShortDto(task, owner, assignee);
+        return taskService.getTaskShortById(pathVars.taskId());
     }
 
     @Operation(summary = "Delete task by its id")

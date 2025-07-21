@@ -2,7 +2,6 @@ package com.febfes.fftmback.schedule;
 
 import com.febfes.fftmback.controller.SseNotificationController;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.SendNotificationDto;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.service.TaskService;
@@ -43,8 +42,8 @@ public class TaskDeadlineJob implements Job {
         Long taskId = jobDataMap.getLong(TASK_ID);
         log.info("Executing TaskDeadlineJob: USER_ID: {}", userId);
         try {
-            TaskView taskView = taskService.getTaskById(taskId);
-            ProjectEntity project = projectManagementService.getProject(taskView.getProjectId());
+            var taskView = taskService.getTaskById(taskId);
+            ProjectEntity project = projectManagementService.getProject(taskView.projectId());
             String message = createDeadlineNotificationMessage(taskId, project.getName());
             kafkaTemplate.send("notification-topic", new SendNotificationDto(message, userId));
             sseNotificationController.sendMessageToUser(message, username);
