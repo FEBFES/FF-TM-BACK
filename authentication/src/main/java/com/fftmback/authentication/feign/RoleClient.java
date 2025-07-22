@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
         path = "/v1/roles")
 public interface RoleClient {
 
-    // TODO: write tests for this client
     @GetMapping("/projects/{projectId}/users/{userId}/")
     RoleName getUserRoleNameOnProject(@PathVariable Long projectId,
                                       @PathVariable Long userId);
