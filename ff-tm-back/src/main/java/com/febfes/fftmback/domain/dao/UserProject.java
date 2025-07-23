@@ -27,10 +27,10 @@ public class UserProject {
     public final boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
+        if (!(o instanceof UserProject that)) return false;
         Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        UserProject that = (UserProject) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 
