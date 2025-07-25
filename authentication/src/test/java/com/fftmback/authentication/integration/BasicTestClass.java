@@ -86,11 +86,5 @@ public class BasicTestClass {
         return given().header("Authorization", "Bearer " + token)
                 .header(userRoleHeader, RoleName.OWNER.name());
     }
-
-    protected Long createNewUser() {
-        UserEntity user = DtoBuilders.createUser();
-        authenticationService.registerUser(user);
-        return ((UserEntity) userService.loadUserByUsername(user.getUsername())).getId();
-    }
 }
 

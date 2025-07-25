@@ -1,10 +1,12 @@
 spring:
   cache:
-    type: none
-  data:
+    type: redis
     redis:
-      host: dummy
-      port: 6379
+      time-to-live: 1h
+      cache-null-values: false
+    cache-names:
+      - refreshTokens
+      - refreshTokensByUser
   datasource:
     url: jdbc:tc:postgresql:11.1:///integration-tests-db?TC_INITSCRIPT=schema.sql
     hikari:

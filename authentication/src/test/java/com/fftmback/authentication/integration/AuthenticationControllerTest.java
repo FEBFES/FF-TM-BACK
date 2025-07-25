@@ -9,32 +9,11 @@ import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
 
 import static io.restassured.RestAssured.given;
 import static org.instancio.Select.field;
 
 class AuthenticationControllerTest extends BasicTestClass {
-
-    @Container
-    static GenericContainer<?> redisContainer = new GenericContainer<>("redis:7.2.5")
-            .withExposedPorts(6379)
-            .waitingFor(Wait.forListeningPort());
-
-    static {
-        redisContainer.start();
-    }
-
-    @DynamicPropertySource
-    static void addProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.redis.host", redisContainer::getHost);
-        registry.add("spring.data.redis.port", () -> redisContainer.getFirstMappedPort());
-        registry.add("spring.cache.type", () -> "redis");
-    }
 
     public static final String PATH_TO_AUTH_API = "/api/v1/auth";
     public static final String EMAIL_PATTERN = "#a#a#a#a#a#a@example.com";
