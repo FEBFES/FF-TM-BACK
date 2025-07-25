@@ -33,7 +33,7 @@ import static io.restassured.RestAssured.given;
 @Testcontainers
 @ActiveProfiles("test")
 @Slf4j
-public class BasicTestClass {
+class BasicTestClass {
 
     @Autowired
     private DatabaseCleanup databaseCleanup;

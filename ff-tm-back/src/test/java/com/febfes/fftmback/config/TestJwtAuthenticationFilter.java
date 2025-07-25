@@ -39,20 +39,17 @@ public class TestJwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header != null && header.startsWith(BEARER)) {
-            try {
-                String role = request.getHeader(userRoleHeader);
-                final String jwt = header.substring(BEARER.length());
-                Long userId = jwtService.extractClaim(jwt, claims -> claims.get("userId", Long.class));
-                String username = jwtService.extractClaim(jwt, Claims::getSubject);
-                User user = new User(userId, role != null ? role : RoleName.OWNER.name(), username);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        user,
-                        null,
-                        getRoles(user.role())
-                );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (NumberFormatException ignored) {
-            }
+            String role = request.getHeader(userRoleHeader);
+            final String jwt = header.substring(BEARER.length());
+            Long userId = jwtService.extractClaim(jwt, claims -> claims.get("userId", Long.class));
+            String username = jwtService.extractClaim(jwt, Claims::getSubject);
+            User user = new User(userId, role != null ? role : RoleName.OWNER.name(), username);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    user,
+                    null,
+                    getRoles(user.role())
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
     }

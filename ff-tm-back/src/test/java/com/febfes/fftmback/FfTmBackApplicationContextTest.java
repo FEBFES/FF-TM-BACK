@@ -7,7 +7,9 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 class FfTmBackApplicationContextTest {
+
     @Test
     void contextLoads() {
+        // Test that context loads without errors
     }
 }
