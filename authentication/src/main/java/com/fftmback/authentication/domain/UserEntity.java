@@ -1,19 +1,19 @@
 package com.fftmback.authentication.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import com.febfes.fftmback.domain.abstracts.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
-import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_entity")
@@ -22,22 +22,13 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = {"projectRoles"})
 @ToString(exclude = {"projectRoles"})
-public class UserEntity implements UserDetails {
+public class UserEntity extends BaseEntity implements UserDetails {
 
     public static final String ENTITY_NAME = "User";
 
     @Serial
     private static final long serialVersionUID = 7365026142938847634L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "create_date", updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createDate;
 
     @Column(name = "email")
     private String email;
@@ -56,15 +47,6 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "display_name")
     private String displayName;
-
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "project_user_role",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    @MapKeyColumn(name = "project_id")
-    @Builder.Default
-    @JsonIgnore
-    private Map<Long, RoleEntity> projectRoles = new HashMap<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -94,5 +76,21 @@ public class UserEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        UserEntity that = (UserEntity) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

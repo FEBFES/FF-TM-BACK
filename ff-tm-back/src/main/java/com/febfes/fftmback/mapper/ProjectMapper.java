@@ -1,8 +1,8 @@
 package com.febfes.fftmback.mapper;
 
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.projection.MemberProjection;
 import com.febfes.fftmback.domain.projection.ProjectProjection;
+import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.OneProjectDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.ProjectForUserDto;
@@ -11,15 +11,13 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class})
+@Mapper(componentModel = "spring")
 public interface ProjectMapper {
 
     @Mapping(target = "isFavourite", ignore = true)
     ProjectDto projectToProjectDto(ProjectEntity project);
 
     ProjectEntity projectDtoToProject(ProjectDto projectDto);
-
-    ProjectDto projectProjectionToProjectDto(ProjectForUserDto projectForUserDto);
 
     List<ProjectDto> projectProjectionToProjectDto(List<ProjectProjection> projectForUserDto);
 
@@ -28,6 +26,6 @@ public interface ProjectMapper {
     @Mapping(target = "userRoleOnProject.description", source = "projectForUserDto.roleDescription")
     OneProjectDto projectWithMembersToOneProjectDto(
             ProjectForUserDto projectForUserDto,
-            List<MemberProjection> members
+            List<MemberDto> members
     );
 }

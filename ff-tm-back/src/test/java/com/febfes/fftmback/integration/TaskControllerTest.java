@@ -1,13 +1,13 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.TaskPriority;
-import com.febfes.fftmback.domain.dao.*;
-import com.febfes.fftmback.dto.EditTaskDto;
-import com.febfes.fftmback.dto.TaskDto;
-import com.febfes.fftmback.dto.TaskFileDto;
-import com.febfes.fftmback.dto.TaskShortDto;
-import com.febfes.fftmback.dto.error.ErrorDto;
+import com.febfes.fftmback.domain.dao.FileEntity;
+import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.TaskTypeEntity;
+import com.febfes.fftmback.dto.*;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DtoBuilders;
@@ -33,6 +33,7 @@ import java.util.Map;
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
+import static org.mockito.Mockito.when;
 
 class TaskControllerTest extends BasicTestClass {
 
@@ -127,20 +128,22 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulEditTaskTest() {
-        TaskView task = createNewTask();
+        var task = createNewTask();
         Long newUserId = createNewUser();
-        UserEntity newUser = userService.getUserById(newUserId);
         EditTaskDto editTaskDto = Instancio.of(EditTaskDto.class)
                 .set(field(EditTaskDto::assigneeId), newUserId)
                 .set(field(EditTaskDto::deadlineDate), LocalDateTime.now().plusDays(1L))
                 .create();
+
+        UserDto newUser = new UserDto(newUserId, "new@test.com", "new-user", null, null, null, null);
+        when(userService.getUser(newUserId)).thenReturn(newUser);
 
         TaskShortDto taskShortDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .body(editTaskDto)
                 .when()
                 .put("%s/{projectId}/columns/{columnId}/tasks/{taskId}".formatted(PATH_TO_PROJECTS_API),
-                        createdProjectId, createdColumnId, task.getId())
+                        createdProjectId, createdColumnId, task.id())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
@@ -149,8 +152,8 @@ class TaskControllerTest extends BasicTestClass {
         Assertions.assertEquals(editTaskDto.name(), taskShortDto.name());
         Assertions.assertEquals(editTaskDto.description(), taskShortDto.description());
         Assertions.assertEquals(editTaskDto.assigneeId(), taskShortDto.assignee().id());
-        Assertions.assertEquals(newUser.getEmail(), taskShortDto.assignee().email());
-        Assertions.assertEquals(newUser.getUsername(), taskShortDto.assignee().username());
+        Assertions.assertEquals(newUser.email(), taskShortDto.assignee().email());
+        Assertions.assertEquals(newUser.username(), taskShortDto.assignee().username());
         Assertions.assertEquals(editTaskDto.priority(), taskShortDto.priority());
         Assertions.assertEquals(editTaskDto.type(), taskShortDto.type());
         Assertions.assertNotNull(taskShortDto.createDate());
@@ -178,7 +181,7 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void successfulDeleteOfTaskTest() {
-        long createdTaskId = createNewTask().getId();
+        long createdTaskId = createNewTask().id();
 
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -253,28 +256,28 @@ class TaskControllerTest extends BasicTestClass {
 
     @Test
     void saveTaskFileTest() {
-        TaskView task = createNewTask();
-        saveTaskFile(task.getId());
+        var task = createNewTask();
+        saveTaskFile(task.id());
     }
 
     @Test
     void getTaskFilesTest() {
-        TaskView task = createNewTask();
-        saveTaskFile(task.getId());
+        var task = createNewTask();
+        saveTaskFile(task.id());
 
-        TaskView updatedTask = taskService.getTaskById(task.getId());
-        Assertions.assertEquals(1, updatedTask.getFilesCounter());
+        var updatedTask = taskService.getTaskById(task.id());
+        Assertions.assertEquals(1, updatedTask.filesCounter());
 
-        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
+        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.id(), EntityType.TASK);
         Assertions.assertEquals(1, taskFiles.size());
     }
 
     @Test
     void deleteTaskFileTest() {
-        TaskView task = createNewTask();
+        var task = createNewTask();
 
-        saveTaskFile(task.getId());
-        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
+        saveTaskFile(task.id());
+        List<FileEntity> taskFiles = fileService.getFilesByEntityId(task.id(), EntityType.TASK);
         Assertions.assertEquals(1, taskFiles.size());
 
         requestWithBearerToken()
@@ -284,7 +287,7 @@ class TaskControllerTest extends BasicTestClass {
                 .then()
                 .statusCode(HttpStatus.SC_OK);
 
-        List<FileEntity> newTaskFiles = fileService.getFilesByEntityId(task.getId(), EntityType.TASK);
+        List<FileEntity> newTaskFiles = fileService.getFilesByEntityId(task.id(), EntityType.TASK);
         Assertions.assertEquals(0, newTaskFiles.size());
     }
 
@@ -297,15 +300,15 @@ class TaskControllerTest extends BasicTestClass {
                         createdProjectId, createdColumnId);
     }
 
-    private TaskView createNewTask() {
-        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), createdUserId);
+    private TaskDto createNewTask() {
+        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), new User(createdUserId, null, null));
         return taskService.getTaskById(taskId);
     }
 
     private void createNewTask(String name, String description) {
         TaskEntity task = DtoBuilders.createTask(createdProjectId, createdColumnId, name);
         task.setDescription(description);
-        taskService.createTask(task, createdUserId);
+        taskService.createTask(task, new User(createdUserId, null, null));
     }
 
     private void saveTaskFile(Long taskId) {

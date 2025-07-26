@@ -18,10 +18,10 @@ public class ProjectPatchIsFavouriteProcessor extends ProjectPatchFieldProcessor
     private static final String FIELD_NAME = "isFavourite";
 
     @Override
-    public void patchField(ProjectEntity project, Long ownerId, PatchDto patchDto) {
+    public boolean patchField(ProjectEntity project, Long ownerId, PatchDto patchDto) {
         if (!FIELD_NAME.equals(patchDto.key())) {
             callNextProcessor(project, ownerId, patchDto);
-            return;
+            return false;
         }
 
         if (PatchOperation.UPDATE.equals(patchDto.op())) {
@@ -34,5 +34,6 @@ public class ProjectPatchIsFavouriteProcessor extends ProjectPatchFieldProcessor
             }
             log.info("Project field \"{}\" updated. New value: {}", FIELD_NAME, isFavourite);
         }
+        return true;
     }
 }

@@ -1,37 +1,33 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.common.RoleName;
-import com.febfes.fftmback.domain.dao.RoleEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
-import com.febfes.fftmback.service.AuthenticationService;
+import com.febfes.fftmback.domain.RoleName;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
+import com.febfes.fftmback.service.RoleService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import lombok.NonNull;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
-import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
 import static io.restassured.RestAssured.given;
 
 public class RoleControllerTest extends BasicTestClass {
 
     public static final String PATH_TO_ROLES_API = "/api/v1/roles";
 
+    @Autowired
+    private RoleService roleService;
+
+    @Value("${custom-headers.user-role}")
+    private String userRoleHeader;
+
     private Long createdProjectId;
-
-    @Autowired
-    private AuthenticationService authenticationService;
-
-    @Autowired
-    private TransactionTemplate txTemplate;
 
     @BeforeEach
     void beforeEach() {
@@ -71,15 +67,14 @@ public class RoleControllerTest extends BasicTestClass {
     }
 
     @Test
+    @Disabled("Testing that the role matches the one required to execute the method should occur in the authentication module")
     void failedChangeRoleTest() {
         Long newUserId = createNewUser();
-        UserEntity newUser = userService.getUserById(newUserId);
-        String newToken = authenticationService.authenticateUser(
-                UserEntity.builder().username(newUser.getUsername()).encryptedPassword(PASSWORD).build()
-        ).accessToken();
+        String newToken = generateToken(newUserId, username + "2");
         projectMemberService.addNewMembers(createdProjectId, List.of(newUserId));
 
         given().header("Authorization", "Bearer " + newToken)
+                .header(userRoleHeader, RoleName.MEMBER)
                 .contentType(ContentType.JSON)
                 .when()
                 .post("%s/%s/projects/%d/users/%d/".formatted(PATH_TO_ROLES_API,
@@ -89,15 +84,8 @@ public class RoleControllerTest extends BasicTestClass {
     }
 
     private void checkProjectUserRole(RoleName expectedUserRoleName, Long userId) {
-        txTemplate.execute(new TransactionCallbackWithoutResult() {
-
-            @Override
-            protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
-                UserEntity user = userService.getUserById(userId);
-                RoleEntity role = user.getProjectRoles().get(createdProjectId);
-                Assertions.assertThat(role.getName())
-                        .isEqualTo(expectedUserRoleName);
-            }
-        });
+        var roleEntity = roleService.getUserRoleOnProject(createdProjectId, userId);
+        Assertions.assertThat(roleEntity.getName())
+                .isEqualTo(expectedUserRoleName);
     }
 }

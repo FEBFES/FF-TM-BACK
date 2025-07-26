@@ -32,7 +32,7 @@ public class ColumnController {
 
     @Operation(summary = "Create new column in a project with given id")
     @ApiCreate(path = "{projectId}/columns")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER_PLUS.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER_PLUS.name())")
     public ColumnDto crateNewColumn(
             @PathVariable Long projectId,
             @RequestBody @Valid ColumnDto columnDto
@@ -45,7 +45,7 @@ public class ColumnController {
 
     @Operation(summary = "Edit column by its columnId")
     @ApiEdit(path = "{projectId}/columns/{columnId}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER_PLUS.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER_PLUS.name())")
     public ColumnDto editColumn(
             @ParameterObject ColumnParameters pathVars,
             @RequestBody ColumnDto columnDto
@@ -56,7 +56,7 @@ public class ColumnController {
 
     @Operation(summary = "Delete column by its columnId")
     @ApiDelete(path = "{projectId}/columns/{columnId}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER_PLUS.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER_PLUS.name())")
     public void deleteColumn(@ParameterObject ColumnParameters pathVars) {
         columnService.deleteColumn(pathVars.columnId());
     }

@@ -16,11 +16,13 @@ import java.lang.reflect.Field;
 public class ProjectPatchCommonProcessor extends ProjectPatchFieldProcessor {
 
     @Override
-    public void patchField(ProjectEntity project, Long ownerId, PatchDto patchDto) {
+    public boolean patchField(ProjectEntity project, Long ownerId, PatchDto patchDto) {
         if (PatchOperation.UPDATE.equals(patchDto.op())) {
             updateProjectField(patchDto, project);
+            return true;
         } else {
             callNextProcessor(project, ownerId, patchDto);
+            return false;
         }
     }
 
@@ -34,7 +36,7 @@ public class ProjectPatchCommonProcessor extends ProjectPatchFieldProcessor {
             ReflectionUtils.setField(field, projectEntity, patchDto.value());
             log.info("Project field \"{}\" updated. New value: {}", patchDto.key(), patchDto.value());
         } catch (NoSuchFieldException e) {
-            log.warn(String.format("Can't find field \"%s\" in Project entity", patchDto.key()), e);
+            log.warn("Can't find field \"{}\" in Project entity: {}", patchDto.key(), e.getMessage());
         }
     }
 }

@@ -1,42 +1,50 @@
 package com.febfes.fftmback.service.project;
 
-import com.febfes.fftmback.domain.common.RoleName;
-import com.febfes.fftmback.domain.common.UserProjectId;
-import com.febfes.fftmback.domain.dao.UserProject;
-import com.febfes.fftmback.domain.projection.MemberProjection;
+import com.febfes.fftmback.domain.RoleName;
+import com.febfes.fftmback.domain.projection.MemberIdRoleProjection;
 import com.febfes.fftmback.domain.projection.ProjectForUserProjection;
 import com.febfes.fftmback.domain.projection.ProjectProjection;
+import com.febfes.fftmback.dto.MemberDto;
 import com.febfes.fftmback.dto.ProjectDto;
 import com.febfes.fftmback.dto.ProjectForUserDto;
+import com.febfes.fftmback.dto.UserDto;
 import com.febfes.fftmback.exception.Exceptions;
 import com.febfes.fftmback.mapper.ProjectMapper;
+import com.febfes.fftmback.mapper.ProjectMemberMapper;
+import com.febfes.fftmback.repository.ProjectMemberRepository;
 import com.febfes.fftmback.repository.ProjectRepository;
 import com.febfes.fftmback.repository.UserProjectRepository;
-import com.febfes.fftmback.service.RoleService;
 import com.febfes.fftmback.service.UserService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.febfes.fftmback.util.CaseUtils.camelToSnake;
 
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
-    private final UserService userService;
-    private final RoleService roleService;
+    private final ProjectMemberRepository projectMemberRepository;
+
     private final ProjectMapper projectMapper;
+    private final ProjectMemberMapper projectMemberMapper;
+
+    private final UserService userService;
+    private final ProjectMemberTransactionalService projectMemberTransactionalService;
 
     @Override
     @Cacheable(value = "projects", key = "'projectsForUser:' + #userId + ':' + #sort.hashCode()")
@@ -61,30 +69,53 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     @CacheEvict(value = "projects", allEntries = true)
     public void addNewMembers(Long projectId, List<Long> memberIds) {
-        memberIds.forEach(memberId -> addUserToProjectAndChangeRole(projectId, memberId, RoleName.MEMBER));
+        memberIds.forEach(memberId ->
+                projectMemberTransactionalService.addUserToProjectAndChangeRole(projectId, memberId, RoleName.MEMBER)
+        );
         log.info("Added {} new members for project with id={}", memberIds.size(), projectId);
     }
 
     @Override
     @CacheEvict(value = "projects", allEntries = true)
-    public MemberProjection removeMember(Long projectId, Long memberId) {
-        MemberProjection memberToDelete = userService.getProjectMemberWithRole(projectId, memberId);
+    @Transactional
+    public void removeMember(Long projectId, Long memberId) {
         userProjectRepository.deleteByIdProjectIdAndIdUserId(projectId, memberId);
         log.info("Removed member with id={} from project with id={}", memberId, projectId);
-        return memberToDelete;
     }
 
     @Override
     @CacheEvict(value = "projects", allEntries = true)
     public void addUserToProjectAndChangeRole(Long projectId, Long memberId, RoleName roleName) {
-        UserProject userProject = UserProject.builder()
-                .id(UserProjectId.builder()
-                        .userId(memberId)
-                        .projectId(projectId)
-                        .build()
-                )
-                .build();
-        userProjectRepository.save(userProject);
-        roleService.changeUserRoleOnProject(projectId, memberId, roleName);
+        projectMemberTransactionalService.addUserToProjectAndChangeRole(projectId, memberId, roleName);
+    }
+
+    @Override
+    public List<MemberDto> getProjectMembersWithRole(Long projectId) {
+        List<MemberIdRoleProjection> projections = projectMemberRepository.getProjectMembersWithRole(projectId);
+        Map<Long, UserDto> users = userService.getUsers(
+                projections.stream().map(MemberIdRoleProjection::getId).collect(Collectors.toSet())
+        ).stream().collect(Collectors.toMap(UserDto::id, Function.identity()));
+        return projections.stream()
+                .map(p -> projectMemberMapper.mapToMemberDto(p, users.get(p.getId())))
+                .toList();
+    }
+
+    @Override
+    public MemberDto getProjectMemberWithRole(Long projectId, Long memberId) {
+        MemberIdRoleProjection projection = projectMemberRepository.getProjectMemberWithRole(projectId, memberId)
+                .orElseThrow(Exceptions.userNotFoundById(memberId));
+        UserDto user = userService.getUser(memberId);
+        return projectMemberMapper.mapToMemberDto(projection, user);
+    }
+
+    @Override
+    public List<MemberDto> getProjectMembersWithRole(Long projectId, Set<Long> membersIds) {
+        List<MemberIdRoleProjection> projections = projectMemberRepository.getProjectMembersWithRole(projectId, membersIds);
+        Map<Long, UserDto> users = userService.getUsers(membersIds)
+                .stream()
+                .collect(Collectors.toMap(UserDto::id, Function.identity()));
+        return projections.stream()
+                .map(p -> projectMemberMapper.mapToMemberDto(p, users.get(p.getId())))
+                .toList();
     }
 }

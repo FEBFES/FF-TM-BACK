@@ -1,12 +1,14 @@
 package com.febfes.fftmback.domain.dao;
 
+import com.febfes.fftmback.domain.abstracts.OrderedView;
 import com.febfes.fftmback.domain.common.TaskPriority;
-import com.febfes.fftmback.domain.dao.abstracts.OrderedView;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "v_task")
@@ -15,7 +17,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class TaskView extends OrderedView {
 
@@ -31,13 +32,11 @@ public class TaskView extends OrderedView {
     @Column(name = "\"columnId\"")
     private Long columnId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "\"ownerId\"", referencedColumnName = "id")
-    private UserView owner;
+    @Column(name = "\"ownerId\"")
+    private Long ownerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "\"assigneeId\"", referencedColumnName = "id")
-    private UserView assignee;
+    @Column(name = "\"assigneeId\"")
+    private Long assigneeId;
 
     @Column(name = "\"priority\"", columnDefinition = "priority")
     @Enumerated(EnumType.STRING)
@@ -45,6 +44,7 @@ public class TaskView extends OrderedView {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "\"taskTypeId\"", referencedColumnName = "id")
+    @ToString.Exclude
     private TaskTypeEntity taskType;
 
     @Column(name = "\"filesCounter\"")
@@ -55,4 +55,20 @@ public class TaskView extends OrderedView {
 
     @Column(name = "\"deadlineDate\"")
     private LocalDateTime deadlineDate;
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!(o instanceof TaskView taskView)) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        return getId() != null && Objects.equals(getId(), taskView.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }

@@ -1,17 +1,16 @@
 package com.febfes.fftmback.service.impl;
 
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.exception.Exceptions;
+import com.febfes.fftmback.exception.UserRoleChangeException;
 import com.febfes.fftmback.repository.RoleRepository;
-import com.febfes.fftmback.repository.UserRepository;
 import com.febfes.fftmback.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,7 +20,6 @@ import java.util.List;
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
 
     @Override
     @Cacheable("roles")
@@ -30,27 +28,21 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Cacheable(value = "roles", key = "#roleName")
-    public RoleEntity getRoleByName(RoleName roleName) {
-        return roleRepository.findByName(roleName)
-                .orElseThrow(Exceptions.roleNotFound(roleName));
+    public RoleEntity getUserRoleOnProject(Long projectId, Long userId) {
+        return roleRepository.getUserRoleOnProject(projectId, userId)
+                .orElseThrow(Exceptions.roleNotFoundByProjectId(projectId));
     }
 
     @Override
-    @CacheEvict(value = "roles", allEntries = true)
+    @Transactional
     public void changeUserRoleOnProject(Long projectId, Long userId, RoleName roleName) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(Exceptions.userNotFoundById(userId));
-        changeUserRoleOnProject(projectId, user, roleName);
-    }
-
-    @Override
-    @CacheEvict(value = "roles", allEntries = true)
-    public void changeUserRoleOnProject(Long projectId, UserEntity user, RoleName roleName) {
-        RoleEntity ownerRole = getRoleByName(roleName);
-        user.getProjectRoles().put(projectId, ownerRole);
-        userRepository.save(user);
+        RoleEntity ownerRole = roleRepository.findByName(roleName)
+                .orElseThrow(Exceptions.roleNotFound(roleName));
+        int res = roleRepository.changeUserRoleOnProject(projectId, userId, ownerRole.getName().name());
+        if (res == 0) {
+            throw new UserRoleChangeException(projectId, userId, roleName);
+        }
         log.info("The user's role on the project has been changed. User id: {}, Project id: {}, Role name: {}",
-                user.getId(), projectId, roleName.name());
+                userId, projectId, roleName.name());
     }
 }

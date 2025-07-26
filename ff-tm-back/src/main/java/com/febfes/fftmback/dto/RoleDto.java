@@ -1,6 +1,6 @@
 package com.febfes.fftmback.dto;
 
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 
 public record RoleDto(
 

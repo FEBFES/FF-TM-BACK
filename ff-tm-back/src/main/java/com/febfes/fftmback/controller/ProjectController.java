@@ -4,14 +4,9 @@ import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskTypeEntity;
-import com.febfes.fftmback.domain.projection.MemberProjection;
-import com.febfes.fftmback.dto.OneProjectDto;
-import com.febfes.fftmback.dto.PatchDto;
-import com.febfes.fftmback.dto.ProjectDto;
-import com.febfes.fftmback.dto.ProjectForUserDto;
+import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.mapper.ProjectMapper;
 import com.febfes.fftmback.service.TaskTypeService;
-import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
 import com.febfes.fftmback.service.project.ProjectMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +34,6 @@ public class ProjectController {
     private final ProjectMemberService projectMemberService;
     private final TaskTypeService taskTypeService;
     private final ProjectMapper projectMapper;
-    private final UserService userService;
-
 
     @Operation(summary = "Get all projects for authenticated user")
     @ApiGet
@@ -68,13 +61,13 @@ public class ProjectController {
     @SuppressWarnings("MVCPathVariableInspection") // fake warn "Cannot resolve path variable 'id' in @RequestMapping"
     public OneProjectDto getProject(@AuthenticationPrincipal User user, @PathVariable Long id) {
         ProjectForUserDto project = projectMemberService.getProjectForUser(id, user.id());
-        List<MemberProjection> members = userService.getProjectMembersWithRole(id);
+        List<MemberDto> members = projectMemberService.getProjectMembersWithRole(id);
         return projectMapper.projectWithMembersToOneProjectDto(project, members);
     }
 
     @Operation(summary = "Edit project by its id")
     @ApiEdit(path = "{id}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER_PLUS.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER_PLUS.name())")
     public ProjectDto editProject(
             @PathVariable Long id,
             @RequestBody ProjectDto projectDto
@@ -86,7 +79,7 @@ public class ProjectController {
 
     @Operation(summary = "Delete project by its id")
     @ApiDelete(path = "{id}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).OWNER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).OWNER.name())")
     public void deleteProject(@PathVariable Long id) {
         projectManagementService.deleteProject(id);
     }

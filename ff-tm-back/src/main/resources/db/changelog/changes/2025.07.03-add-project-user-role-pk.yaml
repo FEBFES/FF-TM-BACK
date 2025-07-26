@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1"
+      author: IvanShish
+      comment: "Add project-user-role pk"
+      changes:
+        - addPrimaryKey:
+            tableName: project_user_role
+            columnNames: project_id, user_id
+            constraintName: pk_project_user_role

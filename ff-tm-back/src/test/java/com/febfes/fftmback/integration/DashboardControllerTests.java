@@ -1,11 +1,13 @@
 package com.febfes.fftmback.integration;
 
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.util.DtoBuilders;
@@ -18,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+
+import static com.febfes.fftmback.util.UnitTestBuilders.user;
 
 
 class DashboardControllerTests extends BasicTestClass {
@@ -33,7 +37,7 @@ class DashboardControllerTests extends BasicTestClass {
         Long projectId = createNewProject();
         TaskColumnEntity columnEntity = columnService.createColumn(DtoBuilders.createColumn(projectId));
         TaskEntity task = DtoBuilders.createTask(projectId, columnEntity.getId());
-        taskService.createTask(task, createdUserId);
+        taskService.createTask(task, new User(createdUserId, null, null));
 
         DashboardDto dashboardDto = requestWithBearerToken()
                 .contentType(ContentType.JSON)
@@ -86,7 +90,7 @@ class DashboardControllerTests extends BasicTestClass {
     private void createTask(Long projectId, Long columnId, String taskName) {
         taskService.createTask(
                 DtoBuilders.createTask(projectId, columnId, taskName),
-                createdUserId
+                user(createdUserId)
         );
     }
 }

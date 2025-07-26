@@ -1,7 +1,7 @@
 package com.fftmback.service.impl;
 
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.fftmback.domain.NotificationEntity;
-import com.fftmback.exception.EntityNotFoundException;
 import com.fftmback.repository.NotificationRepository;
 import com.fftmback.service.NotificationService;
 import lombok.RequiredArgsConstructor;

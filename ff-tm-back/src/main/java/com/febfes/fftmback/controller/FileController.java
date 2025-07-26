@@ -9,6 +9,7 @@ import com.febfes.fftmback.dto.TaskFileDto;
 import com.febfes.fftmback.dto.UserPicDto;
 import com.febfes.fftmback.mapper.FileMapper;
 import com.febfes.fftmback.service.FileService;
+import com.febfes.fftmback.util.FileUrnUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,8 +25,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static com.febfes.fftmback.util.FileUtils.USER_PIC_URN;
 
 @RestController
 @RequestMapping("v1/files")
@@ -97,7 +96,8 @@ public class FileController {
     @Operation(summary = "Delete user pic by userId")
     @ApiDelete(path = "user-pic/{userId}")
     public void deleteUserPic(@PathVariable Long userId) {
-        fileService.deleteFileById(fileService.getFile(String.format(USER_PIC_URN, userId)).getId());
+        String userPicUrn = FileUrnUtils.getUserPicUrn(userId);
+        fileService.deleteFileById(fileService.getFile(userPicUrn).getId());
     }
 
     private Optional<FileEntity> saveTaskFile(
@@ -109,7 +109,7 @@ public class FileController {
             FileEntity fileEntity = fileService.saveFile(userId, entityId, EntityType.TASK, file);
             return Optional.of(fileEntity);
         } catch (IOException e) {
-            log.warn(String.format("Task file wasn't saved: %s.", file.getOriginalFilename()), e);
+            log.warn("Task file wasn't saved {}: {}", file.getOriginalFilename(), e.getMessage());
             return Optional.empty();
         }
     }

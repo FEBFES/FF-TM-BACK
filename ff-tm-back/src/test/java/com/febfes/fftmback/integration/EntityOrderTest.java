@@ -5,6 +5,7 @@ import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
 import com.febfes.fftmback.dto.EditTaskDto;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.util.DtoBuilders;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.febfes.fftmback.integration.ProjectControllerTest.PATH_TO_PROJECTS_API;
+import static com.febfes.fftmback.util.UnitTestBuilders.user;
 
 class EntityOrderTest extends BasicTestClass {
 
@@ -37,7 +39,7 @@ class EntityOrderTest extends BasicTestClass {
         createdColumnId = columnService.createColumn(DtoBuilders.createColumn(createdProjectId)).getId();
 
         for (int i = 0; i < 4; i++) {
-            taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), createdUserId);
+            taskService.createTask(DtoBuilders.createTask(createdProjectId, createdColumnId), user(createdUserId));
         }
     }
 

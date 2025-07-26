@@ -1,12 +1,12 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.common.PatchOperation;
-import com.febfes.fftmback.domain.common.RoleName;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.*;
 import com.febfes.fftmback.exception.EntityNotFoundException;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.TaskService;
 import com.febfes.fftmback.service.impl.DefaultColumns;
 import com.febfes.fftmback.service.project.DashboardService;
@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
-import static com.febfes.fftmback.util.DtoBuilders.PASSWORD;
+import static com.febfes.fftmback.util.UnitTestBuilders.user;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.instancio.Select.field;
@@ -92,6 +92,7 @@ class ProjectControllerTest extends BasicTestClass {
     }
 
     @Test
+//    @WithMockUser(authorities = {"MEMBER_PLUS"})
     void successfulEditOfProjectTest() {
         Long createdProjectId = createNewProject();
         ProjectDto editProjectDto = Instancio.create(ProjectDto.class);
@@ -132,7 +133,7 @@ class ProjectControllerTest extends BasicTestClass {
         Long createdProjectId = createNewProject();
         TaskSpec emptyTaskSpec = SpecificationBuilder.specification(TaskSpec.class).build();
         Long columnId = dashboardService.getDashboard(createdProjectId, emptyTaskSpec).columns().get(0).id();
-        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, columnId), createdUserId);
+        Long taskId = taskService.createTask(DtoBuilders.createTask(createdProjectId, columnId), user(createdUserId));
         requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
@@ -225,13 +226,10 @@ class ProjectControllerTest extends BasicTestClass {
     @Test
     void successfulGetUserProjectsTest() {
         Long secondCreatedUserId = createNewUser();
-        UserEntity secondUser = userService.getUserById(secondCreatedUserId);
+        String token = generateToken(secondCreatedUserId, username + "2");
         projectManagementServiceDecorator.createProject(Instancio.create(ProjectEntity.class), secondCreatedUserId);
 
-        String tokenForSecondUser = authenticationService.authenticateUser(
-                UserEntity.builder().username(secondUser.getUsername()).encryptedPassword(PASSWORD).build()
-        ).accessToken();
-        Response response = given().header("Authorization", "Bearer " + tokenForSecondUser)
+        Response response = given().header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .when()
                 .get(PATH_TO_PROJECTS_API);

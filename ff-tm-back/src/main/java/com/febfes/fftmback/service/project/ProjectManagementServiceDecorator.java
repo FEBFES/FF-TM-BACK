@@ -1,6 +1,6 @@
 package com.febfes.fftmback.service.project;
 
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.dto.PatchDto;
 import com.febfes.fftmback.service.ColumnService;

@@ -1,12 +1,12 @@
 package com.febfes.fftmback.exception;
 
-import com.febfes.fftmback.domain.common.RoleName;
-import com.febfes.fftmback.dto.error.ErrorType;
-import com.febfes.fftmback.dto.error.StatusError;
+import com.febfes.fftmback.domain.RoleName;
+import com.febfes.fftmback.dto.ErrorType;
+import com.febfes.fftmback.dto.StatusError;
 
 import java.io.Serial;
 
-import static com.febfes.fftmback.dto.error.RoleError.createBaseError;
+import static com.febfes.fftmback.dto.RoleError.createBaseError;
 
 public class RoleCheckException extends CustomException {
 

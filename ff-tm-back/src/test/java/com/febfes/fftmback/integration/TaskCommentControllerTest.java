@@ -1,8 +1,7 @@
 package com.febfes.fftmback.integration;
 
-import com.febfes.fftmback.domain.dao.TaskCommentEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.TaskCommentDto;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.febfes.fftmback.service.TaskCommentService;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
@@ -25,7 +24,7 @@ class TaskCommentControllerTest extends BasicTestClass {
         Long projectId = createNewProject();
         Long taskId = createNewTask(projectId, userId);
 
-        TaskCommentDto comment = TaskCommentDto.builder()
+        com.febfes.fftmback.dto.TaskCommentDto comment = com.febfes.fftmback.dto.TaskCommentDto.builder()
                 .creatorId(userId)
                 .taskId(taskId)
                 .text("Some comment text")
@@ -46,15 +45,15 @@ class TaskCommentControllerTest extends BasicTestClass {
         Long projectId = createNewProject();
         Long taskId = createNewTask(projectId, userId);
 
-        TaskCommentEntity comment = taskCommentService.saveTaskComment(
-                TaskCommentEntity.builder()
-                    .creator(UserEntity.builder().id(userId).build())
-                    .taskId(taskId)
-                    .text("Some comment text")
-                    .build()
+        var comment = taskCommentService.saveTaskComment(
+                TaskCommentDto.builder()
+                        .creatorId(userId)
+                        .taskId(taskId)
+                        .text("Some comment text")
+                        .build()
         );
 
-        Optional<TaskCommentDto> receivedCommentOpt = requestWithBearerToken()
+        Optional<com.febfes.fftmback.dto.TaskCommentDto> receivedCommentOpt = requestWithBearerToken()
                 .contentType(ContentType.JSON)
                 .when()
                 .get("%s/task/%s/comments".formatted(PATH_TO_PROJECTS_API, taskId.toString()))
@@ -63,16 +62,16 @@ class TaskCommentControllerTest extends BasicTestClass {
                 .extract()
                 .response()
                 .jsonPath()
-                .getList(".", TaskCommentDto.class)
+                .getList(".", com.febfes.fftmback.dto.TaskCommentDto.class)
                 .stream()
                 .findFirst();
 
         assertThat(receivedCommentOpt).isPresent();
         receivedCommentOpt.ifPresent(receivedComment -> {
-            assertThat(receivedComment.id()).isEqualTo(comment.getTaskId());
-            assertThat(receivedComment.taskId()).isEqualTo(comment.getTaskId());
-            assertThat(receivedComment.creatorId()).isEqualTo(comment.getCreator().getId());
-            assertThat(receivedComment.text()).isEqualTo(comment.getText());
+            assertThat(receivedComment.id()).isEqualTo(comment.taskId());
+            assertThat(receivedComment.taskId()).isEqualTo(comment.taskId());
+            assertThat(receivedComment.creatorId()).isEqualTo(comment.creatorId());
+            assertThat(receivedComment.text()).isEqualTo(comment.text());
         });
     }
 }

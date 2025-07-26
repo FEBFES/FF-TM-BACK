@@ -1,11 +1,11 @@
 package com.fftmback.domain;
 
-import jakarta.persistence.*;
+import com.febfes.fftmback.domain.abstracts.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notification")
@@ -15,17 +15,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class NotificationEntity {
+public class NotificationEntity extends BaseEntity {
 
     public static final String ENTITY_NAME = "Notification";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "create_date", updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createDate;
 
     @Column(name = "user_id_to")
     private Long userIdTo;

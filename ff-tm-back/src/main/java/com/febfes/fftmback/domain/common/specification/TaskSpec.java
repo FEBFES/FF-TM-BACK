@@ -11,15 +11,13 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Set;
 
-@JoinFetch(paths = "owner", alias = "own")
-@JoinFetch(paths = "assignee", alias = "asg")
 @JoinFetch(paths = "taskType", alias = "tt")
 @And({
         @Spec(path = "id", params = "taskId", spec = Equal.class),
         @Spec(path = "name", params = "taskName", spec = LikeIgnoreCase.class),
         @Spec(path = "description", params = "taskDescription", spec = LikeIgnoreCase.class),
-        @Spec(path = "own.id", params = "taskOwnerId", spec = Equal.class),
-        @Spec(path = "asg.id", params = "taskAssigneeId", spec = Equal.class),
+        @Spec(path = "ownerId", params = "taskOwnerId", spec = Equal.class),
+        @Spec(path = "assigneeId", params = "taskAssigneeId", spec = Equal.class),
         @Spec(path = "priority", params = "taskPriority", spec = EqualIgnoreCase.class),
         @Spec(path = "tt.name", params = "taskType", spec = Equal.class)
 })

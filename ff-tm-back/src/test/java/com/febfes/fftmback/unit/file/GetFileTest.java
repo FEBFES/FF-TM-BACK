@@ -5,31 +5,33 @@ import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.febfes.fftmback.repository.FileRepository;
 import com.febfes.fftmback.service.impl.FileServiceImpl;
+import com.febfes.fftmback.unit.BaseUnitTest;
+import com.febfes.fftmback.util.FileUrnUtils;
 import com.febfes.fftmback.util.FileUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.febfes.fftmback.util.UnitTestBuilders.file;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class GetFileTest {
+class GetFileTest extends BaseUnitTest {
 
     private static final Long FIRST_ID = 1L;
     private static final String FILE_URN = "test-file-urn";
     private static final String ID_FOR_URN = "123";
     private static final String FILE_PATH = "test-file-path";
-    private static final String USER_FILE_URN = String.format(FileUtils.USER_PIC_URN, Long.parseLong(ID_FOR_URN));
+    private static final String USER_FILE_URN = FileUrnUtils.getUserPicUrn(Long.parseLong(ID_FOR_URN));
     private static final String TASK_FILE_URN = String.format(FileUtils.TASK_FILE_URN, Long.parseLong(ID_FOR_URN));
     private static final byte[] EXPECTED_BYTES = "test content".getBytes();
 
@@ -39,16 +41,11 @@ class GetFileTest {
     @InjectMocks
     private FileServiceImpl fileService;
 
-    @BeforeEach
-    public void init() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void testGetFile() {
         // Arrange
-        FileEntity file = new FileEntity();
-        file.setFileUrn(FILE_URN);
+        FileEntity file = file(null, FILE_URN, null, null);
 
         when(fileRepository.findByFileUrn(FILE_URN)).thenReturn(Optional.of(file));
 
@@ -68,12 +65,10 @@ class GetFileTest {
     @Test
     void testGetFilesByEntityId() {
         // Arrange
-        FileEntity fileEntity1 = new FileEntity();
+        FileEntity fileEntity1 = file(null, null, EntityType.TASK, null);
         fileEntity1.setEntityId(FIRST_ID);
-        fileEntity1.setEntityType(EntityType.TASK);
-        FileEntity fileEntity2 = new FileEntity();
+        FileEntity fileEntity2 = file(null, null, EntityType.TASK, null);
         fileEntity2.setEntityId(FIRST_ID);
-        fileEntity2.setEntityType(EntityType.TASK);
 
         when(fileRepository.findAllByEntityIdAndEntityType(FIRST_ID, EntityType.TASK))
                 .thenReturn(Arrays.asList(fileEntity1, fileEntity2));
@@ -99,18 +94,10 @@ class GetFileTest {
     @Test
     void testGetFileContent() throws IOException {
         // Arrange
-        FileEntity fileEntity = new FileEntity();
-        fileEntity.setId(FIRST_ID);
-        fileEntity.setFileUrn(USER_FILE_URN);
-        fileEntity.setFilePath(FILE_PATH);
-        fileEntity.setEntityType(EntityType.USER_PIC);
+        FileEntity fileEntity = file(FIRST_ID, USER_FILE_URN, EntityType.USER_PIC, FILE_PATH);
 
         when(fileRepository.findByFileUrn(USER_FILE_URN)).thenReturn(Optional.of(fileEntity));
         when(fileRepository.findByFileUrn(TASK_FILE_URN)).thenReturn(Optional.of(fileEntity));
-        File mockedUserPicFile = mock(File.class);
-        Path mockedUserPicPath = mock(Path.class);
-        when(mockedUserPicFile.toPath()).thenReturn(mockedUserPicPath);
-        when(mockedUserPicPath.toString()).thenReturn(FILE_PATH);
 
         // static method
         try (MockedStatic<Files> mockedFiles = Mockito.mockStatic(Files.class)) {

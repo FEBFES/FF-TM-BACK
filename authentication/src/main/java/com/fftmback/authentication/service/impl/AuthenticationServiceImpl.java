@@ -3,14 +3,15 @@ package com.fftmback.authentication.service.impl;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.febfes.fftmback.dto.ErrorType;
+import com.febfes.fftmback.exception.EntityAlreadyExistsException;
+import com.febfes.fftmback.exception.EntityNotFoundException;
 import com.fftmback.authentication.config.jwt.JwtService;
 import com.fftmback.authentication.domain.UserEntity;
 import com.fftmback.authentication.dto.ConnValidationResponse;
 import com.fftmback.authentication.dto.GetAuthDto;
-import com.fftmback.authentication.dto.error.ErrorType;
-import com.fftmback.authentication.exception.EntityAlreadyExistsException;
-import com.fftmback.authentication.exception.EntityNotFoundException;
 import com.fftmback.authentication.exception.TokenExpiredException;
+import com.fftmback.authentication.feign.RoleClient;
 import com.fftmback.authentication.repository.UserRepository;
 import com.fftmback.authentication.service.AuthenticationService;
 import com.fftmback.authentication.service.RefreshTokenService;
@@ -42,6 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
+    private final RoleClient roleClient;
 
     private final RandomStringGenerator generator = new RandomStringGenerator.Builder()
             .selectFrom('0', '9')
@@ -51,6 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private static final String BEARER = "Bearer ";
     private static final String PROJECTS_REGEX = "/projects/(\\d+).*";
+    private static final Pattern PROJECTS_PATTERN = Pattern.compile(PROJECTS_REGEX);
 
     @Value("${custom-headers.init-uri}")
     private String initUriHeader;
@@ -139,14 +142,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return null;
         }
 
-        Pattern pattern = Pattern.compile(PROJECTS_REGEX);
-        Matcher matcher = pattern.matcher(initUri);
+        Matcher matcher = PROJECTS_PATTERN.matcher(initUri);
 
         if (matcher.find()) {
             String projectIdStr = matcher.group(1);
             try {
                 Long projectId = Long.parseLong(projectIdStr);
-                return userDetails.getProjectRoles().get(projectId).getName().name();
+                return roleClient.getUserRoleNameOnProject(projectId, userDetails.getId()).name();
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Invalid project ID format in init URI", e);
             }

@@ -1,19 +1,17 @@
 package com.febfes.fftmback.integration;
 
+import com.febfes.fftmback.config.jwt.User;
 import com.febfes.fftmback.domain.common.TaskPriority;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
 import com.febfes.fftmback.domain.dao.ProjectEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.domain.dao.UserEntity;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
+import com.febfes.fftmback.integration.basic.BasicStaticDataTestClass;
 import com.febfes.fftmback.repository.TaskViewRepository;
-import com.febfes.fftmback.service.AuthenticationService;
 import com.febfes.fftmback.service.ColumnService;
 import com.febfes.fftmback.service.TaskService;
-import com.febfes.fftmback.service.UserService;
 import com.febfes.fftmback.service.project.DashboardService;
 import com.febfes.fftmback.service.project.ProjectManagementService;
-import com.febfes.fftmback.util.DtoBuilders;
 import net.kaczmarzyk.spring.data.jpa.utils.SpecificationBuilder;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
@@ -36,20 +34,13 @@ class TaskFilterTest extends BasicStaticDataTestClass {
 
     @BeforeAll
     static void beforeAll(
-            @Autowired AuthenticationService authenticationService,
-            @Autowired UserService userService,
             @Autowired @Qualifier("projectManagementService") ProjectManagementService projectManagementService,
             @Autowired TaskService taskService,
             @Autowired ColumnService columnService,
             @Autowired DashboardService dashboardService
     ) {
-        UserEntity user = DtoBuilders.createUser();
-        authenticationService.registerUser(user);
-        Long createdUserId = userService.getUserIdByUsername(user.getUsername());
-
-        UserEntity user2 = DtoBuilders.createUser();
-        authenticationService.registerUser(user2);
-        Long createdUserId2 = userService.getUserIdByUsername(user2.getUsername());
+        Long createdUserId = 1L;
+        Long createdUserId2 = 2L;
 
         Long createdProjectId = createProject(projectManagementService, columnService, createdUserId);
         Long createdProjectId2 = createProject(projectManagementService, columnService, createdUserId2);
@@ -69,7 +60,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .description("123")
                         .priority(TaskPriority.LOW)
                         .build(),
-                createdUserId
+                new User(createdUserId, null, null)
         );
 
         taskService.createTask(
@@ -80,7 +71,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME + "2")
                         .description("12345")
                         .build(),
-                createdUserId
+                new User(createdUserId, null, null)
         );
 
         taskService.createTask(
@@ -91,7 +82,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME)
                         .description("12345")
                         .build(),
-                createdUserId
+                new User(createdUserId, null, null)
         );
 
         taskService.createTask(
@@ -102,7 +93,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
-                createdUserId2
+                new User(createdUserId2, null, null)
         );
 
         taskService.createTask(
@@ -113,7 +104,7 @@ class TaskFilterTest extends BasicStaticDataTestClass {
                         .name(TASK_NAME + "another")
                         .description("12345")
                         .build(),
-                createdUserId2
+                new User(createdUserId2, null, null)
         );
 
         /*

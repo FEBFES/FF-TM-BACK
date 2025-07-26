@@ -1,8 +1,9 @@
 package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.ApiGet;
+import com.febfes.fftmback.annotation.ApiGetOne;
 import com.febfes.fftmback.annotation.ProtectedApi;
-import com.febfes.fftmback.domain.common.RoleName;
+import com.febfes.fftmback.domain.RoleName;
 import com.febfes.fftmback.domain.dao.RoleEntity;
 import com.febfes.fftmback.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,9 +32,15 @@ public class RoleController {
         return roleService.getRoles();
     }
 
+    @Operation(summary = "Get user role name on project")
+    @ApiGetOne(path = "/projects/{projectId}/users/{userId}/")
+    public RoleName getUserRoleNameOnProject(@PathVariable Long projectId, @PathVariable Long userId) {
+        return roleService.getUserRoleOnProject(projectId, userId).getName();
+    }
+
     @Operation(summary = "Change user role on a project")
     @PostMapping(path = "{roleName}/projects/{projectId}/users/{userId}/")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).OWNER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).OWNER.name())")
     public void changeUserRoleOnProject(
             @PathVariable RoleName roleName,
             @PathVariable Long projectId,

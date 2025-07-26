@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1"
+      author: IvanShish
+      comment: "Drop v_user view"
+      changes:
+        - dropView:
+            catalogName: ff-tm
+            schemaName: public
+            viewName: v_user

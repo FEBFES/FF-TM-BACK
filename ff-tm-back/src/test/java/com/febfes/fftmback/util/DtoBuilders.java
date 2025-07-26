@@ -1,6 +1,9 @@
 package com.febfes.fftmback.util;
 
-import com.febfes.fftmback.domain.dao.*;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.TaskColumnEntity;
+import com.febfes.fftmback.domain.dao.TaskEntity;
+import com.febfes.fftmback.domain.dao.TaskTypeEntity;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.EditTaskDto;
 import lombok.experimental.UtilityClass;
@@ -9,9 +12,7 @@ import org.instancio.InstancioApi;
 import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 
-import static com.febfes.fftmback.integration.AuthenticationControllerTest.EMAIL_PATTERN;
 import static org.instancio.Select.field;
 
 @UtilityClass
@@ -25,16 +26,6 @@ public class DtoBuilders {
                 .name(name)
                 .order(order)
                 .build();
-    }
-
-    public static UserEntity createUser() {
-        return commonUser().create();
-    }
-
-    public static UserEntity createUser(String displayName) {
-        return commonUser()
-                .set(field(UserEntity::getDisplayName), displayName)
-                .create();
     }
 
     public static TaskColumnEntity createColumn(Long projectId) {
@@ -78,14 +69,7 @@ public class DtoBuilders {
                 .create();
     }
 
-    private InstancioApi<UserEntity> commonUser() {
-        return Instancio.of(UserEntity.class)
-                .generate(field(UserEntity::getEmail), gen -> gen.text().pattern(EMAIL_PATTERN))
-                .set(field(UserEntity::getProjectRoles), Collections.emptyMap())
-                .set(field(UserEntity::getEncryptedPassword), PASSWORD);
-    }
-
-    private InstancioApi<TaskEntity> commonTask(Long projectId, Long columnId) {
+    private static InstancioApi<TaskEntity> commonTask(Long projectId, Long columnId) {
         return Instancio.of(TaskEntity.class)
                 .set(field(TaskEntity::getProjectId), projectId)
                 .set(field(TaskEntity::getColumnId), columnId)
@@ -94,7 +78,7 @@ public class DtoBuilders {
                 .set(field(TaskEntity::getTaskType), null);
     }
 
-    private InstancioApi<EditTaskDto> commonEditTask() {
+    private static InstancioApi<EditTaskDto> commonEditTask() {
         return Instancio.of(EditTaskDto.class)
                 .set(field(EditTaskDto::assigneeId), null);
     }

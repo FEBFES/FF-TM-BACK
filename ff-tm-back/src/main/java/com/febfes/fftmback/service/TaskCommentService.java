@@ -1,12 +1,12 @@
 package com.febfes.fftmback.service;
 
-import com.febfes.fftmback.domain.dao.TaskCommentEntity;
+import com.febfes.fftmback.dto.TaskCommentDto;
 
 import java.util.List;
 
 public interface TaskCommentService {
 
-    TaskCommentEntity saveTaskComment(TaskCommentEntity taskComment);
+    TaskCommentDto saveTaskComment(TaskCommentDto taskComment);
 
-    List<TaskCommentEntity> getCommentsByTaskId(Long taskId);
+    List<TaskCommentDto> getCommentsByTaskId(Long taskId);
 }

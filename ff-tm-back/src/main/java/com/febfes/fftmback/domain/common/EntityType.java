@@ -1,7 +1,10 @@
 package com.febfes.fftmback.domain.common;
 
+import com.febfes.fftmback.util.FileUrnUtils;
 import com.febfes.fftmback.util.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.Paths;
 
 public enum EntityType {
 
@@ -29,7 +32,7 @@ public enum EntityType {
 
         @Override
         public String getFileUrn(String idForUrn) {
-            return String.format(FileUtils.USER_PIC_URN, Long.parseLong(idForUrn));
+            return FileUrnUtils.getUserPicUrn(Long.parseLong(idForUrn));
         }
 
         @Override
@@ -45,6 +48,7 @@ public enum EntityType {
     public abstract String getPathPropertyName();
 
     public String getFilePath(MultipartFile file, String folderPath, String idForPath) {
-        return "%s%s.%s".formatted(folderPath, idForPath, FileUtils.getExtension(file.getOriginalFilename()));
+        String sanitizedExt = FileUtils.getExtension(file.getOriginalFilename());
+        return Paths.get(folderPath, idForPath + '.' + sanitizedExt).toString();
     }
 }

@@ -12,9 +12,10 @@ import java.util.regex.Pattern;
 @UtilityClass
 public class SortUtils {
 
+    private static final Pattern SORT_PATTERN = Pattern.compile("([\\-+]?)(\\w+)");
+
     public static Order getOrderFromParam(String sortParam) {
-        Pattern pattern = Pattern.compile("([\\-+]?)(\\w+)");
-        Matcher matcher = pattern.matcher(sortParam);
+        Matcher matcher = SORT_PATTERN.matcher(sortParam);
         if (!matcher.find()) {
             throw new IllegalArgumentException("Sort parameter doesn't match pattern");
         }

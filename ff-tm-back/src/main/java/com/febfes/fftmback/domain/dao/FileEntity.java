@@ -1,7 +1,7 @@
 package com.febfes.fftmback.domain.dao;
 
+import com.febfes.fftmback.domain.abstracts.BaseEntity;
 import com.febfes.fftmback.domain.common.EntityType;
-import com.febfes.fftmback.domain.dao.abstracts.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

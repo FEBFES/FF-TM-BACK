@@ -29,7 +29,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            log.warn("Spring Security Filter Chain Exception: ", e);
+            log.warn("Spring Security Filter Chain Exception: {}", e.getMessage());
             resolver.resolveException(request, response, null, e);
         }
     }

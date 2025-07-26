@@ -4,18 +4,18 @@ import com.febfes.fftmback.domain.dao.TaskColumnEntity;
 import com.febfes.fftmback.repository.ColumnRepository;
 import com.febfes.fftmback.service.impl.ColumnServiceImpl;
 import com.febfes.fftmback.service.order.OrderService;
-import org.junit.jupiter.api.BeforeEach;
+import com.febfes.fftmback.unit.BaseUnitTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
+import static com.febfes.fftmback.util.UnitTestBuilders.column;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class CreateColumnTest {
+class CreateColumnTest extends BaseUnitTest {
 
     private static final Long FIRST_ID = 1L;
     private static final String COLUMN_NAME = "Test Column";
@@ -29,17 +29,10 @@ class CreateColumnTest {
     @InjectMocks
     private ColumnServiceImpl columnService;
 
-    @BeforeEach
-    public void init() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void testCreateColumn() {
-        // Create a mock TaskColumnEntity object
-        TaskColumnEntity column = new TaskColumnEntity();
-        column.setName(COLUMN_NAME);
-        column.setProjectId(FIRST_ID);
+        TaskColumnEntity column = column(null, FIRST_ID, COLUMN_NAME);
 
         // Mock the columnRepository to return the saved column
         when(columnRepository.save(column)).thenReturn(column);
@@ -62,10 +55,7 @@ class CreateColumnTest {
 
     @Test
     void testCreateColumnThrowsException() {
-        // Create a mock TaskColumnEntity object
-        TaskColumnEntity column = new TaskColumnEntity();
-        column.setName(COLUMN_NAME);
-        column.setProjectId(FIRST_ID);
+        TaskColumnEntity column = column(null, FIRST_ID, COLUMN_NAME);
 
         // Mock the columnRepository to throw an exception
         given(columnRepository.save(column)).willAnswer(invocation -> {

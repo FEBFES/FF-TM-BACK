@@ -1,5 +1,6 @@
 package com.febfes.fftmback.config.jwt;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,8 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt = authHeader.substring(BEARER.length());
         String role = request.getHeader(userRoleHeader);
         Long userId = jwtService.extractClaim(jwt, claims -> claims.get("userId", Long.class));
+        String username = jwtService.extractClaim(jwt, Claims::getSubject);
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                new User(userId, role),
+                new User(userId, role, username),
                 null,
                 getRoles(role)
         );

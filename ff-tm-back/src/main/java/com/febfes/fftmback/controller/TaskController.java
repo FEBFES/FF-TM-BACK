@@ -2,18 +2,14 @@ package com.febfes.fftmback.controller;
 
 import com.febfes.fftmback.annotation.*;
 import com.febfes.fftmback.config.jwt.User;
-import com.febfes.fftmback.domain.common.EntityType;
 import com.febfes.fftmback.domain.common.specification.TaskSpec;
-import com.febfes.fftmback.domain.dao.FileEntity;
 import com.febfes.fftmback.domain.dao.TaskEntity;
-import com.febfes.fftmback.domain.dao.TaskView;
 import com.febfes.fftmback.dto.EditTaskDto;
 import com.febfes.fftmback.dto.TaskDto;
 import com.febfes.fftmback.dto.TaskShortDto;
 import com.febfes.fftmback.dto.parameter.ColumnParameters;
 import com.febfes.fftmback.dto.parameter.TaskParameters;
 import com.febfes.fftmback.mapper.TaskMapper;
-import com.febfes.fftmback.service.FileService;
 import com.febfes.fftmback.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +33,6 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
-    private final FileService fileService;
     private final TaskMapper taskMapper;
 
     @Operation(summary = "Get tasks with pagination")
@@ -48,23 +43,18 @@ public class TaskController {
             TaskSpec taskSpec,
             @ParameterObject ColumnParameters pathVars
     ) {
-        List<TaskView> tasks = taskService.getTasks(page, limit, pathVars.columnId(), taskSpec);
-        return tasks.stream()
-                .map(taskMapper::taskViewToTaskShortDto)
-                .toList();
+        return taskService.getTasks(page, limit, pathVars.columnId(), taskSpec);
     }
 
     @Operation(summary = "Get task by its id")
     @ApiGetOne(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
     public TaskDto getTaskById(@ParameterObject TaskParameters pathVars) {
-        TaskView task = taskService.getTaskById(pathVars.taskId());
-        List<FileEntity> files = fileService.getFilesByEntityId(pathVars.taskId(), EntityType.TASK);
-        return taskMapper.taskViewToTaskDto(task, files);
+        return taskService.getTaskById(pathVars.taskId());
     }
 
     @Operation(summary = "Create new task")
     @ApiCreate(path = "{projectId}/columns/{columnId}/tasks")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER.name())")
     public TaskShortDto createTask(
             @AuthenticationPrincipal User user,
             @ParameterObject ColumnParameters pathVars,
@@ -72,14 +62,14 @@ public class TaskController {
     ) {
         Long createdTaskId = taskService.createTask(
                 taskMapper.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto),
-                user.id()
+                user
         );
-        return taskMapper.taskViewToTaskShortDto(taskService.getTaskById(createdTaskId));
+        return taskService.getTaskShortById(createdTaskId);
     }
 
     @Operation(summary = "Edit task by its id")
     @ApiEdit(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER.name())")
     public TaskShortDto updateTask(
             @AuthenticationPrincipal User user,
             @ParameterObject TaskParameters pathVars,
@@ -87,13 +77,13 @@ public class TaskController {
     ) {
         TaskEntity editTask = taskMapper.taskDtoToTask(pathVars.projectId(), pathVars.columnId(), editTaskDto);
         editTask.setId(pathVars.taskId());
-        taskService.updateTask(editTask, user.id());
-        return taskMapper.taskViewToTaskShortDto(taskService.getTaskById(pathVars.taskId()));
+        taskService.updateTask(editTask, user);
+        return taskService.getTaskShortById(pathVars.taskId());
     }
 
     @Operation(summary = "Delete task by its id")
     @ApiDelete(path = "{projectId}/columns/{columnId}/tasks/{taskId}")
-    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.common.RoleName).MEMBER.name())")
+    @PreAuthorize("hasAuthority(T(com.febfes.fftmback.domain.RoleName).MEMBER.name())")
     public void deleteTask(@ParameterObject TaskParameters pathVars) {
         taskService.deleteTask(pathVars.taskId());
     }

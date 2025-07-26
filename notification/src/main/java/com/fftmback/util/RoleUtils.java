@@ -1,7 +1,7 @@
 package com.fftmback.util;
 
+import com.febfes.fftmback.domain.RoleName;
 import com.fftmback.domain.Role;
-import com.fftmback.domain.RoleName;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 

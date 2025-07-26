@@ -3,6 +3,7 @@ package com.febfes.fftmback.integration;
 import com.febfes.fftmback.dto.ColumnDto;
 import com.febfes.fftmback.dto.ColumnWithTasksDto;
 import com.febfes.fftmback.dto.DashboardDto;
+import com.febfes.fftmback.integration.basic.BasicTestClass;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -116,7 +117,7 @@ class ColumnControllerTest extends BasicTestClass {
         List<ColumnWithTasksDto> columnsAfterDelete = getDashboard().columns();
         Assertions.assertThat(columnsBeforeDelete.size() - 1)
                 .isEqualTo(columnsAfterDelete.size());
-        if (columnsAfterDelete.size() > 0) {
+        if (!columnsAfterDelete.isEmpty()) {
             ColumnWithTasksDto firstColumn = columnsAfterDelete.get(0);
             deleteFoo.accept(firstColumn.id());
             List<ColumnWithTasksDto> columnsAfterSecondDelete = getDashboard().columns();
