@@ -1,6 +1,14 @@
 spring:
   application:
     name: notification
-
+  boot:
+    admin:
+      client:
+        url: ${config.path}:8095
 server:
   port: 8091
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

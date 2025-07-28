@@ -22,10 +22,14 @@
 - `ff-tm-back` – main monolithic application
 - `gateway` – API gateway for routing requests
 - `notification` – service for sending notifications via Kafka and SSE
+- `admin-server` – Spring Boot Admin UI service
 - `docker` – Dockerfiles and compose configuration
 - `docs` – project documentation and diagrams
 - `k8s` – Kubernetes manifests
 - `scripts` – helper deployment scripts
+
+All running services register with the Admin UI available at
+`http://localhost:8095`.
 
 ## Running locally (IntelliJ IDEA):
 

@@ -5,3 +5,12 @@ spring:
     name: gateway
   config:
     import: optional:configserver:${config.path}:8888
+  boot:
+    admin:
+      client:
+        url: ${config.path}:8095
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

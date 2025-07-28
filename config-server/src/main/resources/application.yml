@@ -6,6 +6,10 @@ config:
   path: http://localhost
 
 spring:
+  boot:
+    admin:
+      client:
+        url: ${config.path}:8095
   application:
     name: config-service
   profiles:
@@ -16,3 +20,9 @@ spring:
         bootstrap: false
         native:
           search-locations: classpath:/configurations/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
