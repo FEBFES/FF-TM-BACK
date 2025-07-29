@@ -53,7 +53,8 @@ public class WebSecurity {
                         "/v1/auth/register",
                         "/v1/auth/authenticate",
                         "/v1/auth/refresh-token",
-                        "/v1/auth/check-token-expiration"
+                        "/v1/auth/check-token-expiration",
+                        "/actuator/**"
                 )
                 .permitAll()
                 .anyRequest()

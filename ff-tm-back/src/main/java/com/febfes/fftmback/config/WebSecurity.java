@@ -49,7 +49,8 @@ public class WebSecurity {
                 .requestMatchers(
                         "/v1/roles",
                         "/v3/api-docs/**",
-                        "/v1/v3/api-docs/**"
+                        "/v1/v3/api-docs/**",
+                        "/actuator/**"
                 )
                 .permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/files/user-pic/**")
