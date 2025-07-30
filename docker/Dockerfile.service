@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1
+
+ARG SERVICE_DIR
+ARG EXPOSE_PORT
+ARG EXTRA_PACKAGES=""
+ARG PRE_BUILD_CMD=""
+
+FROM amazoncorretto:17-alpine AS build
+ARG SERVICE_DIR
+ARG EXTRA_PACKAGES
+ARG PRE_BUILD_CMD
+
+WORKDIR /home/${SERVICE_DIR}
+
+# Copy service sources
+COPY ./${SERVICE_DIR}/ ./
+# Copy shared module
+COPY ./febfes-commons ./febfes-commons
+
+# Optional packages and custom commands before build
+RUN if [ -n "$EXTRA_PACKAGES" ]; then apk add --no-cache $EXTRA_PACKAGES; fi && \
+    chmod +x mvnw && \
+    sed -i 's/\r$//' mvnw && \
+    /bin/sh -c "$PRE_BUILD_CMD" && \
+    ./mvnw -f febfes-commons/pom.xml clean install -DskipTests && \
+    ./mvnw clean install -Dmaven.test.skip
+
+FROM amazoncorretto:17-alpine
+ARG SERVICE_DIR
+ARG EXPOSE_PORT
+
+WORKDIR /home/${SERVICE_DIR}
+COPY --from=build /home/${SERVICE_DIR}/target/*.jar app.jar
+EXPOSE ${EXPOSE_PORT}
+ENTRYPOINT ["java", "-jar", "app.jar"]
