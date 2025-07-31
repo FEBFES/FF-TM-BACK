@@ -4,9 +4,11 @@ databaseChangeLog:
       author: IvanShish
       comment: "Create user table"
       preConditions:
-        - not:
-            tableExists:
-              tableName: user_entity
+        onFail: MARK_RAN
+        onError: MARK_RAN
+        not:
+          tableExists:
+            tableName: user_entity
       changes:
         - createTable:
             tableName: user_entity

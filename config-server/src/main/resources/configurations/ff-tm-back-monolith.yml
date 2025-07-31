@@ -1,10 +1,17 @@
 spring:
   application:
     name: ff-tm-back-monolith
-
+  boot:
+    admin:
+      client:
+        url: ${config.path}:8095
 server:
   port: 8090
-
 folders:
   user-pic: /home/febfes/userPics/
   task-files: /home/febfes/files/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

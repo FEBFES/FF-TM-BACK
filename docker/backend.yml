@@ -2,6 +2,7 @@ version: '3.9'
 
 name: ff-tm-back
 services:
+
   config-server:
     build:
       context: ../
@@ -10,8 +11,18 @@ services:
       - "8888:8888"
     env_file:
       .env
+
+  admin-server:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-admin-server
+    ports:
+      - "8095:8095"
+    env_file:
+      .env
+    restart: on-failure
     depends_on:
-      - postgres
+      - config-server
 
   authentication:
     build:

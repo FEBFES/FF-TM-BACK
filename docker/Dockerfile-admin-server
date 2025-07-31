@@ -1,0 +1,20 @@
+## Build stage
+FROM amazoncorretto:17-alpine AS build
+WORKDIR /home/admin-server
+
+COPY ./admin-server/.mvn/ .mvn/
+COPY ./admin-server/mvnw ./
+COPY ./admin-server/pom.xml ./
+COPY ./admin-server/src ./src/
+
+RUN chmod +x mvnw
+RUN sed -i 's/\r$//' mvnw
+RUN ./mvnw clean install -Dmaven.test.skip
+
+## Package stage
+FROM amazoncorretto:17-alpine
+WORKDIR /home/admin-server
+
+COPY --from=build /home/admin-server/target/*.jar /home/admin-server/*.jar
+EXPOSE 8095
+ENTRYPOINT ["java", "-jar", "/home/admin-server/*.jar"]

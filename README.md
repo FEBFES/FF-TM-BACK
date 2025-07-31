@@ -22,10 +22,14 @@
 - `ff-tm-back` – main monolithic application
 - `gateway` – API gateway for routing requests
 - `notification` – service for sending notifications via Kafka and SSE
+- `admin-server` – Spring Boot Admin UI service
 - `docker` – Dockerfiles and compose configuration
 - `docs` – project documentation and diagrams
 - `k8s` – Kubernetes manifests
 - `scripts` – helper deployment scripts
+
+All running services register with the Admin UI available at
+`http://localhost:8095`.
 
 ## Running locally (IntelliJ IDEA):
 
@@ -61,7 +65,7 @@ build: `docker build . --tag=ff-tm-back:latest -f docker/Dockerfile`
 
 run: `docker run -p 8090:8090 --env-file docker/.env --name ff-tm-back ff-tm-back:latest`
 
-docker-compose: `docker-compose -f docker/other.yml -f docker/backend.yml up`
+docker-compose: `docker-compose up - d` (from `/docker` folder)
 
 ## Database scheme
 

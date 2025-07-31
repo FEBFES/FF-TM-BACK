@@ -52,6 +52,11 @@
                         <artifactId>febfes-commons</artifactId>
                         <version>0.0.1-SNAPSHOT</version>
                 </dependency>
+                <dependency>
+                        <groupId>de.codecentric</groupId>
+                        <artifactId>spring-boot-admin-starter-client</artifactId>
+                        <version>3.1.8</version>
+                </dependency>
         </dependencies>
 	<dependencyManagement>
 		<dependencies>

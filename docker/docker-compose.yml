@@ -116,6 +116,18 @@ services:
     depends_on:
       - postgres
 
+  admin-server:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile-admin-server
+    ports:
+      - "8095:8095"
+    env_file:
+      .env
+    restart: on-failure
+    depends_on:
+      - config-server
+
   authentication:
     build:
       context: ../

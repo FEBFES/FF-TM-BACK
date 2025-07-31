@@ -47,7 +47,8 @@ public class WebSecurity {
                 .authorizeHttpRequests()
                 .requestMatchers(
                         "/v1/notifications/swagger-ui/**",
-                        "/v1/notifications/v3/api-docs/**"
+                        "/v1/notifications/v3/api-docs/**",
+                        "/actuator/**"
                 )
                 .permitAll()
                 .anyRequest()
