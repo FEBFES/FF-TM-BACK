@@ -6,11 +6,14 @@ set -euo pipefail
 
 echo "Downloading Maven dependencies..."
 
-# Build the shared commons module first
-(
-  cd febfes-commons
-  ./mvnw -B install -DskipTests
-)
+# Build shared modules first
+for shared in febfes-commons fftm-grpc-api
+do
+  (
+    cd "$shared"
+    mvn -B install -DskipTests
+  )
+done
 
 # Fetch dependencies for each service
 for module in authentication config-server gateway notification ff-tm-back
