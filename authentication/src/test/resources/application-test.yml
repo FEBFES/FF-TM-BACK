@@ -25,3 +25,9 @@ custom-headers:
   init-uri: X-init-uri
   user-role: X-user-role
   username: X-username
+
+grpc:
+  client:
+    role-service:
+      address: static://localhost:9091
+      negotiationType: PLAINTEXT

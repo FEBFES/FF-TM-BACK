@@ -1,9 +1,13 @@
-package com.fftmback.authentication.feign;
+package com.fftmback.authentication.grpc;
 
 import com.febfes.fftmback.domain.RoleName;
+import com.febfes.fftmback.grpc.role.RoleRequest;
+import com.febfes.fftmback.grpc.role.RoleResponse;
+import com.febfes.fftmback.grpc.role.RoleServiceGrpc;
+import io.grpc.Server;
+import io.grpc.inprocess.InProcessServerBuilder;
+import io.grpc.stub.StreamObserver;
 import lombok.NonNull;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,22 +27,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 class RoleClientTest {
 
-    static MockWebServer mockWebServer;
+    static Server server;
 
     @Autowired
     private RoleClient roleClient;
 
     @AfterEach
-    void tearDown() throws IOException {
-        mockWebServer.shutdown();
+    void tearDown() {
+        server.shutdownNow();
     }
 
     @Test
     void getUserRoleNameOnProjectReturnsEnum() {
-        mockWebServer.enqueue(new MockResponse()
-                .setBody("\"OWNER\"")
-                .addHeader("Content-Type", "application/json"));
-
         RoleName role = roleClient.getUserRoleNameOnProject(1L, 2L);
 
         assertThat(role).isEqualTo(RoleName.OWNER);
@@ -48,14 +48,27 @@ class RoleClientTest {
             implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override
         public void initialize(@NonNull ConfigurableApplicationContext context) {
-            mockWebServer = new MockWebServer();
             try {
-                mockWebServer.start();
+                server = InProcessServerBuilder.forName("test")
+                        .directExecutor()
+                        .addService(new RoleServiceGrpc.RoleServiceImplBase() {
+                            @Override
+                            public void getUserRoleNameOnProject(RoleRequest request,
+                                                                 StreamObserver<RoleResponse> responseObserver) {
+                                responseObserver.onNext(RoleResponse.newBuilder()
+                                        .setRoleName(com.febfes.fftmback.grpc.role.RoleName.OWNER)
+                                        .build());
+                                responseObserver.onCompleted();
+                            }
+                        })
+                        .build()
+                        .start();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             TestPropertyValues.of(
-                    "ff-tm-back.url=http://localhost:" + mockWebServer.getPort()
+                    "grpc.client.role-service.address=in-process:test",
+                    "grpc.client.role-service.negotiationType=PLAINTEXT"
             ).applyTo(context.getEnvironment());
         }
     }

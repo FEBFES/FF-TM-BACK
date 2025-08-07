@@ -54,7 +54,3 @@ springdoc:
   api-docs:
     enabled: true
     path: /v1/auth/v3/api-docs
-
-# Base URL to ff-tm-back service used by Feign clients
-ff-tm-back:
-  url: ${config.path}:8090/api
