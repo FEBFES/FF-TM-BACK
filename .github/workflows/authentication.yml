@@ -6,11 +6,13 @@ on:
     paths:
       - 'authentication/**'
       - 'febfes-commons/**'
+      - 'ff-tm-grpc-api/**'
   pull_request:
     types: [ opened, synchronize, reopened ]
     paths:
       - 'authentication/**'
       - 'febfes-commons/**'
+      - 'ff-tm-grpc-api/**'
 
 jobs:
   authentication:
@@ -35,6 +37,11 @@ jobs:
       - name: Install febfes-commons
         run: |
           cd febfes-commons
+          mvn -B install -DskipTests
+          cd ..
+      - name: Install ff-tm-grpc-api
+        run: |
+          cd ff-tm-grpc-api
           mvn -B install -DskipTests
           cd ..
       - name: Build and analyze Authentication
