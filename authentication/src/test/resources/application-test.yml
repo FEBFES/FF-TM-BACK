@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    exclude:
+      - net.devh.boot.grpc.client.autoconfigure.GrpcClientMetricAutoConfiguration
   cache:
     type: none
   data:
@@ -7,6 +10,7 @@ spring:
       port: 6379
   datasource:
     url: jdbc:tc:postgresql:11.1:///integration-tests-db?TC_INITSCRIPT=schema.sql
+#    url: jdbc:tc:postgresql:11.1:///integration-tests-db
     hikari:
       max-lifetime: 600000
     testWhileIdle: true

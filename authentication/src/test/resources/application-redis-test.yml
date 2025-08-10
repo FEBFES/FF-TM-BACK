@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    exclude:
+      - net.devh.boot.grpc.client.autoconfigure.GrpcClientMetricAutoConfiguration
   cache:
     type: redis
     redis:
