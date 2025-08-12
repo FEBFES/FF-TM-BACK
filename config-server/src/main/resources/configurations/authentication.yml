@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    exclude:
+      - net.devh.boot.grpc.client.autoconfigure.GrpcClientMetricAutoConfiguration
   application:
     name: authentication
   boot:

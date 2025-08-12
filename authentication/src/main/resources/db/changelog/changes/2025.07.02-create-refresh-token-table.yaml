@@ -3,6 +3,12 @@ databaseChangeLog:
       id: 1
       author: IvanShish
       comment: "Create refresh token table"
+      preConditions:
+        onFail: MARK_RAN
+        onError: MARK_RAN
+        not:
+          tableExists:
+            tableName: refresh_token
       changes:
         - createTable:
             tableName: refresh_token
@@ -36,3 +42,10 @@ databaseChangeLog:
                   constraints:
                     foreignKeyName: fk_refresh_token_user
                     references: user_entity(id)
+        - addUniqueConstraint:
+            tableName: refresh_token
+            columnNames: user_id
+        - addDefaultValue:
+            tableName: refresh_token
+            columnName: create_date
+            defaultValueComputed: CURRENT_TIMESTAMP

@@ -1,9 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 1
-      author: IvanShish
-      comment: "Add unique user_id in refresh token"
-      changes:
-        - addUniqueConstraint:
-            tableName: refresh_token
-            columnNames: user_id
