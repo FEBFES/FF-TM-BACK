@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    exclude:
+      - net.devh.boot.grpc.client.autoconfigure.GrpcServerMetricAutoConfiguration
   application:
     name: ff-tm-back-monolith
   boot:
@@ -17,4 +20,6 @@ management:
         include: '*'
 grpc:
   server:
+    metrics:
+      enabled: false
     port: 9091
