@@ -1,0 +1,24 @@
+syntax = "proto3";
+option java_multiple_files = true;
+option java_package = "com.febfes.fftmback.grpc.role";
+option java_outer_classname = "RoleServiceProto";
+package role;
+
+service RoleService {
+  rpc GetUserRoleNameOnProject (RoleRequest) returns (RoleResponse);
+}
+
+message RoleRequest {
+  int64 projectId = 1;
+  int64 userId = 2;
+}
+
+enum RoleName {
+  MEMBER = 0;
+  MEMBER_PLUS = 1;
+  OWNER = 2;
+}
+
+message RoleResponse {
+  RoleName roleName = 1;
+}

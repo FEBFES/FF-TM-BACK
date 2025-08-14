@@ -12,3 +12,12 @@ management:
     web:
       exposure:
         include: '*'
+# Base URL to ff-tm-back service used by Feign clients
+ff-tm-back:
+  url: ${config.path}:8090/api
+
+grpc:
+  client:
+    role-service:
+      address: ${role.service.address:static://${config.path}:9091}
+      negotiationType: PLAINTEXT

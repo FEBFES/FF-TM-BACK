@@ -11,7 +11,7 @@ import com.fftmback.authentication.domain.UserEntity;
 import com.fftmback.authentication.dto.ConnValidationResponse;
 import com.fftmback.authentication.dto.GetAuthDto;
 import com.fftmback.authentication.exception.TokenExpiredException;
-import com.fftmback.authentication.feign.RoleClient;
+import com.fftmback.authentication.grpc.RoleClient;
 import com.fftmback.authentication.repository.UserRepository;
 import com.fftmback.authentication.service.AuthenticationService;
 import com.fftmback.authentication.service.RefreshTokenService;

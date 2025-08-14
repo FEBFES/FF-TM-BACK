@@ -5,8 +5,8 @@ services:
 
   config-server:
     build:
-      context: ../
-      dockerfile: docker/Dockerfile.service
+      context: ..
+      dockerfile: docker/Dockerfile-service
       args:
         SERVICE_DIR: config-server
         EXPOSE_PORT: 8888
@@ -18,8 +18,11 @@ services:
 
   admin-server:
     build:
-      context: ../
-      dockerfile: docker/Dockerfile-admin-server
+      context: ..
+      dockerfile: docker/Dockerfile-service
+      args:
+        SERVICE_DIR: admin-server
+        EXPOSE_PORT: 8095
     ports:
       - "8095:8095"
     env_file:
@@ -30,8 +33,8 @@ services:
 
   authentication:
     build:
-      context: ../
-      dockerfile: docker/Dockerfile.service
+      context: ..
+      dockerfile: docker/Dockerfile-service
       args:
         SERVICE_DIR: authentication
         EXPOSE_PORT: 8092
@@ -47,12 +50,12 @@ services:
 
   gateway:
     build:
-      context: ../
-      dockerfile: docker/Dockerfile.service
+      context: ..
+      dockerfile: docker/Dockerfile-service
       args:
         SERVICE_DIR: gateway
         EXPOSE_PORT: 8061
-        PRE_BUILD_CMD: "/bin/sh mvnw dependency:resolve"
+#        PRE_BUILD_CMD: "/bin/sh mvnw dependency:resolve"
     ports:
       - "8061:8061"
     env_file:
@@ -64,8 +67,8 @@ services:
 
   notification:
     build:
-      context: ../
-      dockerfile: docker/Dockerfile.service
+      context: ..
+      dockerfile: docker/Dockerfile-service
       args:
         SERVICE_DIR: notification
         EXPOSE_PORT: 8091
@@ -80,8 +83,8 @@ services:
 
   ff-tm-back-monolith:
     build:
-      context: ../
-      dockerfile: docker/Dockerfile.service
+      context: ..
+      dockerfile: docker/Dockerfile-service
       args:
         SERVICE_DIR: ff-tm-back
         EXPOSE_PORT: 8090

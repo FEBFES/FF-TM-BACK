@@ -3,7 +3,7 @@ package com.fftmback.authentication.integration;
 
 import com.febfes.fftmback.domain.RoleName;
 import com.fftmback.authentication.domain.UserEntity;
-import com.fftmback.authentication.feign.RoleClient;
+import com.fftmback.authentication.grpc.RoleClient;
 import com.fftmback.authentication.service.AuthenticationService;
 import com.fftmback.authentication.service.UserService;
 import com.fftmback.authentication.util.DatabaseCleanup;
