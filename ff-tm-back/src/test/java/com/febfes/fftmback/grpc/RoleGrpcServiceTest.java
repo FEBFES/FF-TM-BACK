@@ -6,28 +6,31 @@ import com.febfes.fftmback.grpc.role.RoleResponse;
 import com.febfes.fftmback.grpc.role.RoleServiceGrpc;
 import com.febfes.fftmback.integration.basic.BasicTestClass;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 @ActiveProfiles("test")
+@TestPropertySource(properties = {
+        "grpc.server.port=-1",
+        "grpc.server.inProcessName=test-grpc",
+        "grpc.server.security.enabled=false"
+})
 class RoleGrpcServiceTest extends BasicTestClass {
-
-    @Value("${grpc.server.port}")
-    int grpcPort;
 
     private ManagedChannel channel;
     private RoleServiceGrpc.RoleServiceBlockingStub stub;
 
     @BeforeEach
     void setUpChannel() {
-        channel = ManagedChannelBuilder.forAddress("localhost", grpcPort)
-                .usePlaintext()
+        channel = io.grpc.inprocess.InProcessChannelBuilder
+                .forName("test-grpc")
+                .directExecutor()
                 .build();
+
         stub = RoleServiceGrpc.newBlockingStub(channel);
     }
 

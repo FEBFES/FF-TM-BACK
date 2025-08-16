@@ -1,13 +1,19 @@
 spring:
-  autoconfigure:
-    exclude:
-      - net.devh.boot.grpc.client.autoconfigure.GrpcServerMetricAutoConfiguration
   application:
     name: ff-tm-back-monolith
   boot:
     admin:
       client:
         url: ${config.path}:8095
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
+      httpclient:
+        enabled: false
+  autoconfigure:
+    exclude:
+      - net.devh.boot.grpc.client.autoconfigure.GrpcServerMetricAutoConfiguration
 server:
   port: 8090
 folders:

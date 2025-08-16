@@ -268,6 +268,12 @@
             <artifactId>spring-boot-admin-starter-client</artifactId>
             <version>3.1.8</version>
         </dependency>
+
+        <!-- Интеграция Feign с OkHttp -->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
