@@ -10,6 +10,7 @@
 - **MapStruct** for DTO mapping
 - **Quartz** scheduler
 - **Kafka** messaging
+- **gRPC** with **Protobuf** for inter-service communication
 - **Micrometer** and **Zipkin** for tracing
 - **Docker** and **Kubernetes** deployment
 - **JUnit 5**, **Mockito**, **Testcontainers** for tests
@@ -20,6 +21,8 @@
 - `authentication` – microservice for user authentication
 - `config-server` – centralized configuration service
 - `ff-tm-back` – main monolithic application
+- `ff-tm-grpc-api` – shared gRPC API definitions
+- `febfes-commons` – common utilities shared across services
 - `gateway` – API gateway for routing requests
 - `notification` – service for sending notifications via Kafka and SSE
 - `admin-server` – Spring Boot Admin UI service
@@ -93,6 +96,7 @@ flowchart TD
     config <--> monolith
     config <--> notification
 
+    auth -- gRPC --> monolith
     monolith -- "notification events" --> kafka
     kafka --> notification
     monolith -- SSE --> client
