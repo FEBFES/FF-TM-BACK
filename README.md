@@ -37,7 +37,7 @@ All running services register with the Admin UI available at
 ## Running locally (IntelliJ IDEA):
 
 1. Select Spring Boot -> Application
-2. Expand "Modify options" -> select "Shorten command line"  -> expand "Shorten command line" -> select "classpath file"
+2. Expand "Modify options" -> select "Shorten command line" -> expand "Shorten command line" -> select "classpath file"
 3. Copy the following Java VM options at Applications VM options field
 4. "Active profiles" -> dev
 
@@ -68,7 +68,7 @@ build: `docker build . --tag=ff-tm-back:latest -f docker/Dockerfile`
 
 run: `docker run -p 8090:8090 --env-file docker/.env --name ff-tm-back ff-tm-back:latest`
 
-docker-compose: `docker-compose up - d` (from `/docker` folder)
+docker-compose: `docker-compose up -d` (from `/docker` folder)
 
 ## Database scheme
 
