@@ -21,51 +21,58 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class KryoGlobalSerializer implements StreamSerializer<Object> {
+public class KryoSerializer<T> implements StreamSerializer<T> {
 
     private final Kryo kryo = new Kryo();
+    private final Class<T> type;
+    private final int typeId;
 
-    public KryoGlobalSerializer() {
+    public KryoSerializer(Class<T> type, int typeId) {
+        this.type = type;
+        this.typeId = typeId;
+
         kryo.setRegistrationRequired(true);
         // common
         kryo.register(List.class);
         kryo.register(Object[].class);
         kryo.register(SimpleKey.class);
         kryo.register(LocalDateTime.class);
-
+        // custom
         kryo.register(ProjectForUserDto.class);
         kryo.register(ProjectDto.class);
         kryo.register(ProjectEntity.class);
+        kryo.register(RoleEntity.class);
         kryo.register(RoleName.class);
         kryo.register(UserDto.class);
-        kryo.register(RoleEntity.class);
     }
 
     @Override
-    public void write(ObjectDataOutput out, @NonNull Object object) throws IOException {
+    public void write(ObjectDataOutput out, @NonNull T object) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Output output = new Output(baos);
-        kryo.writeClassAndObject(output, object);
+        kryo.writeObject(output, object);
         output.close();
+
         byte[] bytes = baos.toByteArray();
         out.writeInt(bytes.length);
         out.write(bytes);
     }
 
     @Override
-    public @NonNull Object read(ObjectDataInput in) throws IOException {
+    public @NonNull T read(ObjectDataInput in) throws IOException {
         int length = in.readInt();
         byte[] bytes = new byte[length];
         in.readFully(bytes);
+
         Input input = new Input(new ByteArrayInputStream(bytes));
-        Object obj = kryo.readClassAndObject(input);
+        T obj = kryo.readObject(input, type);
         input.close();
         return obj;
     }
 
     @Override
     public int getTypeId() {
-        return 1;
+        return typeId;
     }
 
     @Override

@@ -3,6 +3,10 @@ databaseChangeLog:
       id: 1
       author: IvanShish
       comment: "Create user table"
+      preConditions:
+        - not:
+            tableExists:
+              tableName: user_entity
       changes:
         - createTable:
             tableName: user_entity

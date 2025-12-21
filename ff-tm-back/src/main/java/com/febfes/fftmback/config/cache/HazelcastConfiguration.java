@@ -1,5 +1,11 @@
 package com.febfes.fftmback.config.cache;
 
+import com.febfes.fftmback.domain.RoleName;
+import com.febfes.fftmback.domain.dao.ProjectEntity;
+import com.febfes.fftmback.domain.dao.RoleEntity;
+import com.febfes.fftmback.dto.ProjectDto;
+import com.febfes.fftmback.dto.ProjectForUserDto;
+import com.febfes.fftmback.dto.UserDto;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -8,12 +14,23 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
 @EnableCaching
 public class HazelcastConfiguration {
 
     @Value("${cache.users.ttl:600}")
     private int usersCacheTtl;
+
+    private static final List<Class<?>> KRYO_TYPES = List.of(
+            UserDto.class,
+            ProjectDto.class,
+            ProjectForUserDto.class,
+            ProjectEntity.class,
+            RoleName.class,
+            RoleEntity.class
+    );
 
     @Bean
     public HazelcastInstance hazelcastInstance() {
@@ -30,12 +47,16 @@ public class HazelcastConfiguration {
         JoinConfig joinConfig = networkConfig.getJoin();
         joinConfig.getMulticastConfig().setEnabled(false);
 
-        // === global-serializer ===
+        // === serializer ===
         SerializationConfig serializationConfig = config.getSerializationConfig();
-        GlobalSerializerConfig globalSerializerConfig = new GlobalSerializerConfig();
-        globalSerializerConfig.setClassName("com.febfes.fftmback.config.cache.KryoGlobalSerializer");
-        globalSerializerConfig.setOverrideJavaSerialization(true);
-        serializationConfig.setGlobalSerializerConfig(globalSerializerConfig);
+        int typeId = 1000;
+        for (Class<?> clazz : KRYO_TYPES) {
+            serializationConfig.addSerializerConfig(
+                    new SerializerConfig()
+                            .setTypeClass(clazz)
+                            .setImplementation(new KryoSerializer<>(clazz, typeId++))
+            );
+        }
 
         // === metrics.management-center.enabled = true ===
         MetricsConfig metricsConfig = config.getMetricsConfig();
